@@ -42,7 +42,6 @@ class Opacity : ObservableObject {
             }
         }
     }
-
 }
 
 struct LaunchScreenView: View {
@@ -112,7 +111,6 @@ struct LaunchScreenView: View {
             image  // Mark 3
         }
     }
-    
 }
 
 class AppDelegate: NSObject, UIApplicationDelegate {
@@ -154,22 +152,28 @@ struct MusicianshipTrainerApp: App {
     var logger = Logger.logger
     static let productionMode = true
     let settings:Settings = Settings.shared
-    var exampleData = ExampleData.sharedExampleData
+    var exampleData:ExampleData
     //product licensed by grade 14Jun23
     //static let root:ContentSection = ContentSection(parent: nil, type: ContentSection.SectionType.none, name: "Grade 1")
-    static let root:ContentSection = ContentSection(parent: nil, name: "", type: "")
+    let rootContentSection:ContentSection = ContentSection(parent: nil, name: "", type: "")
     var launchTimeSecs = 4.5
 
     init() {
         UIDevice.current.beginGeneratingDeviceOrientationNotifications()
         //Playback supposedly gives better playback than play and record. So only set record when needed
         AudioManager.shared.setSession(.playback)
+        if let path = Bundle.main.path(forResource: "GoogleAPI", ofType: "plist") {
+            if let dict = NSDictionary(contentsOfFile: path) { //as? [String: AnyObject] {
+                GoogleAPI.shared = GoogleAPI(bundleDictionary: dict)
+            }
+        }
+        exampleData = ExampleData(sheetName: "ContentSheetID_TEST", rootContentSection: rootContentSection)
     }
     
     func getStartContentSection() -> ContentSection {
         var cs:ContentSection
         //if MusicianshipTrainerApp.productionMode {
-            cs = MusicianshipTrainerApp.root//.subSections[1].subSections[0] //NZMEB, Grade 1
+            cs = rootContentSection//.subSections[1].subSections[0] //NZMEB, Grade 1
         //}
         //else {
             //cs = MusicianshipTrainerApp.root.subSections[1].subSections[0].subSections[0] //NZMEB, Grade 1, practice
@@ -188,7 +192,7 @@ struct MusicianshipTrainerApp: App {
 //                            }
                         }
 
-                        //ContentNavigationView(contentSection: getStartContentSection())
+                        ContentNavigationView(contentSection: getStartContentSection())
                         ///No colour here appears to make a difference. i.e. be visible
                             //.background(Color(red: 0.0, green: 0.7, blue: 0.7))
                             //TODO .tabItem {Label("Exercises", image: "music.note")}

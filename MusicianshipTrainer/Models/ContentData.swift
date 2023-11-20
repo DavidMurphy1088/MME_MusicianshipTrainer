@@ -1,4 +1,6 @@
 import Foundation
+import CommonLibrary
+
 enum QuestionType {
     //intervals
     case intervalVisual
@@ -27,3 +29,4 @@ enum AgeGroup: Int, CaseIterable, Identifiable {
         }
     }
 }
+
