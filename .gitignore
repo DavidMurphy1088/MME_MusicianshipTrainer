@@ -6,8 +6,9 @@
 **/*.wav
 **/*.aif
 
-#all files under directory...
-**/APIKeys/**
+# all files under directory...
+# **/APIKeys/**
+**/GoogleAPI*
 
 ### Firebase ###
 .idea
