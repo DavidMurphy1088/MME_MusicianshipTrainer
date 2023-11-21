@@ -39,38 +39,38 @@ struct ContentTypeView: View {
                     answer: $answer
                 )
             }
-//            if type == "Type_2" {
-//                ClapOrPlayView (
-//                    questionType: QuestionType.rhythmVisualClap,
-//                    contentSection: contentSection,
-//                    answerState: $answerState,
-//                    answer: $answer
-//                )
-//            }
-//            if type == "Type_3" {
-//                ClapOrPlayView (
-//                    questionType: QuestionType.melodyPlay,
-//                    contentSection: contentSection,
-//                    answerState: $answerState,
-//                    answer: $answer
-//                )
-//            }
-//            if type == "Type_4" {
-//                IntervalView(
-//                    questionType: QuestionType.intervalAural,
-//                    contentSection: contentSection,
-//                    answerState: $answerState,
-//                    answer: $answer
-//                )
-//            }
-//            if type == "Type_5" {
-//                ClapOrPlayView (
-//                    questionType: QuestionType.rhythmEchoClap,
-//                    contentSection: contentSection,
-//                    answerState: $answerState,
-//                    answer: $answer
-//                )
-//            }
+            if type == "Type_2" {
+                ClapOrPlayView (
+                    questionType: QuestionType.rhythmVisualClap,
+                    contentSection: contentSection,
+                    answerState: $answerState,
+                    answer: $answer
+                )
+            }
+            if type == "Type_3" {
+                ClapOrPlayView (
+                    questionType: QuestionType.melodyPlay,
+                    contentSection: contentSection,
+                    answerState: $answerState,
+                    answer: $answer
+                )
+            }
+            if type == "Type_4" {
+                IntervalView(
+                    questionType: QuestionType.intervalAural,
+                    contentSection: contentSection,
+                    answerState: $answerState,
+                    answer: $answer
+                )
+            }
+            if type == "Type_5" {
+                ClapOrPlayView (
+                    questionType: QuestionType.rhythmEchoClap,
+                    contentSection: contentSection,
+                    answerState: $answerState,
+                    answer: $answer
+                )
+            }
         }
         .navigationBarHidden(isNavigationHidden())
         .onDisappear() {
@@ -168,7 +168,7 @@ struct ContentSectionHeaderView: View {
         }
         let filename = "Instructions" //instructionContent.contentSectionData.data[0]
         pathSegments.append(Settings.shared.getAgeGroup())
-        googleAPI?.getDocumentByName(pathSegments: pathSegments, name: filename, reportError: false, bypassCache: bypassCache) {status,document in
+        googleAPI.getDocumentByName(pathSegments: pathSegments, name: filename, reportError: false, bypassCache: bypassCache) {status,document in
             if status == .success {
                 self.instructions = document
             }
@@ -180,7 +180,7 @@ struct ContentSectionHeaderView: View {
         var pathSegments = contentSection.getPathAsArray()
         pathSegments.append(Settings.shared.getAgeGroup())
 
-        googleAPI?.getDocumentByName(pathSegments: pathSegments, name: filename, reportError: false, bypassCache: bypassCache) {status,document in
+        googleAPI.getDocumentByName(pathSegments: pathSegments, name: filename, reportError: false, bypassCache: bypassCache) {status,document in
             if status == .success {
                 self.tipsAndTricksExists = true
                 self.tipsAndTricksData = document
@@ -193,7 +193,7 @@ struct ContentSectionHeaderView: View {
         var pathSegments = contentSection.getPathAsArray()
         pathSegments.append(Settings.shared.getAgeGroup())
 
-        googleAPI?.getDocumentByName(pathSegments: pathSegments, name: filename, reportError: false, bypassCache: bypassCache) {status,document in
+        googleAPI.getDocumentByName(pathSegments: pathSegments, name: filename, reportError: false, bypassCache: bypassCache) {status,document in
             if status == .success {
                 self.parentsExists = true
                 self.parentsData = document

@@ -116,8 +116,8 @@ struct ScoreView: View {
         
         //??????????????????????????????
         //score.lineSpacing = UIDevice.current.userInterfaceIdiom == .phone ? 5.0 : 8
-        print("\n👉 👉 setOrientationLineSize \(logCtr) \twidth::", UIScreen.main.bounds.width, "height:", UIScreen.main.bounds.height, "\tline spacing", score.lineSpacing)
-        UIGlobals.showDeviceOrientation()
+//        print("\n👉 👉 setOrientationLineSize \(logCtr) \twidth::", UIScreen.main.bounds.width, "height:", UIScreen.main.bounds.height, "\tline spacing", score.lineSpacing)
+//        UIGlobals.showDeviceOrientation()
         logCtr += 1
     }
     

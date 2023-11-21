@@ -162,12 +162,6 @@ struct MusicianshipTrainerApp: App {
         UIDevice.current.beginGeneratingDeviceOrientationNotifications()
         //Playback supposedly gives better playback than play and record. So only set record when needed
         AudioManager.shared.setSession(.playback)
-        if let path = Bundle.main.path(forResource: "GoogleAPI", ofType: "plist") {
-            if let dict = NSDictionary(contentsOfFile: path) { //as? [String: AnyObject] {
-                GoogleAPI.shared = GoogleAPI(bundleDictionary: dict)
-            }
-        }
-        //exampleData = ExampleData(sheetName: "ContentSheetID_TEST", rootContentSection: rootContentSection)
         exampleData = ExampleData(sheetName: "ContentSheetID", rootContentSection: rootContentSection)
     }
     
