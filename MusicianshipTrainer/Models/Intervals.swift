@@ -1,4 +1,5 @@
 import Foundation
+import CommonLibrary
 
 ///The same pitch difference can be a different interval depending on how its written
 ///e.g. pitch interval 6 can be an augmented 4th or diminished 5th. They are differentiated by the number of notes the interval spans. i.e. how it is written.
