@@ -31,14 +31,14 @@ struct ContentTypeView: View {
         VStack {
             let type = contentSection.type
            
-//            if type == "Type_1" {
-//                IntervalView(
-//                    questionType: QuestionType.intervalVisual,
-//                    contentSection: contentSection,
-//                    answerState: $answerState,
-//                    answer: $answer
-//                )
-//            }
+            if type == "Type_1" {
+                IntervalView(
+                    questionType: QuestionType.intervalVisual,
+                    contentSection: contentSection,
+                    answerState: $answerState,
+                    answer: $answer
+                )
+            }
 //            if type == "Type_2" {
 //                ClapOrPlayView (
 //                    questionType: QuestionType.rhythmVisualClap,

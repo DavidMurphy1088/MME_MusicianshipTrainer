@@ -167,7 +167,8 @@ struct MusicianshipTrainerApp: App {
                 GoogleAPI.shared = GoogleAPI(bundleDictionary: dict)
             }
         }
-        exampleData = ExampleData(sheetName: "ContentSheetID_TEST", rootContentSection: rootContentSection)
+        //exampleData = ExampleData(sheetName: "ContentSheetID_TEST", rootContentSection: rootContentSection)
+        exampleData = ExampleData(sheetName: "ContentSheetID", rootContentSection: rootContentSection)
     }
     
     func getStartContentSection() -> ContentSection {
@@ -195,7 +196,7 @@ struct MusicianshipTrainerApp: App {
                         ContentNavigationView(contentSection: getStartContentSection())
                         ///No colour here appears to make a difference. i.e. be visible
                             //.background(Color(red: 0.0, green: 0.7, blue: 0.7))
-                            //TODO .tabItem {Label("Exercises", image: "music.note")}
+                            //.tabItem {Label("Exercises", image: "music.note")}
                     }
                     else {
                         if exampleData.dataStatus == RequestStatus.waiting {
