@@ -42,8 +42,13 @@ struct ConfigurationView: View {
                     Circle()
                         .fill(settings.colorBackground)
                         .frame(width: colorCircleSize, height: colorCircleSize)
-                    
-                    ColorPicker("Background\nSelect a Colour", selection: $settings.colorBackground, supportsOpacity: false)
+                    if UIDevice.current.userInterfaceIdiom == .pad {
+                        ColorPicker("Background\nSelect a Colour", selection: $settings.colorBackground, supportsOpacity: false)
+                    }
+                    else {
+                        Text("Background").font(.caption)
+                        ColorPicker("", selection: $settings.colorBackground, supportsOpacity: false)
+                    }
                     
                     Button("Reset") {
                         DispatchQueue.main.async {
@@ -57,9 +62,13 @@ struct ConfigurationView: View {
                     Circle()
                         .fill(settings.colorScore)
                         .frame(width: colorCircleSize, height: colorCircleSize)
-                    
-                    ColorPicker("Score\nSelect a Colour", selection: $settings.colorScore, supportsOpacity: false)
-                    
+                    if UIDevice.current.userInterfaceIdiom == .pad {
+                        ColorPicker("Score\nSelect a Colour", selection: $settings.colorScore, supportsOpacity: false)
+                    }
+                    else {
+                        Text("Score").font(.caption)
+                        ColorPicker("", selection: $settings.colorScore, supportsOpacity: false)
+                    }
                     Button("Reset") {
                         DispatchQueue.main.async {
                             settings.colorScore = UIGlobals.colorScoreDefault
@@ -72,9 +81,13 @@ struct ConfigurationView: View {
                     Circle()
                         .fill(settings.colorInstructions)
                         .frame(width: colorCircleSize, height: colorCircleSize)
-                    
-                    ColorPicker("Instructions\nSelect a Colour", selection: $settings.colorInstructions, supportsOpacity: false)
-
+                    if UIDevice.current.userInterfaceIdiom == .pad {
+                        ColorPicker("Instructions\nSelect a Colour", selection: $settings.colorInstructions, supportsOpacity: false)
+                    }
+                    else {
+                        Text("Instructions").font(.caption)
+                        ColorPicker("", selection: $settings.colorInstructions, supportsOpacity: false)
+                    }
                     Button("Reset") {
                         DispatchQueue.main.async {
                             settings.colorInstructions = UIGlobals.colorInstructionsDefault

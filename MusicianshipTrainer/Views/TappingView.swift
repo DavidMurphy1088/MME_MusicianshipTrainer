@@ -92,10 +92,10 @@ struct TappingView: View {
                             ///iPhone seems to generate 4-6 notifictions on each tap. Maybe since this is a gesture?
                             ///So drop the notifictions that are too close together. < 0.10 seconds
                             var doTap = false
-                            if UIDevice.current.userInterfaceIdiom == .pad {
-                                doTap = true
-                            }
-                            else {
+//                            if UIDevice.current.userInterfaceIdiom == .pad {
+//                                doTap = true
+//                            }
+//                            else {
                                 if let lastTime = lastGestureTime {
                                     let diff = gesture.time.timeIntervalSince(lastTime)
                                     if diff > 0.20 {
@@ -107,7 +107,7 @@ struct TappingView: View {
                                     doTap = true
                                 }
                                 
-                            }
+                            //}
                             if doTap {
                                 self.lastGestureTime = gesture.time
                                 invert.switchBorder()

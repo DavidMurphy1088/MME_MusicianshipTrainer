@@ -114,7 +114,9 @@ struct IntervalPresentView: View { //}, QuestionPartProtocol {
                 let note = timeSlice.getTimeSliceNotes()[0]
                 intervalNotes.append(note)
                 if let chord = chord {
-                    chord.addNote(note: Note(timeSlice: timeSlice, num: note.midiNumber, value:2, staffNum: note.staffNum))
+                    let chordNote = Note(timeSlice: timeSlice, num: note.midiNumber, value:2, staffNum: note.staffNum)
+                    chordNote.accidental = note.accidental
+                    chord.addNote(note: chordNote)
                 }
             }
         }

@@ -87,7 +87,8 @@ struct ClapOrPlayPresentView: View {
     @State var examInstructionsNarrated = false
     @State private var rhythmTolerancePercent: Double = 50
     @State private var originalScore:Score?
-    
+    @State var isToleranceHelpPresented:Bool = false
+
     @State private var startWasShortended = false
     @State private var endWasShortended = false
     @State private var rhythmWasSimplified = false
@@ -202,7 +203,7 @@ struct ClapOrPlayPresentView: View {
         }
 //        .frame(width: UIScreen.main.bounds.width * 0.9, alignment: .leading)
         ///Limit the size of the scroller since otherwise it takes as much height as it can
-        .frame(height: UIScreen.main.bounds.height * 0.20)
+        .frame(height: UIScreen.main.bounds.height * 0.10)
         .overlay(
             RoundedRectangle(cornerRadius: UIGlobals.cornerRadius).stroke(Color(UIGlobals.borderColor), lineWidth: UIGlobals.borderLineWidth)
         )
@@ -382,7 +383,7 @@ struct ClapOrPlayPresentView: View {
     }
     
     func getToleranceLabel(_ setting:Double) -> String {
-        var name = UIDevice.current.userInterfaceIdiom == .pad ? "Rhythm Tolerance:" : "Tolerance:"
+        var name = UIDevice.current.userInterfaceIdiom == .pad ? "Rhythm Tolerance:" : "Tolerance"
         //if UIDevice.current.userInterfaceIdiom == .pad {
         var grade:String? = nil
         while grade == nil {
@@ -430,8 +431,23 @@ struct ClapOrPlayPresentView: View {
     
     func setRhythmTolerance() -> some View {
         HStack {
-            HStack {
-                Text(getToleranceLabel(rhythmTolerancePercent)).defaultTextStyle()
+            VStack {
+                HStack {
+                    Text(getToleranceLabel(rhythmTolerancePercent)).defaultTextStyle()
+                    Button(action: {
+                        self.isToleranceHelpPresented = true
+                    }) {
+                        Image(systemName: "questionmark.circle")
+                            .font(UIDevice.current.userInterfaceIdiom == .pad ? .largeTitle : .title3)
+                    }
+                }
+                .sheet(isPresented: $isToleranceHelpPresented) {
+                    VStack {
+                        Text("Rhythm Matching Tolerance").font(.title).foregroundColor(.blue).padding()
+                        Text("The rhythm tolerance setting affects how precisely the tapped rhythm is measured for correctness.").padding()
+                        Text("Lower values of tolerance will make it harder to tap a correct rhythm and higher values will make it easier.").padding()
+                    }
+                }
                 Slider(value: $rhythmTolerancePercent, in: 20...60).padding(.horizontal, UIDevice.current.userInterfaceIdiom == .pad ? 50 : 4)
             }
             .onChange(of: rhythmTolerancePercent) { newValue in
@@ -446,7 +462,7 @@ struct ClapOrPlayPresentView: View {
                 RoundedRectangle(cornerRadius: UIGlobals.cornerRadius).stroke(Color(UIGlobals.borderColor), lineWidth: UIGlobals.borderLineWidth)
             )
             .background(Settings.shared.colorScore)
-            .padding()
+            //.padding()
         }
     }
     
@@ -475,14 +491,17 @@ struct ClapOrPlayPresentView: View {
             }
             if let originalScore = originalScore {
                 if score.getBarCount() != originalScore.getBarCount() {
-                    Button(action: {
-                        score.copyEntries(from: originalScore)
-                        self.endWasShortended = false
-                        self.startWasShortended = false
-                    }) {
-                        hintButtonView("Put Back The Question Rhythm", selected: false)
+                    if UIDevice.current.userInterfaceIdiom == .pad {
+                        //This button just cant fit on iPhone display
+                        Button(action: {
+                            score.copyEntries(from: originalScore)
+                            self.endWasShortended = false
+                            self.startWasShortended = false
+                        }) {
+                            hintButtonView("Put Back The Question Rhythm", selected: false)
+                        }
+                        .padding()
                     }
-                    .padding()
                 }
             }
         }
@@ -520,7 +539,7 @@ struct ClapOrPlayPresentView: View {
                 ///Option for editing the rhythm and restoring the rhythm to the original if the rhythm was edited
                 if answerState != .recording {
                     if contentSection.getExamTakingStatus() != .inExam {
-                        VStack {
+                        HStack {
                             if questionType == .rhythmVisualClap {
                                 if score.getBarCount() > 1 {
                                     //HStack {
@@ -535,15 +554,17 @@ struct ClapOrPlayPresentView: View {
                                     }
                                     if let originalScore = originalScore {
                                         if score.getBarCount() != originalScore.getBarCount() {
-                                            Button(action: {
-                                                score.barLayoutPositions = BarLayoutPositions()
-                                                score.copyEntries(from: originalScore)
-                                                self.rhythmWasSimplified = false
-                                            }) {
-                                                hintButtonView("Put Back The Question Rhythm", selected: false)
-                                                //Text("Put Back The Question Rhythm").submitAnswerButtonStyle()
+                                            if UIDevice.current.userInterfaceIdiom == .pad {
+                                                //This button just cant fit on iPhone display                                                
+                                                Button(action: {
+                                                    score.barLayoutPositions = BarLayoutPositions()
+                                                    score.copyEntries(from: originalScore)
+                                                    self.rhythmWasSimplified = false
+                                                }) {
+                                                    hintButtonView("Put Back The Question Rhythm", selected: false)
+                                                }
+                                                .padding()
                                             }
-                                            .padding()
                                         }
                                     }
                                     //}
@@ -563,16 +584,16 @@ struct ClapOrPlayPresentView: View {
                     }
                 }
                 
-                VStack {
+                if UIDevice.current.userInterfaceIdiom == .pad {
+                    if UIDevice.current.orientation.isPortrait {
+                        //if UIGlobals.showDeviceOrientation() {
+                            instructionView()
+                        //}
+                    }
+                }
+                
+                HStack {
                     if answerState != .recording {
-//                        if contentSection.getExamTakingStatus() == .inExam {
-//                            Text(examInstructionsStartedStatus).font(.title).padding()
-//                        }
-//                        else {
-                            if UIDevice.current.userInterfaceIdiom == .pad {
-                                instructionView()
-                            }
-//                        }
                         buttonsView()
                         Text(" ")
                         if contentSection.getExamTakingStatus() == .inExam {
@@ -608,17 +629,10 @@ struct ClapOrPlayPresentView: View {
                                     }
                                 }
                             }
-                        
-                            TappingView(isRecording: $isTapping, tapRecorder: tapRecorder, onDone: {
-                                answerState = .recorded
-                                self.isTapping = false
-                                answer.values = self.tapRecorder.stopRecording(score:score)
-                                isTapping = false
-                            })
-                        }
-
-                    }
                     
+                        }
+                    }
+
                     if questionType == .melodyPlay {
                         if answerState == .recording {
                             Button(action: {
@@ -632,26 +646,39 @@ struct ClapOrPlayPresentView: View {
                             .padding()
                         }
                     }
-                    if log() {
-                        if answerState == .recorded {
-                            HStack {
-                                Button(action: {
-                                    answerState = .submittedAnswer
-                                    if questionType == .melodyPlay {
-                                        answer.correct = true
-                                    }
-                                    else {
-                                        answer.correct = rhythmIsCorrect()
-                                    }
-                                    score.setHiddenStaff(num: 1, isHidden: false)
-                                }) {
-                                    Text(nextStepText()).submitAnswerButtonStyle()
-                                }
-                                .padding()
-                            }
-                        }
+                }
+                
+                if questionType == .rhythmVisualClap || questionType == .rhythmEchoClap {
+                    if answerState == .recording {
+                        TappingView(isRecording: $isTapping, tapRecorder: tapRecorder, onDone: {
+                            answerState = .recorded
+                            self.isTapping = false
+                            answer.values = self.tapRecorder.stopRecording(score:score)
+                            isTapping = false
+                        })
                     }
+                }
+                
+                //Check answer
+                if answerState == .recorded {
+                    HStack {
+                        Button(action: {
+                            answerState = .submittedAnswer
+                            if questionType == .melodyPlay {
+                                answer.correct = true
+                            }
+                            else {
+                                answer.correct = rhythmIsCorrect()
+                            }
+                            score.setHiddenStaff(num: 1, isHidden: false)
+                        }) {
+                            Text(nextStepText()).submitAnswerButtonStyle()
+                        }
+                        .padding()
+                    }
+                }
             }
+            .font(.system(size: UIDevice.current.userInterfaceIdiom == .phone ? UIFont.systemFontSize : UIFont.systemFontSize * 1.6))
             .onAppear() {
                 examInstructionsNarrated = false
                 if contentSection.getExamTakingStatus() == .inExam {
@@ -680,8 +707,6 @@ struct ClapOrPlayPresentView: View {
                 self.audioRecorder.stopPlaying()
                 //self.metronome.stopPlayingScore()
             }
-        }
-        .font(.system(size: UIDevice.current.userInterfaceIdiom == .phone ? UIFont.systemFontSize : UIFont.systemFontSize * 1.6))
         )
     }
 }

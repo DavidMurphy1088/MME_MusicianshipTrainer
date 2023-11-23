@@ -688,40 +688,44 @@ struct ExamView: View {
                 if self.answerState == .submittedAnswer {
                     Spacer()
                     if sectionIndex < contentSections.count - 1 {
-                        Text("Completed question \(sectionIndex+1) of \(contentSections.count)").defaultTextStyle().padding()
-                        Button(action: {
-                            contentSections[sectionIndex].setStoredAnswer(answer: answer.copyAnwser(), ctx: "")
-                            contentSections[sectionIndex].saveAnswerToFile(answer: answer.copyAnwser())
-                            answerState = .notEverAnswered
-                            sectionIndex += 1
-                        }) {
-                            VStack {
-                                Text("Next Exam Question").defaultButtonStyle()
-                            }
-                        }
-                        .padding()
-                        Spacer()
-                        Button(action: {
-                            showingConfirm = true
-                        }) {
-                            VStack {
-                                Text("Exit Exam").defaultButtonStyle().padding()
-                            }
-                        }
-                        .alert(isPresented: $showingConfirm) {
-                            Alert(title: Text("Are you sure?"),
-                                  message: Text("You cannot restart an exam you exit from"),
-                                  primaryButton: .destructive(Text("Yes, I'm sure")) {
-                                for s in contentSections {
-                                    let answer = Answer()
-                                    s.setStoredAnswer(answer: answer, ctx: "")
-                                    s.saveAnswerToFile(answer: answer)
+                        VStack {
+                            Spacer()
+                            Text("Completed question \(sectionIndex+1) of \(contentSections.count)").defaultTextStyle().padding()
+                            Button(action: {
+                                contentSections[sectionIndex].setStoredAnswer(answer: answer.copyAnwser(), ctx: "")
+                                contentSections[sectionIndex].saveAnswerToFile(answer: answer.copyAnwser())
+                                answerState = .notEverAnswered
+                                sectionIndex += 1
+                            }) {
+                                VStack {
+                                    Text("Next Exam Question").defaultButtonStyle()
                                 }
-                                presentationMode.wrappedValue.dismiss()
-                            }, secondaryButton: .cancel())
+                            }
+                            
+                            Spacer()
+                            
+                            Button(action: {
+                                showingConfirm = true
+                            }) {
+                                HStack {
+                                    Spacer()
+                                    Text("Exit Exam").defaultButtonStyle().padding()
+                                }
+                            }
+                            .alert(isPresented: $showingConfirm) {
+                                Alert(title: Text("Are you sure?"),
+                                      message: Text("You cannot restart an exam you exit from"),
+                                      primaryButton: .destructive(Text("Yes, I'm sure")) {
+                                    for s in contentSections {
+                                        let answer = Answer()
+                                        s.setStoredAnswer(answer: answer, ctx: "")
+                                        s.saveAnswerToFile(answer: answer)
+                                    }
+                                    presentationMode.wrappedValue.dismiss()
+                                }, secondaryButton: .cancel())
+                            }
+                            .padding()
                         }
-                        
-                        .padding()
                     }
                     else {
                         Spacer()
@@ -732,7 +736,7 @@ struct ExamView: View {
                             contentSection.questionStatus.setStatus(1)
                             presentationMode.wrappedValue.dismiss()
                         }) {
-                            Text("End of Exam").defaultButtonStyle()
+                            Text("Submit Your Exam").defaultButtonStyle()
                         }
                         Spacer()
                     }
