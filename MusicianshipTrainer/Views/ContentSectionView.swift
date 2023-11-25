@@ -403,7 +403,7 @@ struct SectionsNavigationView:View {
         func msg(contentSection:ContentSection) -> String {
             var s = ""
             guard let answer = contentSection.storedAnswer else {
-                return "This is homework to do."
+                return "This is homework to do"
             }
             if answer.correct {
                 s = "Homework done - Good Job!"
@@ -430,7 +430,7 @@ struct SectionsNavigationView:View {
         
         var body: some View {
             VStack(spacing: 20) {
-                Text("Homework for week of Monday 6th")
+                Text("Homework for week of Monday 27th")
                     .font(.title)
                 Image("homework_girl_transparent")
                     .resizable()
@@ -439,7 +439,7 @@ struct SectionsNavigationView:View {
                     .padding()
                     .padding()
 
-                Text(msg(contentSection:contentSection)).foregroundColor(getColor(contentSection: contentSection)).font(.title3)
+                Text(msg(contentSection:contentSection)).foregroundColor(getColor(contentSection: contentSection)).font(.title)
                 Text("")
                 Button("Dismiss") {
                     presentationMode.wrappedValue.dismiss()
@@ -481,8 +481,8 @@ struct SectionsNavigationView:View {
     struct HomeworkStatusIconView:View {
         @ObservedObject var contentSection:ContentSection
         var body: some View {
-            VStack {
-                //Text("\(contentSection.storedAnswer == nil ? 0 : 1)")
+            HStack {
+                Text("Homework:").padding(.vertical)
                 if let rowImage = contentSection.getGradeImage() {
                     rowImage
                         .resizable()
@@ -540,7 +540,6 @@ struct SectionsNavigationView:View {
                                             //Show correct answer icon for a homework question
                                             HStack {
                                                 Spacer()
-                                                Text("                         ").font(.system(size: 18, weight: .regular, design: .monospaced))
                                                 Button(action: {
                                                     homeworkIndex = index
                                                     showHomework.toggle()
@@ -549,11 +548,9 @@ struct SectionsNavigationView:View {
                                                 }
                                                 .buttonStyle(BorderlessButtonStyle())
                                                 .sheet(isPresented: $showHomework) {
-                                                    //if let index = homeworkIndex {
-                                                        HomeworkView(contentSection: contentSections[index])
-                                                    //}
+                                                    HomeworkView(contentSection: contentSections[index])
                                                 }
-                                                Spacer()
+                                                Text("        ").font(.system(size: 18, weight: .regular, design: .monospaced))
                                             }
                                         }
                                     }

@@ -150,21 +150,20 @@ struct SetHomeworkView: View {
                 }
             }
         //}
-        VStack {
-            Button(action: {
-                status = "Set Examples"
-            }) {
-                VStack {
-                    
-                    Text("Set Homework Examples")
-                        .font(.title)
-                        .padding()
-                    
-                }
-                .padding()
-            }
-            Text(status)
-        }
+//        VStack {
+//            Button(action: {
+//                status = "Set Examples"
+//            }) {
+//                VStack {
+//                    Text("Set Homework Examples")
+//                        .font(.title)
+//                        .padding()
+//
+//                }
+//                .padding()
+//            }
+//            Text(status)
+//        }
     }
 }
 
