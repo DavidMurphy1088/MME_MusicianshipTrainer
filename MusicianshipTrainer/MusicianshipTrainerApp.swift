@@ -161,8 +161,10 @@ struct MusicianshipTrainerApp: App {
     init() {
         UIDevice.current.beginGeneratingDeviceOrientationNotifications()
         //Playback supposedly gives better playback than play and record. So only set record when needed
+        let settings = Settings.shared
+        let content = settings.useTestData ? "ContentSheetID_TEST" : "ContentSheetID"
         AudioManager.shared.setSession(.playback)
-        exampleData = ExampleData(sheetName: "ContentSheetID", rootContentSection: rootContentSection)
+        exampleData = ExampleData(sheetName: content, rootContentSection: rootContentSection)
     }
     
     func getStartContentSection() -> ContentSection {

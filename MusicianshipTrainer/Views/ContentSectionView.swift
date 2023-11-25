@@ -75,7 +75,7 @@ struct ContentTypeView: View {
         .navigationBarHidden(isNavigationHidden())
         .onDisappear() {
             AudioRecorder.shared.stopPlaying()
-            if UIGlobals.companionAppActive {
+            if Settings.shared.companionOn {
                 if contentSection.homeworkIsAssigned {
                     contentSection.setStoredAnswer(answer: answer.copyAnwser(), ctx: "ContentTypeView DISAPPEAR")
                     contentSection.saveAnswerToFile(answer: answer.copyAnwser())
@@ -318,7 +318,7 @@ struct ContentSectionHeaderView: View {
                         }
                     }
                 }
-                if UIGlobals.companionAppActive {
+                if Settings.shared.companionOn {
                     if contentSection.getPathAsArray().count == 2 {
                         Spacer()
                         Button(action: {
@@ -386,60 +386,17 @@ struct SectionsNavigationView:View {
     @State var homeworkIndex:Int?
     @State var showHomework = false
     
-    func getGradeImage(contentSection: ContentSection) -> Image? {
-        var name = ""
-        if contentSection.isExamTypeContentSection() {
-            //test section group header
-            if !contentSection.hasStoredAnswers() {
-                return nil
-            }
-            else {
-                if getScore(contentSection: contentSection) == contentSection.getNavigableChildSections().count {
-                    name = "checkmark_ok" //grade_a"
-                }
-                else {
-                    name = "checkmark_ok" //grade_b"
-                }
-            }
-        }
-        else {
-            //individual tests
-            if !contentSection.homeworkIsAssigned {
-                return nil
-            }
-            else {
-                if let answer = contentSection.storedAnswer {
-                    if answer.correct {
-                        name = "grade_a"
-                    }
-                    else {
-                        name = "grade_b"
-                    }
-                }
-                else {
-                    name = "todo_transparent"
-                }
-            }
-        }
-        var image:Image
-        image = Image(name)
-        return image
+    func log(cs:ContentSection) -> String {
+//        print("🤢 ===================== SectionsNavigationView [", cs.getPath(),
+//              //"]  ISCS", cs.isExamTypeContentSection(), "Stored", cs.hasStoredAnswers(),
+////              "child", cs.hasExamModeChildren(),
+//              "HOMEWORK", contentSection.homeworkIsAssigned
+//        )
+        return ""
     }
-
-    func getScore(contentSection: ContentSection) -> Int {
-        var score = 0
-        for s in contentSection.getNavigableChildSections() {
-            if let answer = s.storedAnswer {
-                if answer.correct {
-                    score += 1
-                }
-            }
-        }
-        return score
-    }
-
+    
     struct HomeworkView: View {
-        let contentSection:ContentSection
+        @ObservedObject var contentSection:ContentSection
         @Environment(\.presentationMode) var presentationMode
         //@State var setHomework = false
         
@@ -482,7 +439,7 @@ struct SectionsNavigationView:View {
                     .padding()
                     .padding()
 
-                Text(msg(contentSection:contentSection)).foregroundColor(getColor(contentSection: contentSection)).font(.title)
+                Text(msg(contentSection:contentSection)).foregroundColor(getColor(contentSection: contentSection)).font(.title3)
                 Text("")
                 Button("Dismiss") {
                     presentationMode.wrappedValue.dismiss()
@@ -520,6 +477,23 @@ struct SectionsNavigationView:View {
 //        return ""
 //    }
     
+    ///Need to be separate View to force the image to change immediately after answer is made
+    struct HomeworkStatusIconView:View {
+        @ObservedObject var contentSection:ContentSection
+        var body: some View {
+            VStack {
+                //Text("\(contentSection.storedAnswer == nil ? 0 : 1)")
+                if let rowImage = contentSection.getGradeImage() {
+                    rowImage
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 40.0)
+                }
+            }
+        }
+    }
+    
+    ///The list of examples. The navigation link takes the user  to the specific question next
     var body: some View {
         VStack {
             let contentSections = contentSection.getNavigableChildSections()
@@ -528,6 +502,7 @@ struct SectionsNavigationView:View {
                 List(Array(contentSections.indices), id: \.self) { index in
                     ///selection: A bound variable that causes the link to present `destination` when `selection` becomes equal to `tag`
                     ///tag: The value of `selection` that causes the link to present `destination`..
+                    
                     NavigationLink(destination:
                                     ContentSectionView(contentSection: contentSections[index]),
                                    tag: index,
@@ -535,6 +510,7 @@ struct SectionsNavigationView:View {
                                    //selection: $selectedIndex
                                    //selection: $navigationManager.selectedIndex
                     ) {
+                        //let log = log(cs:contentSections[index])
                         ZStack {
                             HStack {
                                 ZStack {
@@ -548,7 +524,7 @@ struct SectionsNavigationView:View {
                                     //let homeworkStatus = log()
                                     if !contentSections[index].homeworkIsAssigned {
                                         //Show correct answer icon for an exam question
-                                        if let rowImage = getGradeImage(contentSection: contentSections[index]) {
+                                        if let rowImage = contentSections[index].getGradeImage() {
                                             HStack {
                                                 Spacer()
                                                 rowImage
@@ -560,33 +536,26 @@ struct SectionsNavigationView:View {
                                         }
                                     }
                                     else {
-                                        if UIGlobals.companionAppActive {
-                                            //if homeworkStatus != .notAssigned {
-                                                //Show correct answer icon for a homework question
-                                                HStack {
-                                                    Spacer()
-                                                    Text("                         ").font(.system(size: 18, weight: .regular, design: .monospaced))
-                                                    Button(action: {
-                                                        homeworkIndex = index
-                                                        showHomework.toggle()
-                                                    }) {
-                                                        if let rowImage = getGradeImage(contentSection: contentSections[index]) {
-                                                            rowImage
-                                                            .resizable()
-                                                            .scaledToFit()
-                                                            .frame(width: 40.0)
-                                                        }
-                                                    }
-                                                    .buttonStyle(BorderlessButtonStyle())
-                                                    .sheet(isPresented: $showHomework) {
-                                                        if let index = homeworkIndex {
-                                                            HomeworkView(contentSection: contentSections[index])
-                                                        }
-                                                    }
-                                                    Spacer()
+                                        if Settings.shared.companionOn {
+                                            //Show correct answer icon for a homework question
+                                            HStack {
+                                                Spacer()
+                                                Text("                         ").font(.system(size: 18, weight: .regular, design: .monospaced))
+                                                Button(action: {
+                                                    homeworkIndex = index
+                                                    showHomework.toggle()
+                                                }) {
+                                                    HomeworkStatusIconView(contentSection: contentSections[index])
                                                 }
-
+                                                .buttonStyle(BorderlessButtonStyle())
+                                                .sheet(isPresented: $showHomework) {
+                                                    //if let index = homeworkIndex {
+                                                        HomeworkView(contentSection: contentSections[index])
+                                                    //}
+                                                }
+                                                Spacer()
                                             }
+                                        }
                                     }
                                 }
                             }
@@ -797,12 +766,6 @@ struct ContentSectionView: View {
         self.contentSection = contentSection
     }
     
-//    func log(cs:ContentSection) -> String {
-//        print("=====================ContentSectionView [", cs.getPath(), "]  ISCS", cs.isExamTypeContentSection(), "Stored", cs.hasStoredAnswers(),
-//              "child", cs.hasExamModeChildren())
-//        return ""
-//    }
-    
     var body: some View {
         VStack {
             if contentSection.getNavigableChildSections().count > 0 {
@@ -844,7 +807,7 @@ struct ContentSectionView: View {
                                 answerState: $answerState,
                                 answer: $answer)
                 .onDisappear() {
-                    if UIGlobals.companionAppActive {
+                    if Settings.shared.companionOn {
                         if contentSection.homeworkIsAssigned {
                             contentSection.setStoredAnswer(answer: answer.copyAnwser(), ctx: "ContentSectionView DISAPPEAR")
                             contentSection.saveAnswerToFile(answer: answer.copyAnwser())
@@ -864,12 +827,12 @@ struct ContentSectionView: View {
         }
         .onDisappear() {
             AudioRecorder.shared.stopPlaying()
-//            if UIGlobals.companionAppActive {
+            if Settings.shared.companionOn {
 //                if [.doneCorrect, .doneError].contains(contentSection.getHomework()) {
 //                    contentSection.setStoredAnswer(answer: answer.copyAnwser())
 //                    contentSection.saveAnswerToFile(answer: answer.copyAnwser())
 //                }
-//            }
+            }
         }
         .navigationBarTitle(contentSection.getTitle(), displayMode: .inline)//.font(.title)
         .toolbar {

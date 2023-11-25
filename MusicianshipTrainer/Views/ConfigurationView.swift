@@ -25,7 +25,6 @@ struct LogView: View {
 struct ConfigurationView: View {
     @Binding var isPresented: Bool
     @ObservedObject var settings:Settings
-    //let ages = ["5-10", "11Plus"]
     let colorCircleSize = 60.0
     
     var body: some View {
@@ -101,7 +100,7 @@ struct ConfigurationView: View {
             VStack {
                 HStack {
                     HStack {
-                        Text("Select Your Age Group")
+                        Text("Age Group")
                         ConfigSelectAgeMode(selectedIndex: $settings.ageGroup)
                     }
                     .onAppear {
@@ -122,7 +121,7 @@ struct ConfigurationView: View {
                     }) {
                         HStack {
                             Image(systemName: settings.useAnimations ? "checkmark.square" : "square")
-                            Text("Show Animations for Answers")
+                            Text("Animated Answers")
                         }
                     }
                     .padding()
@@ -137,7 +136,7 @@ struct ConfigurationView: View {
                         HStack {
                             Image(systemName: settings.soundOnTaps ? "checkmark.square" : "square")
                             //let x = settings.soundOnTaps ? 0 : 1
-                            Text("Drum Sound On For Rhythm Tests")
+                            Text("Sound For Tapping")
                         }
                     }
                     .padding()
@@ -163,7 +162,7 @@ struct ConfigurationView: View {
                     }) {
                         HStack {
                             Image(systemName: settings.showReloadHTMLButton ? "checkmark.square" : "square")
-                            Text("Show Reload HTML Button")
+                            Text("Reload HTML Button")
                         }
                     }
                     .padding()
@@ -176,6 +175,18 @@ struct ConfigurationView: View {
                         HStack {
                             Image(systemName: settings.useTestData ? "checkmark.square" : "square")
                             Text("Use Test Data")
+                        }
+                    }
+                    .padding()
+                    
+                    Button(action: {
+                        DispatchQueue.main.async {
+                            settings.companionOn.toggle()
+                        }
+                    }) {
+                        HStack {
+                            Image(systemName: settings.companionOn ? "checkmark.square" : "square")
+                            Text("Companion On")
                         }
                     }
                     .padding()

@@ -445,7 +445,7 @@ struct ClapOrPlayPresentView: View {
                     VStack {
                         Text("Rhythm Matching Tolerance").font(.title).foregroundColor(.blue).padding()
                         Text("The rhythm tolerance setting affects how precisely the tapped rhythm is measured for correctness.").padding()
-                        Text("Lower values of tolerance will make it harder to tap a correct rhythm and higher values will make it easier.").padding()
+                        Text("Lower values of tolerance require more precise tapping to have a correct rhythm. Higher values require less precise tapping.").padding()
                     }
                 }
                 Slider(value: $rhythmTolerancePercent, in: 20...60).padding(.horizontal, UIDevice.current.userInterfaceIdiom == .pad ? 50 : 4)
