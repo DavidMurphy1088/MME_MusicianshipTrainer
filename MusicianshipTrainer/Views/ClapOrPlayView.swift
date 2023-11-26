@@ -387,35 +387,35 @@ struct ClapOrPlayPresentView: View {
         //if UIDevice.current.userInterfaceIdiom == .pad {
         var grade:String? = nil
         while grade == nil {
-            if setting < 25.0 {
+            if setting < 35.0 {
                 grade = "A+"
                 break
             }
-            if setting < 30.0 {
+            if setting < 40.0 {
                 grade = "A"
                 break
             }
-            if setting < 35.0 {
+            if setting < 45.0 {
                 grade = "A-"
                 break
             }
-            if setting < 40.0 {
+            if setting < 50.0 {
                 grade = "B+"
                 break
             }
-            if setting < 45.0 {
+            if setting < 55.0 {
                 grade = "B"
                 break
             }
-            if setting < 50.0 {
+            if setting < 60.0 {
                 grade = "B-"
                 break
             }
-            if setting < 55.0 {
+            if setting < 65.0 {
                 grade = "C+"
                 break
             }
-            if setting <= 60.0 {
+            if setting <= 70.0 {
                 grade = "C"
                 break
             }
@@ -424,12 +424,12 @@ struct ClapOrPlayPresentView: View {
         if let grade = grade {
             name += " " + grade
         }
-        let percent = " " + String(format: "%.0f", setting) + "%"
-        name += percent
+        //let percent = " " + String(format: "%.0f", setting) + "%"
+        //name += percent
         return name
     }
     
-    func setRhythmTolerance() -> some View {
+    func setRhythmToleranceView() -> some View {
         HStack {
             VStack {
                 HStack {
@@ -448,10 +448,10 @@ struct ClapOrPlayPresentView: View {
                         Text("Lower values of tolerance require more precise tapping to have a correct rhythm. Higher values require less precise tapping.").padding()
                     }
                 }
-                Slider(value: $rhythmTolerancePercent, in: 20...60).padding(.horizontal, UIDevice.current.userInterfaceIdiom == .pad ? 50 : 4)
+                Slider(value: $rhythmTolerancePercent, in: 30...70).padding(.horizontal, UIDevice.current.userInterfaceIdiom == .pad ? 50 : 4)
             }
             .onChange(of: rhythmTolerancePercent) { newValue in
-                let allowedValues = [20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70]
+                let allowedValues = [30, 35, 40, 45, 50, 55, 60, 65, 70]
                 let sortedValues = allowedValues.sorted()
                 let closest = sortedValues.min(by: { abs($0 - Int(newValue)) < abs($1 - Int(newValue)) })
                 UIGlobals.rhythmTolerancePercent = Double(closest ?? Int(newValue))//newValue
@@ -462,7 +462,7 @@ struct ClapOrPlayPresentView: View {
                 RoundedRectangle(cornerRadius: UIGlobals.cornerRadius).stroke(Color(UIGlobals.borderColor), lineWidth: UIGlobals.borderLineWidth)
             )
             .background(Settings.shared.colorScore)
-            //.padding()
+            .padding()
         }
     }
     
@@ -571,7 +571,7 @@ struct ClapOrPlayPresentView: View {
                                 }
                             }
                             if questionType != .melodyPlay {
-                                setRhythmTolerance()
+                                setRhythmToleranceView()
                             }
                         }
                     }
