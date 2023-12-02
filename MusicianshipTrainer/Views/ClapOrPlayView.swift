@@ -444,8 +444,8 @@ struct ClapOrPlayPresentView: View {
                 .sheet(isPresented: $isToleranceHelpPresented) {
                     VStack {
                         Text("Rhythm Matching Tolerance").font(.title).foregroundColor(.blue).padding()
-                        Text("The rhythm tolerance setting affects how precisely the tapped rhythm is measured for correctness.").padding()
-                        Text("Lower values of tolerance require more precise tapping to have a correct rhythm. Higher values require less precise tapping.").padding()
+                        Text("The rhythm tolerance setting affects how precisely your tapped rhythm is measured for correctness.").padding()
+                        Text("Higher grades of tolerance require more precise tapping to achieve a correct rhythm. Lower grades require less precise tapping.").padding()
                     }
                 }
                 Slider(value: $rhythmTolerancePercent, in: 30...70).padding(.horizontal, UIDevice.current.userInterfaceIdiom == .pad ? 50 : 4)
@@ -467,7 +467,7 @@ struct ClapOrPlayPresentView: View {
     }
     
     func showEditButtons() -> some View {
-        HStack {
+        VStack {
             if score.getBarCount() > 1 {
                 ///Enable bar manager to edit out bars in the given rhythm
                 Button(action: {
@@ -521,12 +521,12 @@ struct ClapOrPlayPresentView: View {
                 }
                 else {
                     if UIDevice.current.userInterfaceIdiom != .phone {
-                        if questionType == .melodyPlay || questionType == .rhythmEchoClap {
+                        //if questionType == .melodyPlay || questionType == .rhythmEchoClap {
                             ToolsView(score: score, helpMetronome: helpMetronome())
-                        }
-                        else {
-                            Text(" ")
-                        }
+//                        }
+//                        else {
+//                            Text(" ")
+//                        }
                     }
                 }
 
@@ -570,10 +570,11 @@ struct ClapOrPlayPresentView: View {
                                     //}
                                 }
                             }
-                            if questionType != .melodyPlay {
-                                setRhythmToleranceView()
-                            }
+
                         }
+                    }
+                    if questionType != .melodyPlay {
+                        setRhythmToleranceView()
                     }
                 }
                 
@@ -691,12 +692,12 @@ struct ClapOrPlayPresentView: View {
                 }
 
                 metronome.setTempo(tempo: 90, context: "View init")
-                if questionType == .rhythmEchoClap || questionType == .melodyPlay {
+                //if questionType == .rhythmEchoClap || questionType == .melodyPlay {
                     metronome.setAllowTempoChange(allow: true)
-                }
-                else {
-                    metronome.setAllowTempoChange(allow: false)
-                }
+//                }
+//                else {
+//                    metronome.setAllowTempoChange(allow: false)
+//                }
                 if questionType == .melodyPlay {
                     score.addTriadNotes()
                 }
