@@ -93,6 +93,7 @@ struct ClapOrPlayPresentView: View {
     @State private var endWasShortended = false
     @State private var rhythmWasSimplified = false
     @State var examInstructionsWereNarrated = false
+    @State var countDownTimeLimit:Double = 30.0
 
     var questionType:QuestionType
     let questionTempo = 90
@@ -577,11 +578,10 @@ struct ClapOrPlayPresentView: View {
                         setRhythmToleranceView()
                     }
                 }
-                
-                
+                                
                 if questionType == .melodyPlay {
                     if answerState != .recording {
-                        CountdownTimerView(size: 30.0, timerColor: .blue)
+                        CountdownTimerView(size: 30.0, timerColor: .blue, timeLimit: $countDownTimeLimit, startNotification: {}, endNotification: {})
                     }
                 }
                 
