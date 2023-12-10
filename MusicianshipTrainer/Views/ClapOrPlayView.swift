@@ -581,7 +581,7 @@ struct ClapOrPlayPresentView: View {
                                 
                 if questionType == .melodyPlay {
                     if answerState != .recording {
-                        CountdownTimerView(size: 30.0, timerColor: .blue, timeLimit: $countDownTimeLimit, startNotification: {}, endNotification: {})
+                        CountdownTimerView(size: 50.0, timerColor: .blue, timeLimit: $countDownTimeLimit, startNotification: {}, endNotification: {})
                     }
                 }
                 
