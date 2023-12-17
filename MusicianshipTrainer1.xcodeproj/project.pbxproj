@@ -29,6 +29,7 @@
 		7B3FC9C02B0B62D8004A7987 /* MusicianshipTrainerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B3FC9BF2B0B62D8004A7987 /* MusicianshipTrainerTests.swift */; };
 		7B3FC9CA2B0B62D8004A7987 /* MusicianshipTrainerUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B3FC9C92B0B62D8004A7987 /* MusicianshipTrainerUITests.swift */; };
 		7B3FC9CC2B0B62D8004A7987 /* MusicianshipTrainerUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B3FC9CB2B0B62D8004A7987 /* MusicianshipTrainerUITestsLaunchTests.swift */; };
+		7BA804782B2D05CE007FBE83 /* SightReadingPianoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA804772B2D05CE007FBE83 /* SightReadingPianoView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -74,6 +75,7 @@
 		7B3FC9C52B0B62D8004A7987 /* MusicianshipTrainer1UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MusicianshipTrainer1UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B3FC9C92B0B62D8004A7987 /* MusicianshipTrainerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicianshipTrainerUITests.swift; sourceTree = "<group>"; };
 		7B3FC9CB2B0B62D8004A7987 /* MusicianshipTrainerUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicianshipTrainerUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		7BA804772B2D05CE007FBE83 /* SightReadingPianoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SightReadingPianoView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -115,6 +117,7 @@
 				7B1815D32B0C289A000418CB /* MelodyScoreView.swift */,
 				7B1815B52B0BF47A000418CB /* SetHomeworkView.swift */,
 				7B1815DF2B0CADA8000418CB /* TappingView.swift */,
+				7BA804772B2D05CE007FBE83 /* SightReadingPianoView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -340,6 +343,7 @@
 				7B1815C62B0C1CD3000418CB /* IntervalsView.swift in Sources */,
 				7B1815D62B0C29A2000418CB /* FlyingImageView.swift in Sources */,
 				7B1815B42B0B780E000418CB /* ConfigurationView.swift in Sources */,
+				7BA804782B2D05CE007FBE83 /* SightReadingPianoView.swift in Sources */,
 				7B1815D42B0C289A000418CB /* MelodyScoreView.swift in Sources */,
 				7B1815DE2B0CAD40000418CB /* CountdownTimerView.swift in Sources */,
 				7B1815E02B0CADA8000418CB /* TappingView.swift in Sources */,

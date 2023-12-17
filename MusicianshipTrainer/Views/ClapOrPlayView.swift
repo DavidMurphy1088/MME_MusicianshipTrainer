@@ -98,7 +98,8 @@ struct ClapOrPlayPresentView: View {
     var questionType:QuestionType
     let questionTempo = 90
     let googleAPI = GoogleAPI.shared
-
+    let virtualKeyboard = true
+    
     init(contentSection:ContentSection, score:Score, answerState:Binding<AnswerState>, answer:Binding<Answer>,
          tryNumber: Binding<Int>, questionType:QuestionType, refresh_unused:(() -> Void)? = nil) {
         self.contentSection = contentSection
@@ -222,7 +223,7 @@ struct ClapOrPlayPresentView: View {
                 metronome.stopTicking()
                 if questionType == .rhythmVisualClap || questionType == .rhythmEchoClap {
                     self.isTapping = true
-                    tapRecorder.startRecording(metronomeLeadIn: false, metronomeTempoAtRecordingStart: metronome.tempo)
+                    tapRecorder.startRecording(metronomeLeadIn: false, metronomeTempoAtRecordingStart: metronome.getTempo())
                 } else {
                     audioRecorder.startRecording(fileName: contentSection.name)
                 }
@@ -355,15 +356,17 @@ struct ClapOrPlayPresentView: View {
                     score.barEditor = nil
                     if questionType == .rhythmVisualClap || questionType == .rhythmEchoClap {
                         self.isTapping = true
-                        tapRecorder.startRecording(metronomeLeadIn: false, metronomeTempoAtRecordingStart: metronome.tempo)
+                        tapRecorder.startRecording(metronomeLeadIn: false, metronomeTempoAtRecordingStart: metronome.getTempo())
                     } else {
-                        if !audioRecorder.checkAudioPermissions() {
-                            AVAudioSession.sharedInstance().requestRecordPermission { granted in
+                        if !virtualKeyboard {
+                            if !audioRecorder.checkAudioPermissions() {
+                                AVAudioSession.sharedInstance().requestRecordPermission { granted in
+                                    audioRecorder.startRecording(fileName: contentSection.name)
+                                }
+                            }
+                            else {
                                 audioRecorder.startRecording(fileName: contentSection.name)
                             }
-                        }
-                        else {
-                            audioRecorder.startRecording(fileName: contentSection.name)
                         }
                     }
                 }) {
@@ -522,12 +525,7 @@ struct ClapOrPlayPresentView: View {
                 }
                 else {
                     if UIDevice.current.userInterfaceIdiom != .phone {
-                        //if questionType == .melodyPlay || questionType == .rhythmEchoClap {
-                            ToolsView(score: score, helpMetronome: helpMetronome())
-//                        }
-//                        else {
-//                            Text(" ")
-//                        }
+                        ToolsView(score: score, helpMetronome: helpMetronome())
                     }
                 }
 
@@ -660,6 +658,12 @@ struct ClapOrPlayPresentView: View {
                     }
                 }
                 
+                if questionType == .melodyPlay {
+                    if answerState == .recording {
+                        SightReadingPianoView(contentSection: contentSection, score: score)
+                    }
+                }
+
                 //Check answer
                 if answerState == .recorded {
                     HStack {
@@ -781,7 +785,7 @@ struct ClapOrPlayAnswerView: View {
                 if let recordedTempo = tappedScore.tempo {
                     self.answerMetronome.setAllowTempoChange(allow: true)
                     self.answerMetronome.setTempo(tempo: recordedTempo, context: "ClapOrPlayAnswerView")
-                    let questionTempo = Metronome.getMetronomeWithCurrentSettings(ctx: "for clap answer").tempo
+                    let questionTempo = Metronome.getMetronomeWithCurrentSettings(ctx: "for clap answer").getTempo()
                     let tolerance = Int(CGFloat(questionTempo) * 0.2)
                     if questionType == .rhythmVisualClap {
                         feedback.feedbackExplanation! +=
