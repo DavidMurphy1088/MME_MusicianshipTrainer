@@ -185,7 +185,10 @@ struct ClapOrPlayPresentView: View {
             return false
         }
         let tappedScore = tapRecorder.getTappedAsAScore(timeSignatue: score.timeSignature, questionScore: score, tapValues: tapValues)
-        let fittedScore = score.fitScoreToQuestionScore(tappedScore:tappedScore, tolerancePercent: UIGlobals.rhythmTolerancePercent).0
+        let fittedScore = score.fitScoreToQuestionScore(userScore:tappedScore,
+                                                        onlyRhythm: questionType == .melodyPlay ? false : true,
+                                                        tolerancePercent: UIGlobals.rhythmTolerancePercent
+                                                        ).0
         if fittedScore.errorCount() == 0 && fittedScore.getAllTimeSlices().count > 0 {
             return true
         }
@@ -358,14 +361,15 @@ struct ClapOrPlayPresentView: View {
                         self.isTapping = true
                         tapRecorder.startRecording(metronomeLeadIn: false, metronomeTempoAtRecordingStart: metronome.getTempo())
                     } else {
-                        if !virtualKeyboard {
+                        if virtualKeyboard {
+                            answer.sightReadingNotePitches = []
+                            answer.sightReadingNoteTimes = []
+                         }
+                        else {
                             if !audioRecorder.checkAudioPermissions() {
                                 AVAudioSession.sharedInstance().requestRecordPermission { granted in
                                     audioRecorder.startRecording(fileName: contentSection.name)
                                 }
-                            }
-                            else {
-                                audioRecorder.startRecording(fileName: contentSection.name)
                             }
                         }
                     }
@@ -660,7 +664,7 @@ struct ClapOrPlayPresentView: View {
                 
                 if questionType == .melodyPlay {
                     if answerState == .recording {
-                        SightReadingPianoView(contentSection: contentSection, score: score)
+                        SightReadingPianoView(answer:answer, score: score)
                     }
                 }
 
@@ -739,6 +743,8 @@ struct ClapOrPlayAnswerView: View {
     private var questionType:QuestionType
     private var answer:Answer
     let questionTempo = 90
+    let melodyAnalyser = MelodyAnalyser()
+    let virtualKeyboard = true
     
     init(contentSection:ContentSection, score:Score, answerState:Binding<AnswerState>, tryNumber:Binding<Int>, answer:Answer, questionType:QuestionType) {
         self.contentSection = contentSection
@@ -751,13 +757,40 @@ struct ClapOrPlayAnswerView: View {
         answerMetronome.setSpeechEnabled(enabled: self.speechEnabled)
     }
     
-    func analyseStudentRhythm() {
-        guard let tapValues = answer.values else {
+    func analyseStudentMelody() {
+        if let answer = contentSection.storedAnswer {
+            let tappedScore = melodyAnalyser.makeScoreFromTaps(questionScore: score, questionTempo: 60,
+                                                               tapPitches: answer.sightReadingNotePitches,
+                                                               tapTimes: answer.sightReadingNoteTimes
+            )
+            tappedScore.label = "Your Melody"
+            self.fittedScore = tappedScore
+        }
+    }
+    
+    func analyseStudentSubmittal() {
+
+        var tappedScore:Score? = nil
+        if questionType == .melodyPlay {
+            tappedScore = melodyAnalyser.makeScoreFromTaps(questionScore: score, questionTempo: 60,
+                                                               tapPitches: answer.sightReadingNotePitches,
+                                                               tapTimes: answer.sightReadingNoteTimes
+            )
+            if let tappedScore = tappedScore {
+                tappedScore.label = "Your Melody"
+            }
+            self.fittedScore = tappedScore
+        }
+        else {
+            guard let tapValues = answer.values else {
+                return
+            }
+            tappedScore = tapRecorder.getTappedAsAScore(timeSignatue: score.timeSignature, questionScore: score, tapValues: tapValues)
+            //tappedScore.label = "Your Rhythm"
+        }
+        guard let tappedScore = tappedScore else {
             return
         }
-        
-        let tappedScore = tapRecorder.getTappedAsAScore(timeSignatue: score.timeSignature, questionScore: score, tapValues: tapValues)
-        tappedScore.label = "Your Rhythm"
         
         ///Checks -
         ///1) all notes in the question have taps at the same time location
@@ -767,7 +800,9 @@ struct ClapOrPlayAnswerView: View {
         ///Otherwise, try to make the studnets tapped score look the same as the question score up until the point of error
         ///(e.g. a long tap might correctly represent either a long note or a short note followed by a rest. So mark the tapped score accordingingly
 
-        let fitted = score.fitScoreToQuestionScore(tappedScore:tappedScore, tolerancePercent: UIGlobals.rhythmTolerancePercent)
+        let fitted = score.fitScoreToQuestionScore(userScore:tappedScore, 
+                                                   onlyRhythm: questionType == .melodyPlay ? false : true,
+                                                   tolerancePercent: UIGlobals.rhythmTolerancePercent)
         self.fittedScore = fitted.0
         let feedback = fitted.1
         
@@ -945,12 +980,12 @@ struct ClapOrPlayAnswerView: View {
                     }
                 //}
                 //ScoreSpacerView()
-                if questionType == .melodyPlay {
+                if (questionType == .melodyPlay && virtualKeyboard == false) {
                     ScoreSpacerView()
                 }
                 ScoreView(score: score).padding()
                 //ScoreSpacerView()
-                if questionType == .melodyPlay {
+                if questionType == .melodyPlay  && virtualKeyboard == false {
                     ScoreSpacerView()
                 }
                 if let fittedScore = self.fittedScore {
@@ -989,11 +1024,13 @@ struct ClapOrPlayAnswerView: View {
                 //Spacer() //Keep - required to align the page from the top
             }
             .onAppear() {
-                if questionType == .rhythmVisualClap || questionType == .rhythmEchoClap {
-                    analyseStudentRhythm()
+                if questionType == .rhythmVisualClap || questionType == .rhythmEchoClap ||
+                    (questionType == .melodyPlay && virtualKeyboard) {
+                    analyseStudentSubmittal()
+                    //answerMetronome.setTempo(tempo: questionTempo, context: "AnswerMode::OnAppear")
                 }
                 else {
-                    answerMetronome.setTempo(tempo: questionTempo, context: "AnswerMode::OnAppear")
+                    analyseStudentMelody()
                 }
                 ///Load score again since it may have changed due student simplifying the rhythm. The parent of this view that loaded the original score is not inited again on a retry of a simplified rhythm.
                 //score = contentSection.getScore(staffCount: questionType == .melodyPlay ? 2 : 1, onlyRhythm: questionType != .melodyPlay)

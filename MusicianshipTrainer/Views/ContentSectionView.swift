@@ -750,11 +750,10 @@ struct ExamView: View {
 
 struct ContentSectionView: View {
     @ObservedObject var contentSection:ContentSection
-    //@ObservedObject var storedAnswer:Answer
     @State private var showNextNavigation: Bool = true
     @State private var endOfSection: Bool = false
     @State var answerState:AnswerState = .notEverAnswered
-    @State var answer:Answer = Answer() //, questionMode: .practice)
+    @State var answer:Answer = Answer() 
     @State var isShowingConfiguration:Bool = false
 
     let id = UUID()

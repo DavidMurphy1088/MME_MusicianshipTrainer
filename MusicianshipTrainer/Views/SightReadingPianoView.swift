@@ -4,9 +4,9 @@ import AVFoundation
 import Foundation
 
 struct SightReadingView: PianoUserProtocol, View {
-    var contentSection:ContentSection? = nil
+    var answer:Answer? = nil
+    var score:Score? = nil
     init() {
-        //self.contentSection = nil // or default value if applicable
     }
 
     func getActionHandler(piano:Piano) -> some View {
@@ -15,36 +15,35 @@ struct SightReadingView: PianoUserProtocol, View {
     }
     
     func receiveNotificationOfKeyPress(key: PianoKey) {
-        print("========", contentSection?.getPath(), key.midi)
-//        if let contentSection = contentSection {
-//            var answer = contentSection.storedAnswer
-//            answer?.values?.append(Double(key.midi))
-        //}
+        if let answer = answer {
+            answer.sightReadingNotePitches.append(key.midi)
+            answer.sightReadingNoteTimes.append(Date())
+            //print("======receiveNotification", answer.sightReadingNotes.count, key.midi)
+        }
     }
     
     func getKeyDisplayView(key:PianoKey) -> some View {
         VStack {
-            Text("K:\(key.midi)")
+            //Text("K:\(key.midi)")
         }
     }
 
     var body: some View {
         VStack {
         }
-    }
-    
+    }    
 }
 
 struct SightReadingPianoView: View {
-    let contentSection:ContentSection
+    let answer:Answer
     @State var piano:Piano?
     let score:Score
     
     func getPianoView(piano:Piano) -> some View {
         var user = SightReadingView()
-        user.contentSection = contentSection
-        var pianoView = PianoView<SightReadingView>(piano: piano, user: user)
-        //pianoView.contentSection = nil
+        user.score = score
+        user.answer = answer
+        let pianoView = PianoView<SightReadingView>(piano: piano, user: user)
         return pianoView
     }
     

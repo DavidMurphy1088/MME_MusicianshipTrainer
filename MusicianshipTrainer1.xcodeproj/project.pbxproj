@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		7B1815A72B0B6F22000418CB /* CommonLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = 7B1815A62B0B6F22000418CB /* CommonLibrary */; };
-		7B1815AA2B0B6FEA000418CB /* ContentData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1815A92B0B6FEA000418CB /* ContentData.swift */; };
 		7B1815AC2B0B7134000418CB /* Intervals.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1815AB2B0B7134000418CB /* Intervals.swift */; };
 		7B1815B02B0B772D000418CB /* ContentNavigationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1815AF2B0B772D000418CB /* ContentNavigationView.swift */; };
 		7B1815B22B0B7795000418CB /* ContentSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1815B12B0B7795000418CB /* ContentSectionView.swift */; };
@@ -30,6 +29,7 @@
 		7B3FC9CA2B0B62D8004A7987 /* MusicianshipTrainerUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B3FC9C92B0B62D8004A7987 /* MusicianshipTrainerUITests.swift */; };
 		7B3FC9CC2B0B62D8004A7987 /* MusicianshipTrainerUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B3FC9CB2B0B62D8004A7987 /* MusicianshipTrainerUITestsLaunchTests.swift */; };
 		7BA804782B2D05CE007FBE83 /* SightReadingPianoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA804772B2D05CE007FBE83 /* SightReadingPianoView.swift */; };
+		7BA8047E2B2EFDE6007FBE83 /* MelodyAnalyser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA8047D2B2EFDE6007FBE83 /* MelodyAnalyser.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -50,7 +50,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		7B1815A92B0B6FEA000418CB /* ContentData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentData.swift; sourceTree = "<group>"; };
 		7B1815AB2B0B7134000418CB /* Intervals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Intervals.swift; sourceTree = "<group>"; };
 		7B1815AF2B0B772D000418CB /* ContentNavigationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentNavigationView.swift; sourceTree = "<group>"; };
 		7B1815B12B0B7795000418CB /* ContentSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentSectionView.swift; sourceTree = "<group>"; };
@@ -76,6 +75,7 @@
 		7B3FC9C92B0B62D8004A7987 /* MusicianshipTrainerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicianshipTrainerUITests.swift; sourceTree = "<group>"; };
 		7B3FC9CB2B0B62D8004A7987 /* MusicianshipTrainerUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicianshipTrainerUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		7BA804772B2D05CE007FBE83 /* SightReadingPianoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SightReadingPianoView.swift; sourceTree = "<group>"; };
+		7BA8047D2B2EFDE6007FBE83 /* MelodyAnalyser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MelodyAnalyser.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -132,8 +132,8 @@
 		7B1815A82B0B6FC7000418CB /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				7B1815A92B0B6FEA000418CB /* ContentData.swift */,
 				7B1815AB2B0B7134000418CB /* Intervals.swift */,
+				7BA8047D2B2EFDE6007FBE83 /* MelodyAnalyser.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -335,8 +335,8 @@
 			files = (
 				7B3FC9B52B0B62D8004A7987 /* MusicianshipTrainer.xcdatamodeld in Sources */,
 				7B1815D82B0CAAAF000418CB /* ClapOrPlayView.swift in Sources */,
-				7B1815AA2B0B6FEA000418CB /* ContentData.swift in Sources */,
 				7B1815B22B0B7795000418CB /* ContentSectionView.swift in Sources */,
+				7BA8047E2B2EFDE6007FBE83 /* MelodyAnalyser.swift in Sources */,
 				7B1815B02B0B772D000418CB /* ContentNavigationView.swift in Sources */,
 				7B3FC9B22B0B62D8004A7987 /* Persistence.swift in Sources */,
 				7B3FC9AB2B0B62D6004A7987 /* ContentView.swift in Sources */,
