@@ -18,7 +18,6 @@ struct SightReadingView: PianoUserProtocol, View {
         if let answer = answer {
             answer.sightReadingNotePitches.append(key.midi)
             answer.sightReadingNoteTimes.append(Date())
-            //print("======receiveNotification", answer.sightReadingNotes.count, key.midi)
         }
     }
     
@@ -72,9 +71,8 @@ struct SightReadingPianoView: View {
             ///Start on a C or an E
             var pianoStart = 0
             var minDiff = 1000
-            //for startMidi in [48, 53, 60, 65, 72, 77] {
-            ///Always start on C?
-            for startMidi in [48, 60, 72] {
+            ///Always start on C or F?
+            for startMidi in [48, 53, 60, 65, 72] {
                 if startMidi <= minMidi {
                     let diff = minMidi - startMidi
                     if diff < minDiff {

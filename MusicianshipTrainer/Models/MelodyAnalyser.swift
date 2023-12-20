@@ -13,8 +13,8 @@ class MelodyAnalyser {
         outputScore.label = "Your Melody"
         
         ///Get first and last notes
-        var firstNoteValue:Double?
-        var lastNoteValue:Double?
+        var firstNoteValue:Double = 1.0
+        var lastNoteValue:Double = 1.0
         
         if questionScore.scoreEntries.count > 0 {
             let entry = questionScore.scoreEntries[0]
@@ -44,10 +44,8 @@ class MelodyAnalyser {
             ///Then use that multiplier for all teh following notes to get their value from their time durations
             if n == 1 {
                 let timeDuractionInSeconds = tapTimes[n].timeIntervalSince(lastNoteTime!)
-                if let firstNoteValue = firstNoteValue {
-                    valueMultiplier = firstNoteValue / timeDuractionInSeconds
-                    tempo = Int(60.0 * valueMultiplier!)
-                }
+                valueMultiplier = firstNoteValue / timeDuractionInSeconds
+                tempo = Int(60.0 * valueMultiplier!)
             }
             var noteValue:Double?
             let timeDurationInSeconds:Double
@@ -56,8 +54,9 @@ class MelodyAnalyser {
                 noteValue = tapRecorder.roundNoteValueToStandardValue(inValue: timeDurationInSeconds, tempo: tempo)
             }
             else {
-                timeDurationInSeconds = 1.0
-                noteValue = lastNoteValue
+                let restsDuration = questionScore.getEndRestsDuration()
+                noteValue = lastNoteValue + restsDuration
+                timeDurationInSeconds = lastNoteValue + restsDuration
             }
             if let noteValue = noteValue {
                 let ts = outputScore.createTimeSlice()
@@ -74,6 +73,7 @@ class MelodyAnalyser {
                 }
             }
         }
+        //outputScore.debugScorexx("End of make", withBeam: false)
         return outputScore
     }
 }

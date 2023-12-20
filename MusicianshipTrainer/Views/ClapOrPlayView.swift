@@ -98,7 +98,6 @@ struct ClapOrPlayPresentView: View {
     var questionType:QuestionType
     let questionTempo = 90
     let googleAPI = GoogleAPI.shared
-    let virtualKeyboard = true
     
     init(contentSection:ContentSection, score:Score, answerState:Binding<AnswerState>, answer:Binding<Answer>,
          tryNumber: Binding<Int>, questionType:QuestionType, refresh_unused:(() -> Void)? = nil) {
@@ -361,16 +360,16 @@ struct ClapOrPlayPresentView: View {
                         self.isTapping = true
                         tapRecorder.startRecording(metronomeLeadIn: false, metronomeTempoAtRecordingStart: metronome.getTempo())
                     } else {
-                        if virtualKeyboard {
+                        if Settings.shared.useVirtualKeyboard {
                             answer.sightReadingNotePitches = []
                             answer.sightReadingNoteTimes = []
                          }
                         else {
-                            if !audioRecorder.checkAudioPermissions() {
+                            //if !audioRecorder.checkAudioPermissions() {
                                 AVAudioSession.sharedInstance().requestRecordPermission { granted in
                                     audioRecorder.startRecording(fileName: contentSection.name)
                                 }
-                            }
+                            //}
                         }
                     }
                 }) {
@@ -663,8 +662,10 @@ struct ClapOrPlayPresentView: View {
                 }
                 
                 if questionType == .melodyPlay {
-                    if answerState == .recording {
-                        SightReadingPianoView(answer:answer, score: score)
+                    if Settings.shared.useVirtualKeyboard {
+                        if answerState == .recording {
+                            SightReadingPianoView(answer:answer, score: score)
+                        }
                     }
                 }
 
@@ -689,6 +690,7 @@ struct ClapOrPlayPresentView: View {
             }
             .font(.system(size: UIDevice.current.userInterfaceIdiom == .phone ? UIFont.systemFontSize : UIFont.systemFontSize * 1.6))
             .onAppear() {
+                score.clearAllStatus()
                 examInstructionsNarrated = false
                 if contentSection.getExamTakingStatus() == .inExam {
                     self.contentSection.playExamInstructions(withDelay: true,
@@ -744,7 +746,6 @@ struct ClapOrPlayAnswerView: View {
     private var answer:Answer
     let questionTempo = 90
     let melodyAnalyser = MelodyAnalyser()
-    let virtualKeyboard = true
     
     init(contentSection:ContentSection, score:Score, answerState:Binding<AnswerState>, tryNumber:Binding<Int>, answer:Answer, questionType:QuestionType) {
         self.contentSection = contentSection
@@ -980,14 +981,14 @@ struct ClapOrPlayAnswerView: View {
                     }
                 //}
                 //ScoreSpacerView()
-                if (questionType == .melodyPlay && virtualKeyboard == false) {
-                    ScoreSpacerView()
-                }
+//                if (questionType == .melodyPlay && Settings.shared.useVirtualKeyboard == false) {
+//                    ScoreSpacerView()
+//                }
                 ScoreView(score: score).padding()
                 //ScoreSpacerView()
-                if questionType == .melodyPlay  && virtualKeyboard == false {
-                    ScoreSpacerView()
-                }
+//                if questionType == .melodyPlay  && Settings.shared.useVirtualKeyboard == false {
+//                    ScoreSpacerView()
+//                }
                 if let fittedScore = self.fittedScore {
                     Text(" ")
                     //ScoreSpacerView()
@@ -1002,7 +1003,7 @@ struct ClapOrPlayAnswerView: View {
                                       fileName: contentSection.name,
                                       onStart: {return score})
 
-                    if questionType == .melodyPlay {
+                    if questionType == .melodyPlay && Settings.shared.useVirtualKeyboard == false {
                         PlayRecordingView(buttonLabel: "Hear Your \(questionType == .melodyPlay ? "Melody" : "Rhythm")",
                                           metronome: answerMetronome,
                                           fileName: contentSection.name,
@@ -1025,7 +1026,7 @@ struct ClapOrPlayAnswerView: View {
             }
             .onAppear() {
                 if questionType == .rhythmVisualClap || questionType == .rhythmEchoClap ||
-                    (questionType == .melodyPlay && virtualKeyboard) {
+                    (questionType == .melodyPlay && Settings.shared.useVirtualKeyboard) {
                     analyseStudentSubmittal()
                     //answerMetronome.setTempo(tempo: questionTempo, context: "AnswerMode::OnAppear")
                 }

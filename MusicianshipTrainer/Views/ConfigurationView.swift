@@ -135,23 +135,22 @@ struct ConfigurationView: View {
                     }) {
                         HStack {
                             Image(systemName: settings.soundOnTaps ? "checkmark.square" : "square")
-                            //let x = settings.soundOnTaps ? 0 : 1
                             Text("Sound For Tapping")
                         }
                     }
                     .padding()
                     
-//                    Button(action: {
-//                        DispatchQueue.main.async {
-//                            settings.useUpstrokeTaps.toggle()
-//                        }
-//                    }) {
-//                        HStack {
-//                            Image(systemName: settings.useUpstrokeTaps ? "checkmark.square" : "square")
-//                            Text("Use Upstroke Taps")
-//                        }
-//                    }
-//                    .padding()
+                    Button(action: {
+                        DispatchQueue.main.async {
+                            settings.useVirtualKeyboard.toggle()
+                        }
+                    }) {
+                        HStack {
+                            Image(systemName: settings.useVirtualKeyboard ? "checkmark.square" : "square")
+                            Text("Use Virtual Keyboard")
+                        }
+                    }
+                    .padding()
                 }
                 
                 HStack {
