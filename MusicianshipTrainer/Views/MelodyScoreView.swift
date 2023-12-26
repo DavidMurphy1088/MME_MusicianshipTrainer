@@ -17,7 +17,7 @@ struct MelodyScoreView: View {
     var body: some View {
         VStack {
             if let score = score {
-                ScoreView(score: score)
+                ScoreView(score: score, widthPadding: false)
             }
         }
         
@@ -129,54 +129,57 @@ struct ListMelodiesView: View {
             .padding()
             .sheet(isPresented: $presentMelodies) {
                 VStack {
+                    Spacer()
+                    Text("Examples of a \(intervalName)").font(.title).padding()
                     VStack {
                         if presentScoreView {
                             if let selectedMelody = selectedMelody {
                                 MelodyScoreView(basePitch: firstNote.midiNumber, interval:interval, melody: selectedMelody)
-                                //.padding()
+                                .padding()
                             }
                         }
                     }
-
-                    ForEach(melodies) { melody in
-                        Button(action: {
-                            presentScoreView = false
-                            selectedMelodyId = melody.id
-                            selectedMelody = melody
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                ///Force the melody view to reinit
-                                presentScoreView = true
-                            }
-                        }) {
-                            HStack {
-                                Text(melody.name)
-                                    .padding()
-                                    .foregroundColor(selectedMelodyId == melody.id ? .black : .black)
-                                    //.foregroundColor(selectedMelodyId == melody.id ? .white : .primary)
-                                    .background(selectedMelodyId == melody.id ? Color.blue : Color.white)
-                                    .cornerRadius(8)
-                                    .padding()
-                                Image(systemName: "play")
-                                    .foregroundColor(.blue)
-                                    .font(.largeTitle)
+                    VStack {
+                        ForEach(melodies) { melody in
+                            Button(action: {
+                                presentScoreView = false
+                                selectedMelodyId = melody.id
+                                selectedMelody = melody
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                    ///Force the melody view to reinit
+                                    presentScoreView = true
+                                }
+                            }) {
+                                ZStack {
+                                    Text(melody.name)
+                                        .padding()
+                                        .foregroundColor(selectedMelodyId == melody.id ? .black : .black)
+                                        .background(selectedMelodyId == melody.id ? Color.blue : Settings.shared.colorBackground)
+                                        .cornerRadius(8)
+                                        .padding()
+                                    HStack {
+                                        Spacer()
+                                        Image(systemName: "play")
+                                            .foregroundColor(.blue)
+                                            .font(.largeTitle)
+                                            .padding()
+                                    }
+                                }
                             }
                         }
                     }
+                    .padding()
+                    .background(Settings.shared.colorBackground)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: UIGlobals.cornerRadius).stroke(Color(UIGlobals.borderColor), lineWidth: UIGlobals.borderLineWidth)
+                    )
+                    Spacer()
                 }
+                
                 .padding()
                 .onAppear {
                     self.selectedMelody = nil
                 }
-//                .sheet(isPresented: $presentScoreView) { //}, arrowEdge: .trailing) {
-//                    if let selectedMelody = selectedMelody {
-//                        VStack {
-//                            MelodyScoreView(basePitch: firstNote.midiNumber, interval:interval, melody: selectedMelody)
-//                                .padding()
-//                        }
-//                        //.isHidden = presentScoreView == false
-//                        //.frame(width: UIScreen.main.bounds.width * 0.90, height: UIScreen.main.bounds.height * 0.33)
-//                    }
-//                }
             }
         }
     }

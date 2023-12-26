@@ -118,6 +118,8 @@ class AppDelegate: NSObject, UIApplicationDelegate {
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? ""
         let buildNumber = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? ""
+        IAPManager.shared = IAPManager()
+        
         Logger.logger.log(self, "Version.Build \(appVersion).\(buildNumber)")
         
         //Make navigation titles at top larger font

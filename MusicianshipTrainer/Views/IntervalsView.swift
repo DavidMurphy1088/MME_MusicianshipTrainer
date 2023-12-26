@@ -196,7 +196,8 @@ struct IntervalPresentView: View { //}, QuestionPartProtocol {
                     }
                     //keep the score in the UI for consistent UIlayout between various usages of this view
                     if questionType == .intervalVisual {
-                        ScoreView(score: score).padding().opacity(questionType == .intervalAural ? 0.0 : 1.0)
+                        ScoreView(score: score, widthPadding: true).padding().opacity(questionType == .intervalAural ? 0.0 : 1.0)
+                            .frame(width: UIScreen.main.bounds.width * 0.75)
                     }
 //                    if UIDevice.current.userInterfaceIdiom == .pad {
 //                        ScoreSpacerView()
@@ -402,7 +403,8 @@ struct IntervalAnswerView: View {
         AnyView(
             VStack {
                 ScoreSpacerView()
-                ScoreView(score: score).padding()
+                ScoreView(score: score, widthPadding: true).padding()
+                    .frame(width: UIScreen.main.bounds.width * 0.75)
                 //ScoreSpacerView()
                 //ScoreSpacerView()
                 

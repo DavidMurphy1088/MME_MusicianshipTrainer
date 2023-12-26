@@ -29,10 +29,12 @@ struct ConfigurationView: View {
     
     var body: some View {
         VStack(alignment: .center) {
-            
-            Text("Configuration").font(.title).padding()
-                //.overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.blue, lineWidth: 2))
+            Spacer()
+            Text("Configuration").font(.largeTitle).padding()
                 .padding()
+            Image(systemName: "music.note.list")
+                .foregroundColor(.blue)
+                .font(UIDevice.current.userInterfaceIdiom == .phone ? .body : .largeTitle)
 
             // ------------------- Colors ----------------
             
@@ -142,12 +144,12 @@ struct ConfigurationView: View {
                     
                     Button(action: {
                         DispatchQueue.main.async {
-                            settings.useVirtualKeyboard.toggle()
+                            settings.useAcousticKeyboard.toggle()
                         }
                     }) {
                         HStack {
-                            Image(systemName: settings.useVirtualKeyboard ? "checkmark.square" : "square")
-                            Text("Use Virtual Keyboard")
+                            Image(systemName: settings.useAcousticKeyboard ? "checkmark.square" : "square")
+                            Text("Use Acoustic Piano")
                         }
                     }
                     .padding()
@@ -194,16 +196,21 @@ struct ConfigurationView: View {
             
             //LogView().border(.black).padding()
             HStack {
-                Button("Ok") {
+                Button(action: {
                     Settings.shared = Settings(copy: settings)
                     Settings.shared.saveConfig()
                     isPresented = false
+                }) {
+                    Text("Ok").font(.title)
                 }
                 .padding()
-                Button("Cancel") {
+                Button(action: {
                     isPresented = false
+                }) {
+                    Text("Cancel").font(.title)
                 }
                 .padding()
+
             }
             
             let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? ""
@@ -213,8 +220,11 @@ struct ConfigurationView: View {
                 Text("Musicianship Trainer - Version.Build \(appVersion).\(buildNumber)").font(.headline)
                 Text("© 2024 Musicmaster Education LLC.").font(.headline)
             }
+            Spacer()
         }
+        .background(Settings.shared.colorBackground)
     }
+    
 }
 
 //struct ConfigSelectAgeMode: View {

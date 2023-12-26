@@ -151,7 +151,12 @@ struct ClapOrPlayPresentView: View {
 
         case .melodyPlay:
             result += "\(bullet)Press Start Recording then "
-            result += "play the melody and the final chords."
+            if !Settings.shared.useAcousticKeyboard {
+                result += "play the melody."
+            }
+            else {
+                result += "play the melody and the final chords."
+            }
             result += "\(linefeed)\(bullet)When you have finished, stop the recording."
             
         default:
@@ -360,16 +365,14 @@ struct ClapOrPlayPresentView: View {
                         self.isTapping = true
                         tapRecorder.startRecording(metronomeLeadIn: false, metronomeTempoAtRecordingStart: metronome.getTempo())
                     } else {
-                        if Settings.shared.useVirtualKeyboard {
+                        if Settings.shared.useAcousticKeyboard {
+                            AVAudioSession.sharedInstance().requestRecordPermission { granted in
+                                audioRecorder.startRecording(fileName: contentSection.name)
+                            }
+                        }
+                        else {
                             answer.sightReadingNotePitches = []
                             answer.sightReadingNoteTimes = []
-                         }
-                        else {
-                            //if !audioRecorder.checkAudioPermissions() {
-                                AVAudioSession.sharedInstance().requestRecordPermission { granted in
-                                    audioRecorder.startRecording(fileName: contentSection.name)
-                                }
-                            //}
                         }
                     }
                 }) {
@@ -450,10 +453,13 @@ struct ClapOrPlayPresentView: View {
                 }
                 .sheet(isPresented: $isToleranceHelpPresented) {
                     VStack {
+                        Spacer()
                         Text("Rhythm Matching Tolerance").font(.title).foregroundColor(.blue).padding()
                         Text("The rhythm tolerance setting affects how precisely your tapped rhythm is measured for correctness.").padding()
                         Text("Higher grades of tolerance require more precise tapping to achieve a correct rhythm. Lower grades require less precise tapping.").padding()
+                        Spacer()
                     }
+                    .background(Settings.shared.colorBackground)
                 }
                 Slider(value: $rhythmTolerancePercent, in: 30...70).padding(.horizontal, UIDevice.current.userInterfaceIdiom == .pad ? 50 : 4)
             }
@@ -483,7 +489,7 @@ struct ClapOrPlayPresentView: View {
                     self.startWasShortended = true
                     //}
                 }) {
-                    hintButtonView("Remove The Rhythm Start", selected: startWasShortended)
+                    hintButtonView("Remove Rhythm Start", selected: startWasShortended)
                 }
                 .padding()
                 Button(action: {
@@ -492,7 +498,7 @@ struct ClapOrPlayPresentView: View {
                     score.barEditor?.reWriteBar(targetBar: score.getBarCount()-1, way: .delete)
                     self.endWasShortended = true
                 }) {
-                    hintButtonView("Remove The Rhythm End", selected: endWasShortended)
+                    hintButtonView("Remove Rhythm End", selected: endWasShortended)
                 }
                 .padding()
             }
@@ -505,7 +511,7 @@ struct ClapOrPlayPresentView: View {
                             self.endWasShortended = false
                             self.startWasShortended = false
                         }) {
-                            hintButtonView("Put Back The Question Rhythm", selected: false)
+                            hintButtonView("Put Back Question Rhythm", selected: false)
                         }
                         .padding()
                     }
@@ -534,7 +540,7 @@ struct ClapOrPlayPresentView: View {
 
                 if questionType == .rhythmVisualClap || questionType == .melodyPlay {
                     //ScoreSpacerView()
-                    ScoreView(score: score).padding()
+                    ScoreView(score: score, widthPadding: false).padding()
                     //ScoreSpacerView()
                 }
                 
@@ -594,7 +600,7 @@ struct ClapOrPlayPresentView: View {
                     }
                 }
                 
-                HStack {
+                VStack {
                     if answerState != .recording {
                         buttonsView()
                         Text(" ")
@@ -662,7 +668,7 @@ struct ClapOrPlayPresentView: View {
                 }
                 
                 if questionType == .melodyPlay {
-                    if Settings.shared.useVirtualKeyboard {
+                    if !Settings.shared.useAcousticKeyboard {
                         if answerState == .recording {
                             SightReadingPianoView(answer:answer, score: score)
                         }
@@ -770,7 +776,6 @@ struct ClapOrPlayAnswerView: View {
     }
     
     func analyseStudentSubmittal() {
-
         var tappedScore:Score? = nil
         if questionType == .melodyPlay {
             tappedScore = melodyAnalyser.makeScoreFromTaps(questionScore: score, questionTempo: 60,
@@ -823,7 +828,7 @@ struct ClapOrPlayAnswerView: View {
                     self.answerMetronome.setTempo(tempo: recordedTempo, context: "ClapOrPlayAnswerView")
                     let questionTempo = Metronome.getMetronomeWithCurrentSettings(ctx: "for clap answer").getTempo()
                     let tolerance = Int(CGFloat(questionTempo) * 0.2)
-                    if questionType == .rhythmVisualClap {
+                    if questionType == .rhythmVisualClap || questionType == .melodyPlay {
                         feedback.feedbackExplanation! +=
                         " Your tempo was \(recordedTempo)."
                     }
@@ -984,15 +989,15 @@ struct ClapOrPlayAnswerView: View {
 //                if (questionType == .melodyPlay && Settings.shared.useVirtualKeyboard == false) {
 //                    ScoreSpacerView()
 //                }
-                ScoreView(score: score).padding()
+                ScoreView(score: score, widthPadding: false).padding()
                 //ScoreSpacerView()
 //                if questionType == .melodyPlay  && Settings.shared.useVirtualKeyboard == false {
 //                    ScoreSpacerView()
 //                }
                 if let fittedScore = self.fittedScore {
-                    Text(" ")
+                    //Text(" ")
                     //ScoreSpacerView()
-                    ScoreView(score: fittedScore).padding()
+                    ScoreView(score: fittedScore, widthPadding: false).padding()
                     //ScoreSpacerView()
                 }
 
@@ -1003,7 +1008,7 @@ struct ClapOrPlayAnswerView: View {
                                       fileName: contentSection.name,
                                       onStart: {return score})
 
-                    if questionType == .melodyPlay && Settings.shared.useVirtualKeyboard == false {
+                    if questionType == .melodyPlay && Settings.shared.useAcousticKeyboard {
                         PlayRecordingView(buttonLabel: "Hear Your \(questionType == .melodyPlay ? "Melody" : "Rhythm")",
                                           metronome: answerMetronome,
                                           fileName: contentSection.name,
@@ -1026,7 +1031,7 @@ struct ClapOrPlayAnswerView: View {
             }
             .onAppear() {
                 if questionType == .rhythmVisualClap || questionType == .rhythmEchoClap ||
-                    (questionType == .melodyPlay && Settings.shared.useVirtualKeyboard) {
+                    (questionType == .melodyPlay && !Settings.shared.useAcousticKeyboard) {
                     analyseStudentSubmittal()
                     //answerMetronome.setTempo(tempo: questionTempo, context: "AnswerMode::OnAppear")
                 }
@@ -1113,17 +1118,19 @@ struct ClapOrPlayView: View {
             }
             else {
                 if shouldShowAnswer() {
-                    ZStack {
-                        ClapOrPlayAnswerView(contentSection: contentSection,
-                                             score: score,
-                                             answerState: $answerState,
-                                             tryNumber: $tryNumber,
-                                             answer: answer,
-                                             questionType: questionType)
-                        if Settings.shared.useAnimations {
-                            if !contentSection.isExamTypeContentSection() {
-                                if !(self.questionType == .melodyPlay) {
-                                    FlyingImageView(answer: answer)
+                    ScrollView {
+                        ZStack {
+                            ClapOrPlayAnswerView(contentSection: contentSection,
+                                                 score: score,
+                                                 answerState: $answerState,
+                                                 tryNumber: $tryNumber,
+                                                 answer: answer,
+                                                 questionType: questionType)
+                            if Settings.shared.useAnimations {
+                                if !contentSection.isExamTypeContentSection() {
+                                    if !(self.questionType == .melodyPlay) {
+                                        FlyingImageView(answer: answer)
+                                    }
                                 }
                             }
                         }

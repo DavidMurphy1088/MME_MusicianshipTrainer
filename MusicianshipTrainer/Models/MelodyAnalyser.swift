@@ -13,7 +13,7 @@ class MelodyAnalyser {
         outputScore.label = "Your Melody"
         
         ///Get first and last notes
-        var firstNoteValue:Double = 1.0
+        var firstNoteValue:Double?
         var lastNoteValue:Double = 1.0
         
         if questionScore.scoreEntries.count > 0 {
@@ -27,8 +27,7 @@ class MelodyAnalyser {
                 }
             }
         }
-        
-        var valueMultiplier:Double?
+        //var valueMultiplier:Double = 1.0 ///Convert tap durations (ms) to note values
         var lastNoteTime:Date?
         var lastNotePitch:Int?
         let tapRecorder = TapRecorder()
@@ -44,10 +43,12 @@ class MelodyAnalyser {
             ///Then use that multiplier for all teh following notes to get their value from their time durations
             if n == 1 {
                 let timeDuractionInSeconds = tapTimes[n].timeIntervalSince(lastNoteTime!)
-                valueMultiplier = firstNoteValue / timeDuractionInSeconds
-                tempo = Int(60.0 * valueMultiplier!)
+                if let firstNoteValue = firstNoteValue {
+                    tempo = Int(60.0 * firstNoteValue / timeDuractionInSeconds)
+                }
             }
             var noteValue:Double?
+            
             let timeDurationInSeconds:Double
             if n < tapTimes.count {
                 timeDurationInSeconds = tapTimes[n].timeIntervalSince(lastNoteTime!)
@@ -56,12 +57,12 @@ class MelodyAnalyser {
             else {
                 let restsDuration = questionScore.getEndRestsDuration()
                 noteValue = lastNoteValue + restsDuration
-                timeDurationInSeconds = lastNoteValue + restsDuration
+                timeDurationInSeconds = (noteValue ?? 1.0) * 60.0 / Double(tempo)
             }
             if let noteValue = noteValue {
                 let ts = outputScore.createTimeSlice()
                 ts.addNote(n: Note(timeSlice: ts, num: Int(lastNotePitch!), value:noteValue, staffNum: 0))
-                ts.tapDuration = timeDurationInSeconds
+                ts.tapSecondsNormalizedToTempo = timeDurationInSeconds * Double(tempo) / 60.0
                 totalValue += noteValue
             }
             if n < tapTimes.count {
@@ -73,7 +74,8 @@ class MelodyAnalyser {
                 }
             }
         }
-        //outputScore.debugScorexx("End of make", withBeam: false)
+        outputScore.tempo = tempo
+        //outputScore.debugScorexx("============== End of make", withBeam: false)
         return outputScore
     }
 }

@@ -61,7 +61,7 @@
 		7B1815D72B0CAAAF000418CB /* ClapOrPlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClapOrPlayView.swift; sourceTree = "<group>"; };
 		7B1815DD2B0CAD40000418CB /* CountdownTimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountdownTimerView.swift; sourceTree = "<group>"; };
 		7B1815DF2B0CADA8000418CB /* TappingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TappingView.swift; sourceTree = "<group>"; };
-		7B3FC9A52B0B62D6004A7987 /* MusicianshipTrainer1.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MusicianshipTrainer1.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		7B3FC9A52B0B62D6004A7987 /* MusicianshipTrainer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MusicianshipTrainer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B3FC9A82B0B62D6004A7987 /* MusicianshipTrainerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicianshipTrainerApp.swift; sourceTree = "<group>"; };
 		7B3FC9AA2B0B62D6004A7987 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		7B3FC9AC2B0B62D8004A7987 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -69,9 +69,9 @@
 		7B3FC9B12B0B62D8004A7987 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
 		7B3FC9B42B0B62D8004A7987 /* MusicianshipTrainer.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = MusicianshipTrainer.xcdatamodel; sourceTree = "<group>"; };
 		7B3FC9B62B0B62D8004A7987 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		7B3FC9BB2B0B62D8004A7987 /* MusicianshipTrainer1Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MusicianshipTrainer1Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		7B3FC9BB2B0B62D8004A7987 /* MusicianshipTrainerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MusicianshipTrainerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B3FC9BF2B0B62D8004A7987 /* MusicianshipTrainerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicianshipTrainerTests.swift; sourceTree = "<group>"; };
-		7B3FC9C52B0B62D8004A7987 /* MusicianshipTrainer1UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MusicianshipTrainer1UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		7B3FC9C52B0B62D8004A7987 /* MusicianshipTrainerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MusicianshipTrainerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B3FC9C92B0B62D8004A7987 /* MusicianshipTrainerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicianshipTrainerUITests.swift; sourceTree = "<group>"; };
 		7B3FC9CB2B0B62D8004A7987 /* MusicianshipTrainerUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicianshipTrainerUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		7BA804772B2D05CE007FBE83 /* SightReadingPianoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SightReadingPianoView.swift; sourceTree = "<group>"; };
@@ -152,9 +152,9 @@
 		7B3FC9A62B0B62D6004A7987 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				7B3FC9A52B0B62D6004A7987 /* MusicianshipTrainer1.app */,
-				7B3FC9BB2B0B62D8004A7987 /* MusicianshipTrainer1Tests.xctest */,
-				7B3FC9C52B0B62D8004A7987 /* MusicianshipTrainer1UITests.xctest */,
+				7B3FC9A52B0B62D6004A7987 /* MusicianshipTrainer.app */,
+				7B3FC9BB2B0B62D8004A7987 /* MusicianshipTrainerTests.xctest */,
+				7B3FC9C52B0B62D8004A7987 /* MusicianshipTrainerUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -203,9 +203,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		7B3FC9A42B0B62D6004A7987 /* MusicianshipTrainer1 */ = {
+		7B3FC9A42B0B62D6004A7987 /* MusicianshipTrainer */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 7B3FC9CF2B0B62D8004A7987 /* Build configuration list for PBXNativeTarget "MusicianshipTrainer1" */;
+			buildConfigurationList = 7B3FC9CF2B0B62D8004A7987 /* Build configuration list for PBXNativeTarget "MusicianshipTrainer" */;
 			buildPhases = (
 				7B3FC9A12B0B62D6004A7987 /* Sources */,
 				7B3FC9A22B0B62D6004A7987 /* Frameworks */,
@@ -215,17 +215,17 @@
 			);
 			dependencies = (
 			);
-			name = MusicianshipTrainer1;
+			name = MusicianshipTrainer;
 			packageProductDependencies = (
 				7B1815A62B0B6F22000418CB /* CommonLibrary */,
 			);
 			productName = MusicianshipTrainer;
-			productReference = 7B3FC9A52B0B62D6004A7987 /* MusicianshipTrainer1.app */;
+			productReference = 7B3FC9A52B0B62D6004A7987 /* MusicianshipTrainer.app */;
 			productType = "com.apple.product-type.application";
 		};
-		7B3FC9BA2B0B62D8004A7987 /* MusicianshipTrainer1Tests */ = {
+		7B3FC9BA2B0B62D8004A7987 /* MusicianshipTrainerTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 7B3FC9D22B0B62D8004A7987 /* Build configuration list for PBXNativeTarget "MusicianshipTrainer1Tests" */;
+			buildConfigurationList = 7B3FC9D22B0B62D8004A7987 /* Build configuration list for PBXNativeTarget "MusicianshipTrainerTests" */;
 			buildPhases = (
 				7B3FC9B72B0B62D8004A7987 /* Sources */,
 				7B3FC9B82B0B62D8004A7987 /* Frameworks */,
@@ -236,14 +236,14 @@
 			dependencies = (
 				7B3FC9BD2B0B62D8004A7987 /* PBXTargetDependency */,
 			);
-			name = MusicianshipTrainer1Tests;
+			name = MusicianshipTrainerTests;
 			productName = MusicianshipTrainerTests;
-			productReference = 7B3FC9BB2B0B62D8004A7987 /* MusicianshipTrainer1Tests.xctest */;
+			productReference = 7B3FC9BB2B0B62D8004A7987 /* MusicianshipTrainerTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		7B3FC9C42B0B62D8004A7987 /* MusicianshipTrainer1UITests */ = {
+		7B3FC9C42B0B62D8004A7987 /* MusicianshipTrainerUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 7B3FC9D52B0B62D8004A7987 /* Build configuration list for PBXNativeTarget "MusicianshipTrainer1UITests" */;
+			buildConfigurationList = 7B3FC9D52B0B62D8004A7987 /* Build configuration list for PBXNativeTarget "MusicianshipTrainerUITests" */;
 			buildPhases = (
 				7B3FC9C12B0B62D8004A7987 /* Sources */,
 				7B3FC9C22B0B62D8004A7987 /* Frameworks */,
@@ -254,9 +254,9 @@
 			dependencies = (
 				7B3FC9C72B0B62D8004A7987 /* PBXTargetDependency */,
 			);
-			name = MusicianshipTrainer1UITests;
+			name = MusicianshipTrainerUITests;
 			productName = MusicianshipTrainerUITests;
-			productReference = 7B3FC9C52B0B62D8004A7987 /* MusicianshipTrainer1UITests.xctest */;
+			productReference = 7B3FC9C52B0B62D8004A7987 /* MusicianshipTrainerUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -282,7 +282,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 7B3FC9A02B0B62D6004A7987 /* Build configuration list for PBXProject "MusicianshipTrainer1" */;
+			buildConfigurationList = 7B3FC9A02B0B62D6004A7987 /* Build configuration list for PBXProject "MusicianshipTrainer" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -295,9 +295,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				7B3FC9A42B0B62D6004A7987 /* MusicianshipTrainer1 */,
-				7B3FC9BA2B0B62D8004A7987 /* MusicianshipTrainer1Tests */,
-				7B3FC9C42B0B62D8004A7987 /* MusicianshipTrainer1UITests */,
+				7B3FC9A42B0B62D6004A7987 /* MusicianshipTrainer */,
+				7B3FC9BA2B0B62D8004A7987 /* MusicianshipTrainerTests */,
+				7B3FC9C42B0B62D8004A7987 /* MusicianshipTrainerUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -375,12 +375,12 @@
 /* Begin PBXTargetDependency section */
 		7B3FC9BD2B0B62D8004A7987 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 7B3FC9A42B0B62D6004A7987 /* MusicianshipTrainer1 */;
+			target = 7B3FC9A42B0B62D6004A7987 /* MusicianshipTrainer */;
 			targetProxy = 7B3FC9BC2B0B62D8004A7987 /* PBXContainerItemProxy */;
 		};
 		7B3FC9C72B0B62D8004A7987 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 7B3FC9A42B0B62D6004A7987 /* MusicianshipTrainer1 */;
+			target = 7B3FC9A42B0B62D6004A7987 /* MusicianshipTrainer */;
 			targetProxy = 7B3FC9C62B0B62D8004A7987 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -506,13 +506,15 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"MusicianshipTrainer/Preview Content\"";
-				DEVELOPMENT_TEAM = 98U3T95RVJ;
+				DEVELOPMENT_TEAM = X9VDGR7PQ7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MusicianshipTrainer/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = MusicianshipTrainer;
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This application uses your microphone to record your music playing";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -523,9 +525,10 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 38.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.musicmastereducation.MusicianshipTrainer;
+				MARKETING_VERSION = 41.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.musicmastereducation.MusicianshipTrainer3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -538,13 +541,15 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"MusicianshipTrainer/Preview Content\"";
-				DEVELOPMENT_TEAM = 98U3T95RVJ;
+				DEVELOPMENT_TEAM = X9VDGR7PQ7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MusicianshipTrainer/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = MusicianshipTrainer;
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This application uses your microphone to record your music playing";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -555,9 +560,10 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 38.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.musicmastereducation.MusicianshipTrainer;
+				MARKETING_VERSION = 41.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.musicmastereducation.MusicianshipTrainer3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -571,7 +577,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 98U3T95RVJ;
+				DEVELOPMENT_TEAM = X9VDGR7PQ7;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
 				MARKETING_VERSION = 1.0;
@@ -580,7 +586,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MusicianshipTrainer1.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/MusicianshipTrainer1";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MusicianshipTrainer.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/MusicianshipTrainer";
 			};
 			name = Debug;
 		};
@@ -591,7 +597,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 98U3T95RVJ;
+				DEVELOPMENT_TEAM = X9VDGR7PQ7;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
 				MARKETING_VERSION = 1.0;
@@ -600,7 +606,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MusicianshipTrainer1.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/MusicianshipTrainer1";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MusicianshipTrainer.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/MusicianshipTrainer";
 			};
 			name = Release;
 		};
@@ -610,7 +616,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 98U3T95RVJ;
+				DEVELOPMENT_TEAM = X9VDGR7PQ7;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dmurphy.test.MusicianshipTrainer.MusicianshipTrainerUITests;
@@ -628,7 +634,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 98U3T95RVJ;
+				DEVELOPMENT_TEAM = X9VDGR7PQ7;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dmurphy.test.MusicianshipTrainer.MusicianshipTrainerUITests;
@@ -643,7 +649,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		7B3FC9A02B0B62D6004A7987 /* Build configuration list for PBXProject "MusicianshipTrainer1" */ = {
+		7B3FC9A02B0B62D6004A7987 /* Build configuration list for PBXProject "MusicianshipTrainer" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				7B3FC9CD2B0B62D8004A7987 /* Debug */,
@@ -652,7 +658,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		7B3FC9CF2B0B62D8004A7987 /* Build configuration list for PBXNativeTarget "MusicianshipTrainer1" */ = {
+		7B3FC9CF2B0B62D8004A7987 /* Build configuration list for PBXNativeTarget "MusicianshipTrainer" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				7B3FC9D02B0B62D8004A7987 /* Debug */,
@@ -661,7 +667,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		7B3FC9D22B0B62D8004A7987 /* Build configuration list for PBXNativeTarget "MusicianshipTrainer1Tests" */ = {
+		7B3FC9D22B0B62D8004A7987 /* Build configuration list for PBXNativeTarget "MusicianshipTrainerTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				7B3FC9D32B0B62D8004A7987 /* Debug */,
@@ -670,7 +676,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		7B3FC9D52B0B62D8004A7987 /* Build configuration list for PBXNativeTarget "MusicianshipTrainer1UITests" */ = {
+		7B3FC9D52B0B62D8004A7987 /* Build configuration list for PBXNativeTarget "MusicianshipTrainerUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				7B3FC9D62B0B62D8004A7987 /* Debug */,

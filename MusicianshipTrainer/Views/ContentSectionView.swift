@@ -140,11 +140,16 @@ struct ContentSectionInstructionsView: UIViewRepresentable {
     var htmlDocument:String
 
     func makeUIView(context: Context) -> WKWebView {
-        return WKWebView()
+        let view = WKWebView()
+        view.backgroundColor = UIColor.white
+        return view
     }
     
     func updateUIView(_ uiView: WKWebView, context: Context) {
-        uiView.loadHTMLString(htmlDocument.trimmingCharacters(in: .whitespaces), baseURL: nil)
+        let cssString = "body { background-color: white !important; }" // Force background color
+        let modifiedHTML = "<style>\(cssString)</style>\(htmlDocument)"
+        uiView.loadHTMLString(modifiedHTML.trimmingCharacters(in: .whitespaces), baseURL: nil)
+        //uiView.loadHTMLString(htmlDocument.trimmingCharacters(in: .whitespaces), baseURL: nil)
     }
 }
 
@@ -157,8 +162,6 @@ struct ContentSectionHeaderView: View {
     @State private var instructions:String? = nil
     @State private var tipsAndTricksExists = false
     @State private var tipsAndTricksData:String?=nil
-    @State private var parentsExists = false
-    @State private var parentsData:String?=nil
     @State private var audioInstructionsFileName:String? = nil
     
     func getInstructions(bypassCache:Bool)  {
@@ -188,18 +191,18 @@ struct ContentSectionHeaderView: View {
         }
     }
     
-    func getParentsData(bypassCache: Bool)  {
-        let filename = "Parents"
-        var pathSegments = contentSection.getPathAsArray()
-        pathSegments.append(Settings.shared.getAgeGroup())
-
-        googleAPI.getDocumentByName(pathSegments: pathSegments, name: filename, reportError: false, bypassCache: bypassCache) {status,document in
-            if status == .success {
-                self.parentsExists = true
-                self.parentsData = document
-            }
-        }
-    }
+//    func getParentsData(bypassCache: Bool)  {
+//        let filename = "Parents"
+//        var pathSegments = contentSection.getPathAsArray()
+//        pathSegments.append(Settings.shared.getAgeGroup())
+//
+//        googleAPI.getDocumentByName(pathSegments: pathSegments, name: filename, reportError: false, bypassCache: bypassCache) {status,document in
+//            if status == .success {
+//                self.parentsExists = true
+//                self.parentsData = document
+//            }
+//        }
+//    }
 
     func getAudio()  {
         let audioContent = contentSection.getChildSectionByType(type: "Audio")
@@ -242,12 +245,9 @@ struct ContentSectionHeaderView: View {
                             NarrationView(contentSection: contentSection, htmlDocument: instructions, context: "Instructions")
                         }
                         .frame(height: CGFloat((getParagraphCount(html: instructions)))/12.0 * UIScreen.main.bounds.height)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: UIGlobals.cornerRadius).stroke(Color(UIGlobals.borderColor), lineWidth: UIGlobals.borderLineWidth)
-                        )
-                        .padding()
+                        //.padding()
                         //.background(UIGlobals.colorNavigationBackground)
-                        .background(Color(.secondarySystemBackground))
+                        //.background(Color(.secondarySystemBackground))
                     }
                 }
             }
@@ -281,8 +281,6 @@ struct ContentSectionHeaderView: View {
                     .sheet(isPresented: $isVideoPresented) {
                         let urlStr = "https://storage.googleapis.com/musicianship_trainer/NZMEB/" +
                         contentSection.getPath() + "." + Settings.shared.getAgeGroup() + ".video.mp4"
-                        //https://storage.googleapis.com/musicianship_trainer/NZMEB/Grade%201.PracticeMode.Sight%20Reading.11Plus.video.mp4
-                        //Grade 1.PracticeMode.Sight Reading.11Plus.video.mp4
                         let allowedCharacterSet = CharacterSet.urlQueryAllowed
                         if let encodedString = urlStr.addingPercentEncoding(withAllowedCharacters: allowedCharacterSet) {
                             if let url = URL(string: encodedString) {
@@ -301,7 +299,6 @@ struct ContentSectionHeaderView: View {
                     Spacer()
                     Button(action: {
                         DispatchQueue.main.async {
-                            //contentSectionView.randomPick()
                             let c = contentSection.subSections.count
                             let r = Int.random(in: 0...c)
                             contentSection.setSelected(r)
@@ -335,27 +332,15 @@ struct ContentSectionHeaderView: View {
                         }
                     }
                 }
-                
-                if parentsExists {
-                    Spacer()
-                    NavigationLink(destination: ContentSectionWebView(htmlDocument: parentsData!, contentSection: contentSection)) {
-                        VStack {
-                            Text("Parents")
-                                .font(UIDevice.current.userInterfaceIdiom == .phone ? .footnote : UIGlobals.navigationFont)
-                            Image(systemName: "text.bubble")
-                                .foregroundColor(.blue)
-                                .font(.title)
-                        }
-                    }
-                }
                 Spacer()
             }
+            .padding()
             if Settings.shared.showReloadHTMLButton {
                 Button(action: {
                     DispatchQueue.main.async {
                         self.getInstructions(bypassCache: true)
                         self.getTipsTricksData(bypassCache: true)
-                        self.getParentsData(bypassCache: true)
+                        //self.getParentsData(bypassCache: true)
                     }
                 }) {
                     VStack {
@@ -369,14 +354,144 @@ struct ContentSectionHeaderView: View {
             }
             
         }
+        .background(Color.white)
+        .padding(3)
+        .overlay(
+            //RoundedRectangle(cornerRadius: UIGlobals.cornerRadius).stroke(Color(UIGlobals.borderColor), lineWidth: UIGlobals.borderLineWidth)
+            RoundedRectangle(cornerRadius: 16).stroke(Color(.gray), lineWidth: 4)
+        )
         .onAppear() {
             getAudio()
             getInstructions(bypassCache: false)
             getTipsTricksData(bypassCache: false)
-            getParentsData(bypassCache: false)
+            //getParentsData(bypassCache: false)
         }
         .onDisappear() {
             AudioRecorder.shared.stopPlaying()
+        }
+    }
+}
+
+struct ContentSectionView: View {
+    @ObservedObject var contentSection:ContentSection
+    @State private var showNextNavigation: Bool = true
+    @State private var endOfSection: Bool = false
+    @State var answerState:AnswerState = .notEverAnswered
+    @State var answer:Answer = Answer()
+    @State var isShowingConfiguration:Bool = false
+    @State var promptForLicense = false
+    
+    let id = UUID()
+    
+    init (contentSection:ContentSection) { //, contentSectionView:(any View), parentSelectionIndex:Binding<Int?>) {
+        self.contentSection = contentSection
+    }
+    
+    func log() -> String {
+        print("==== ContentSectionView", contentSection.getPath())
+        return ""
+    }
+    
+
+    var body: some View {
+        VStack {
+            let log = log()
+            if contentSection.getNavigableChildSections().count > 0 {
+                if contentSection.isExamTypeContentSection() {
+                    //No ContentSectionHeaderView in any exam mode content section except the exam start
+                    if contentSection.hasExamModeChildren() {
+                        ContentSectionHeaderView(contentSection: contentSection)
+                            //.border(Color.red)
+                            //.padding(.vertical, 0)
+                        SectionsNavigationView(contentSection: contentSection)
+                    }
+                    else {
+                        if contentSection.hasStoredAnswers() {
+                            //Exam was taken
+                            SectionsNavigationView(contentSection: contentSection)
+                        }
+                        else {
+                            GeometryReader { geo in
+                                ExamView(contentSection: contentSection)
+                                    .frame(width: geo.size.width)
+                            }
+                        }
+                    }
+                }
+                else {
+                    ZStack {
+                        VStack {
+                            Image("app_bkg")
+                                .resizable()
+                                .scaledToFill() // Scales the image to fill the view
+                                .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+                                .opacity(0.8)
+                        }
+                        ScrollViewReader { proxy in
+                            ContentSectionHeaderView(contentSection: contentSection)
+                                .padding()
+                            
+                            SectionsNavigationView(contentSection: contentSection)
+                                .padding()
+                        }
+                    }
+                }
+            }
+            else {
+                ContentTypeView(contentSection: self.contentSection,
+                                answerState: $answerState,
+                                answer: $answer)
+                .onDisappear() {
+                    if Settings.shared.companionOn {
+                        if contentSection.homeworkIsAssigned {
+                            contentSection.setStoredAnswer(answer: answer.copyAnwser(), ctx: "ContentSectionView DISAPPEAR")
+                            contentSection.saveAnswerToFile(answer: answer.copyAnwser())
+                        }
+                    }
+                }
+
+            }
+        }
+        //.background(UIGlobals.colorNavigationBackground)
+        .background(Color(.secondarySystemBackground))
+        .onAppear {
+            if let licenseManager = IAPManager.shared {
+                //licenseManager.restorePurchases()
+            }
+            
+            if contentSection.storedAnswer != nil {
+                self.answerState = .submittedAnswer
+                self.answer = contentSection.storedAnswer!
+            }
+            //promptForLicense = contentSection.getPathAsArray().count == 1
+        }
+        .onDisappear() {
+            AudioRecorder.shared.stopPlaying()
+//            if Settings.shared.companionOn {
+//
+//            }
+        }
+        .navigationBarTitle(contentSection.getTitle(), displayMode: .inline)//.font(.title)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: {
+                    isShowingConfiguration = true
+                }) {
+                    Image(systemName: "music.note.list")
+                        .foregroundColor(.blue)
+                        .font(UIDevice.current.userInterfaceIdiom == .phone ? .body : .largeTitle)
+                }
+            }
+        }
+        .sheet(isPresented: $isShowingConfiguration) {
+            let newSettings = Settings(copy: Settings.shared)
+            ConfigurationView(isPresented: $isShowingConfiguration,
+                              settings: newSettings)
+            
+        }
+        .sheet(isPresented: $promptForLicense) {
+            let newSettings = Settings(copy: Settings.shared)
+            PurchaseLicenseView(contentSection: contentSection)
         }
     }
 }
@@ -398,7 +513,6 @@ struct SectionsNavigationView:View {
     struct HomeworkView: View {
         @ObservedObject var contentSection:ContentSection
         @Environment(\.presentationMode) var presentationMode
-        //@State var setHomework = false
         
         func msg(contentSection:ContentSection) -> String {
             var s = ""
@@ -472,10 +586,10 @@ struct SectionsNavigationView:View {
         return im
     }
     
-//    func log() -> String {
-//        print("=========>>>>>>>>>>>>>>>>>>>SectionsNavigationView", contentSection.homeworkIsAssigned, contentSection.getPath())
-//        return ""
-//    }
+    func log() -> String {
+        print("==== Sections NAVIGATION View", contentSection.getPath())
+        return ""
+    }
     
     ///Need to be separate View to force the image to change immediately after answer is made
     struct HomeworkStatusIconView:View {
@@ -497,6 +611,7 @@ struct SectionsNavigationView:View {
     var body: some View {
         VStack {
             let contentSections = contentSection.getNavigableChildSections()
+            let log = log()
             
             ScrollViewReader { proxy in
                 List(Array(contentSections.indices), id: \.self) { index in
@@ -507,10 +622,7 @@ struct SectionsNavigationView:View {
                                     ContentSectionView(contentSection: contentSections[index]),
                                    tag: index,
                                    selection: $contentSection.selectedIndex
-                                   //selection: $selectedIndex
-                                   //selection: $navigationManager.selectedIndex
                     ) {
-                        //let log = log(cs:contentSections[index])
                         ZStack {
                             HStack {
                                 ZStack {
@@ -521,7 +633,6 @@ struct SectionsNavigationView:View {
                                             .padding(.vertical, 8)
                                         Spacer()
                                     }
-                                    //let homeworkStatus = log()
                                     if !contentSections[index].homeworkIsAssigned {
                                         //Show correct answer icon for an exam question
                                         if let rowImage = contentSections[index].getGradeImage() {
@@ -561,14 +672,27 @@ struct SectionsNavigationView:View {
                                 Text("")
                                 Spacer()
                             }
-                            
                         }
                     }
+                    ///End of Nav link view
+                    //.background(Color.clear)
+                    //.padding()
                 }
+                ///End of List
+                .padding(3)
+                .overlay(
+                    //RoundedRectangle(cornerRadius: UIGlobals.cornerRadius).stroke(Color(UIGlobals.borderColor), lineWidth: UIGlobals.borderLineWidth)
+                    RoundedRectangle(cornerRadius: 16).stroke(Color(.gray), lineWidth: 4)
+                )
+                .padding()
+                ///Force list view height to stop it taking whole height of screen
+                .frame(height: UIScreen.main.bounds.height / (UIDevice.current.orientation.isLandscape ? 3.0 : 2.0))
+
                 ///This color matches the NavigationView background which cannot be changed.
                 ///i.e. any other colour here causes the navigation link rows to have a different background than the background of the navigationView's own background
                 .listRowBackground(Color(.secondarySystemBackground))
-                
+                //.background(Color.red)
+
                 ///If the random row does not require the ScrollViewReader to scroll then the view for that random row is made visible
                 ///If the random row does require the ScrollViewReader to scroll then it scrolls, goes into the new child view briefly but then exits back to the parent view
                 .onChange(of: contentSection.selectedIndex) { newIndex in
@@ -587,7 +711,9 @@ struct SectionsNavigationView:View {
                     AudioRecorder.shared.stopPlaying()
                 }
             }
+            ///End of Scroll View
         }
+        ///End of VStack
     }
 }
 
@@ -744,108 +870,6 @@ struct ExamView: View {
         }
         .onDisappear() {
             AudioRecorder.shared.stopPlaying()
-        }
-    }
-}
-
-struct ContentSectionView: View {
-    @ObservedObject var contentSection:ContentSection
-    @State private var showNextNavigation: Bool = true
-    @State private var endOfSection: Bool = false
-    @State var answerState:AnswerState = .notEverAnswered
-    @State var answer:Answer = Answer() 
-    @State var isShowingConfiguration:Bool = false
-
-    let id = UUID()
-    
-    init (contentSection:ContentSection) { //, contentSectionView:(any View), parentSelectionIndex:Binding<Int?>) {
-        self.contentSection = contentSection
-    }
-    
-    var body: some View {
-        VStack {
-            if contentSection.getNavigableChildSections().count > 0 {
-                if contentSection.isExamTypeContentSection() {
-                    //No ContentSectionHeaderView in any exam mode content section except the exam start
-                    if contentSection.hasExamModeChildren() {
-                        ContentSectionHeaderView(contentSection: contentSection)
-                            //.border(Color.red)
-                            .padding(.vertical, 0)
-                        SectionsNavigationView(contentSection: contentSection)
-                    }
-                    else {
-                        if contentSection.hasStoredAnswers() {
-                            //Exam was taken
-                            SectionsNavigationView(contentSection: contentSection)
-                        }
-                        else {
-                            GeometryReader { geo in
-                                ExamView(contentSection: contentSection)
-                                    .frame(width: geo.size.width)
-                            }
-                        }
-                    }
-                }
-                else {
-                    ScrollViewReader { proxy in
-                        ContentSectionHeaderView(contentSection: contentSection)
-                            //.border(Color.red)
-                            .padding(.vertical, 0)
-                    
-                        SectionsNavigationView(contentSection: contentSection)
-                        //.border(Color.blue)
-                            .padding(.vertical, 0)
-                    }
-                }
-            }
-            else {
-                ContentTypeView(contentSection: self.contentSection,
-                                answerState: $answerState,
-                                answer: $answer)
-                .onDisappear() {
-                    if Settings.shared.companionOn {
-                        if contentSection.homeworkIsAssigned {
-                            contentSection.setStoredAnswer(answer: answer.copyAnwser(), ctx: "ContentSectionView DISAPPEAR")
-                            contentSection.saveAnswerToFile(answer: answer.copyAnwser())
-                        }
-                    }
-                }
-
-            }
-        }
-        //.background(UIGlobals.colorNavigationBackground)
-        .background(Color(.secondarySystemBackground))
-        .onAppear {
-            if contentSection.storedAnswer != nil {
-                self.answerState = .submittedAnswer
-                self.answer = contentSection.storedAnswer!
-            }
-        }
-        .onDisappear() {
-            AudioRecorder.shared.stopPlaying()
-            if Settings.shared.companionOn {
-//                if [.doneCorrect, .doneError].contains(contentSection.getHomework()) {
-//                    contentSection.setStoredAnswer(answer: answer.copyAnwser())
-//                    contentSection.saveAnswerToFile(answer: answer.copyAnwser())
-//                }
-            }
-        }
-        .navigationBarTitle(contentSection.getTitle(), displayMode: .inline)//.font(.title)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: {
-                    isShowingConfiguration = true
-                }) {
-                    Image(systemName: "music.note.list")
-                        .foregroundColor(.blue)
-                        .font(UIDevice.current.userInterfaceIdiom == .phone ? .body : .largeTitle)
-                }
-            }
-        }
-        .sheet(isPresented: $isShowingConfiguration) {
-            let newSettings = Settings(copy: Settings.shared)
-            ConfigurationView(isPresented: $isShowingConfiguration,
-                              settings: newSettings)
         }
     }
 }

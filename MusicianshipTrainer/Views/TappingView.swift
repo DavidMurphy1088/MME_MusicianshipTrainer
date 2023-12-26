@@ -25,21 +25,21 @@ struct TappingView: View {
     @State private var tapRecords: [CGPoint] = []
     @State var ctr = 0
     @ObservedObject var invert:Invert = Invert()
-    @State private var isScaled = false
     @State var tapSoundOn = false
     @State var tapCtr = 0
     @State var lastGestureTime:Date? = nil
 
     func drumView() -> some View {
-        VStack {
+        ZStack {
+            //Text(" ").padding()
             Image("drum_transparent")
                 .resizable()
                 .scaledToFit()
-                .padding()
+                .padding().padding().padding()
                 //.frame(width: UIScreen.main.bounds.width / 4.0)
                 //.padding()
-                .clipShape(Circle())
-                .padding()
+                //.clipShape(Circle())
+                //.padding()
                 .overlay(Circle().stroke(invert.invert ? Color.white : Color.black, lineWidth: 4))
                 .shadow(radius: 10)
             
@@ -47,12 +47,13 @@ struct TappingView: View {
                 if tapRecorder.enableRecordingLight {
                     Image(systemName: "stop.circle")
                         .foregroundColor(Color.red)
-                        .font(.system(size: isScaled ? 70 : 50))
-                        .onAppear {
-                            self.isScaled.toggle()
-                        }
+                        .font(.system(size: 60))
+//                        .onAppear {
+//                            self.isScaled.toggle()
+//                        }
                 }
             }
+            Text(" ").padding()
         }
     }
 
@@ -63,8 +64,7 @@ struct TappingView: View {
             if Settings.shared.useUpstrokeTaps { //}|| UIDevice.current.userInterfaceIdiom == .phone {
                 ZStack {
                     drumView()
-                        .frame(width: UIScreen.main.bounds.width / (UIDevice.current.userInterfaceIdiom == .pad ? 4 : 2))
-
+                        .frame(width: UIScreen.main.bounds.width / (UIDevice.current.userInterfaceIdiom == .pad ? 3 : 2))
                 }
                 .padding()
                 .onTapGesture {
@@ -73,15 +73,13 @@ struct TappingView: View {
                         invert.switchBorder()
                         ///Too much sound lag on phone so dont use sound
                         tapRecorder.makeTap(useSoundPlayer:Settings.shared.soundOnTaps) // && UIDevice.current.userInterfaceIdiom == .pad)
-//                        tapCtr += 1
-
                     }
                 }
             }
             else {
-                ZStack {
-                    drumView()
-                }
+                //ZStack {
+                drumView()
+                //}
                 .frame(width: UIScreen.main.bounds.width / (UIDevice.current.userInterfaceIdiom == .pad ? 3 : 2))
                 .gesture(
                     ///Fires on downstroke
@@ -92,22 +90,15 @@ struct TappingView: View {
                             ///iPhone seems to generate 4-6 notifictions on each tap. Maybe since this is a gesture?
                             ///So drop the notifictions that are too close together. < 0.10 seconds
                             var doTap = false
-//                            if UIDevice.current.userInterfaceIdiom == .pad {
-//                                doTap = true
-//                            }
-//                            else {
-                                if let lastTime = lastGestureTime {
-                                    let diff = gesture.time.timeIntervalSince(lastTime)
-                                    if diff > 0.20 {
-                                        doTap = true
-                                    }
-                                    //print("================ Tap", tapCtr, "Do:", doTap, "time", gesture.time, "diff", diff )
-                                }
-                                else {
+                            if let lastTime = lastGestureTime {
+                                let diff = gesture.time.timeIntervalSince(lastTime)
+                                if diff > 0.20 {
                                     doTap = true
                                 }
-                                
-                            //}
+                            }
+                            else {
+                                doTap = true
+                            }
                             if doTap {
                                 self.lastGestureTime = gesture.time
                                 invert.switchBorder()
@@ -117,9 +108,9 @@ struct TappingView: View {
                         }
                     })
                 )
+                .padding()
             }
 
-            Text("").padding()
             Button(action: {
                 onDone()
             }) {

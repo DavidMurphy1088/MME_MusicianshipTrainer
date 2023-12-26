@@ -65,6 +65,7 @@ struct ContentNavigationView: View {
                         ConfigurationView(isPresented: $isShowingConfiguration,
                                           settings: newSettings
                         )
+                        
                     }
                 }
             }
