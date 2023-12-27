@@ -196,14 +196,10 @@ struct IntervalPresentView: View { //}, QuestionPartProtocol {
                     }
                     //keep the score in the UI for consistent UIlayout between various usages of this view
                     if questionType == .intervalVisual {
-                        ScoreView(score: score, widthPadding: true).padding().opacity(questionType == .intervalAural ? 0.0 : 1.0)
+                        ScoreView(score: score, widthPadding: true).padding()
+                            .opacity(questionType == .intervalAural ? 0.0 : 1.0)
                             .frame(width: UIScreen.main.bounds.width * 0.75)
                     }
-//                    if UIDevice.current.userInterfaceIdiom == .pad {
-//                        ScoreSpacerView()
-//                        ScoreSpacerView()
-//                        ScoreSpacerView()
-//                    }
                     
                     if isTakingExam() {
                         if examInstructionsWereNarrated {
@@ -240,10 +236,6 @@ struct IntervalPresentView: View { //}, QuestionPartProtocol {
                             }
                             Text("").padding()
                         }
-//                        .overlay(
-//                            RoundedRectangle(cornerRadius: UIGlobals.cornerRadius).stroke(Color(UIGlobals.borderColor), lineWidth: UIGlobals.borderLineWidth)
-//                        )
-//                        .background(UIGlobals.colorScore)
                     }
                 }
                 
@@ -269,6 +261,7 @@ struct IntervalPresentView: View { //}, QuestionPartProtocol {
                         if scoreWasPlayed {
                             if UIDevice.current.userInterfaceIdiom == .pad {
                                 Text("Please select the correct interval").defaultTextStyle().padding()
+                                    .background(Color.white)
                             }
                         }
                     }
@@ -298,7 +291,7 @@ struct IntervalPresentView: View { //}, QuestionPartProtocol {
                         .padding()
                     }
                 }
-                Spacer()
+                //Spacer()
             }
             .onAppear {
                 self.initView()
@@ -452,9 +445,9 @@ struct IntervalAnswerView: View {
                 }
                 
                 if contentSection.getExamTakingStatus() == .notInExam {
-                    Spacer()
+                    //Spacer()
                     nextButtons(answerWasCorrect: answer.correct)
-                    Spacer()
+                    //Spacer()
                 }
                 else {
                     Spacer()
@@ -508,35 +501,44 @@ struct IntervalView: View {
     }
             
     var body: some View {
-        
-        VStack {
-            if answerState  == .notEverAnswered || answerState  == .answered {
-                IntervalPresentView(contentSection: contentSection,
-                                    score: self.score,
-                                    answerState: $answerState,
-                                    answer: $answer,
-                                    questionType:questionType)
-
+        ZStack {
+            VStack {
+                Image("app_background_4")
+                    .resizable()
+                    .scaledToFill() // Scales the image to fill the view
+                    .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+                    .opacity(UIGlobalsMT.backgroundImageOpacity)
             }
-            else {
-                if shouldShowAnswer() {
-                    ZStack {
-                        IntervalAnswerView(contentSection: contentSection,
-                                           score: self.score,
-                                           answer: answer,
-                                           questionType:questionType)
-                        if Settings.shared.useAnimations {
-                            if !contentSection.isExamTypeContentSection() {
-                                FlyingImageView(answer: answer)
+
+            VStack {
+                if answerState  == .notEverAnswered || answerState  == .answered {
+                    IntervalPresentView(contentSection: contentSection,
+                                        score: self.score,
+                                        answerState: $answerState,
+                                        answer: $answer,
+                                        questionType:questionType)
+                    
+                }
+                else {
+                    if shouldShowAnswer() {
+                        ZStack {
+                            IntervalAnswerView(contentSection: contentSection,
+                                               score: self.score,
+                                               answer: answer,
+                                               questionType:questionType)
+                            if Settings.shared.useAnimations {
+                                if !contentSection.isExamTypeContentSection() {
+                                    FlyingImageView(answer: answer)
+                                }
                             }
                         }
                     }
                 }
             }
+
         }
-        .onAppear() {
-        }
-        .background(Settings.shared.colorBackground)
+
+        //.background(Settings.shared.colorBackground)
         //.border(Color.red)
     }
 }

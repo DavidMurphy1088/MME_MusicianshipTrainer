@@ -354,12 +354,8 @@ struct ContentSectionHeaderView: View {
             }
             
         }
-        .background(Color.white)
-        .padding(3)
-        .overlay(
-            //RoundedRectangle(cornerRadius: UIGlobals.cornerRadius).stroke(Color(UIGlobals.borderColor), lineWidth: UIGlobals.borderLineWidth)
-            RoundedRectangle(cornerRadius: 16).stroke(Color(.gray), lineWidth: 4)
-        )
+        .roundedBorderRectangle()
+        
         .onAppear() {
             getAudio()
             getInstructions(bypassCache: false)
@@ -387,15 +383,14 @@ struct ContentSectionView: View {
         self.contentSection = contentSection
     }
     
-    func log() -> String {
-        print("==== ContentSectionView", contentSection.getPath())
-        return ""
-    }
+//    func log() -> String {
+//        print("==== ContentSectionView", contentSection.getPath())
+//        return ""
+//    }
     
-
     var body: some View {
         VStack {
-            let log = log()
+            //let log = log()
             if contentSection.getNavigableChildSections().count > 0 {
                 if contentSection.isExamTypeContentSection() {
                     //No ContentSectionHeaderView in any exam mode content section except the exam start
@@ -421,11 +416,11 @@ struct ContentSectionView: View {
                 else {
                     ZStack {
                         VStack {
-                            Image("app_bkg")
+                            Image("app_background_4")
                                 .resizable()
                                 .scaledToFill() // Scales the image to fill the view
                                 .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
-                                .opacity(0.8)
+                                .opacity(UIGlobalsMT.backgroundImageOpacity)
                         }
                         ScrollViewReader { proxy in
                             ContentSectionHeaderView(contentSection: contentSection)
@@ -588,6 +583,7 @@ struct SectionsNavigationView:View {
     
     func log() -> String {
         print("==== Sections NAVIGATION View", contentSection.getPath())
+        print("============landscape", UIDevice.current.orientation.isLandscape, UIScreen.main.bounds.height)
         return ""
     }
     
@@ -679,19 +675,14 @@ struct SectionsNavigationView:View {
                     //.padding()
                 }
                 ///End of List
-                .padding(3)
-                .overlay(
-                    //RoundedRectangle(cornerRadius: UIGlobals.cornerRadius).stroke(Color(UIGlobals.borderColor), lineWidth: UIGlobals.borderLineWidth)
-                    RoundedRectangle(cornerRadius: 16).stroke(Color(.gray), lineWidth: 4)
-                )
+                .roundedBorderRectangle()
                 .padding()
                 ///Force list view height to stop it taking whole height of screen
-                .frame(height: UIScreen.main.bounds.height / (UIDevice.current.orientation.isLandscape ? 3.0 : 2.0))
+                .frame(height: UIScreen.main.bounds.height * (UIDevice.current.orientation.isLandscape ? 0.45 : 0.45))
 
                 ///This color matches the NavigationView background which cannot be changed.
                 ///i.e. any other colour here causes the navigation link rows to have a different background than the background of the navigationView's own background
-                .listRowBackground(Color(.secondarySystemBackground))
-                //.background(Color.red)
+                //.listRowBackground(Color(.secondarySystemBackground))
 
                 ///If the random row does not require the ScrollViewReader to scroll then the view for that random row is made visible
                 ///If the random row does require the ScrollViewReader to scroll then it scrolls, goes into the new child view briefly but then exits back to the parent view

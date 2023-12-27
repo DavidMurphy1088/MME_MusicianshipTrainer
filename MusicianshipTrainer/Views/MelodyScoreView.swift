@@ -154,7 +154,8 @@ struct ListMelodiesView: View {
                                     Text(melody.name)
                                         .padding()
                                         .foregroundColor(selectedMelodyId == melody.id ? .black : .black)
-                                        .background(selectedMelodyId == melody.id ? Color.blue : Settings.shared.colorBackground)
+                                        //.background(selectedMelodyId == melody.id ? Color.blue : Settings.shared.colorBackground)
+                                        .background(selectedMelodyId == melody.id ? Color.blue : Color.white)
                                         .cornerRadius(8)
                                         .padding()
                                     HStack {
@@ -169,10 +170,7 @@ struct ListMelodiesView: View {
                         }
                     }
                     .padding()
-                    .background(Settings.shared.colorBackground)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: UIGlobals.cornerRadius).stroke(Color(UIGlobals.borderColor), lineWidth: UIGlobals.borderLineWidth)
-                    )
+                    .roundedBorderRectangle()
                     Spacer()
                 }
                 

@@ -4,18 +4,13 @@ import AVFoundation
 
 struct PracticeToolView: View {
     var text:String
+    
     var body: some View {
         HStack {
             Text("Practice Tool:").defaultTextStyle()
             Text(text).defaultTextStyle()
         }
-        .padding()
-        .overlay(
-            RoundedRectangle(cornerRadius: UIGlobals.cornerRadius).stroke(Color(UIGlobals.borderColor), lineWidth: UIGlobals.borderLineWidth)
-        )
-        //.background(UIGlobals.backgroundColorLighter)
-        .background(Settings.shared.colorInstructions)
-        .padding()
+        .roundedBorderRectangle()
     }
 }
 
@@ -210,13 +205,9 @@ struct ClapOrPlayPresentView: View {
                 }
             }
         }
-//        .frame(width: UIScreen.main.bounds.width * 0.9, alignment: .leading)
-        ///Limit the size of the scroller since otherwise it takes as much height as it can
-        .frame(height: UIScreen.main.bounds.height * 0.10)
-        .overlay(
-            RoundedRectangle(cornerRadius: UIGlobals.cornerRadius).stroke(Color(UIGlobals.borderColor), lineWidth: UIGlobals.borderLineWidth)
-        )
         .padding()
+        .frame(height: UIScreen.main.bounds.height * 0.20)
+        .roundedBorderRectangle()
     }
     
     func recordingWasStarted() -> Bool {
@@ -471,10 +462,7 @@ struct ClapOrPlayPresentView: View {
                 rhythmTolerancePercent = UIGlobals.rhythmTolerancePercent
             }
             .padding()
-            .overlay(
-                RoundedRectangle(cornerRadius: UIGlobals.cornerRadius).stroke(Color(UIGlobals.borderColor), lineWidth: UIGlobals.borderLineWidth)
-            )
-            .background(Settings.shared.colorScore)
+            .roundedBorderRectangle()
             .padding()
         }
     }
@@ -977,28 +965,17 @@ struct ClapOrPlayAnswerView: View {
     var body: AnyView {
         AnyView(
             VStack {
-                //if UIDevice.current.userInterfaceIdiom != .phone {
-                    if questionType != .melodyPlay {
-                        ToolsView(score: score, helpMetronome: helpMetronome())
-                    }
-                    else {
-                        Text(" ")
-                    }
-                //}
-                //ScoreSpacerView()
-//                if (questionType == .melodyPlay && Settings.shared.useVirtualKeyboard == false) {
-//                    ScoreSpacerView()
-//                }
+                if questionType != .melodyPlay {
+                    ToolsView(score: score, helpMetronome: helpMetronome())
+                }
+                else {
+                    Text(" ")
+                }
+
                 ScoreView(score: score, widthPadding: false).padding()
-                //ScoreSpacerView()
-//                if questionType == .melodyPlay  && Settings.shared.useVirtualKeyboard == false {
-//                    ScoreSpacerView()
-//                }
+
                 if let fittedScore = self.fittedScore {
-                    //Text(" ")
-                    //ScoreSpacerView()
                     ScoreView(score: fittedScore, widthPadding: false).padding()
-                    //ScoreSpacerView()
                 }
 
                 HStack {
@@ -1104,42 +1081,53 @@ struct ClapOrPlayView: View {
     }
 
     var body: some View {
-        VStack {
-            if answerState  != .submittedAnswer {
-                ClapOrPlayPresentView(
-                    contentSection: contentSection,
-                    score: score,
-                    answerState: $answerState,
-                    answer: $answer,
-                    tryNumber: $tryNumber,
-                    questionType: questionType)
-                .frame(width: UIScreen.main.bounds.width)
-                Spacer()
+        ZStack {
+            VStack {
+                Image("app_background_4")
+                    .resizable()
+                    .scaledToFill() // Scales the image to fill the view
+                    .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+                    .opacity(UIGlobalsMT.backgroundImageOpacity)
             }
-            else {
-                if shouldShowAnswer() {
-                    ScrollView {
-                        ZStack {
-                            ClapOrPlayAnswerView(contentSection: contentSection,
-                                                 score: score,
-                                                 answerState: $answerState,
-                                                 tryNumber: $tryNumber,
-                                                 answer: answer,
-                                                 questionType: questionType)
-                            if Settings.shared.useAnimations {
-                                if !contentSection.isExamTypeContentSection() {
-                                    if !(self.questionType == .melodyPlay) {
-                                        FlyingImageView(answer: answer)
+
+            VStack {
+                if answerState  != .submittedAnswer {
+                    ClapOrPlayPresentView(
+                        contentSection: contentSection,
+                        score: score,
+                        answerState: $answerState,
+                        answer: $answer,
+                        tryNumber: $tryNumber,
+                        questionType: questionType)
+                    .frame(width: UIScreen.main.bounds.width)
+                    //Spacer()
+                }
+                else {
+                    if shouldShowAnswer() {
+                        //ScrollView { ///Forces everthing to top align, not center align
+                            ZStack {
+                                ClapOrPlayAnswerView(contentSection: contentSection,
+                                                     score: score,
+                                                     answerState: $answerState,
+                                                     tryNumber: $tryNumber,
+                                                     answer: answer,
+                                                     questionType: questionType)
+                                if Settings.shared.useAnimations {
+                                    if !contentSection.isExamTypeContentSection() {
+                                        if !(self.questionType == .melodyPlay) {
+                                            FlyingImageView(answer: answer)
+                                        }
                                     }
                                 }
                             }
-                        }
+                        //}
                     }
+                    //Spacer() //Force it to align from the top
                 }
-                Spacer() //Force it to align from the top
             }
         }
-        .background(Settings.shared.colorBackground)
+        //.background(Settings.shared.colorBackground)
+        .background(Color(.white))
 
         .onDisappear {
             let metronome = Metronome.getMetronomeWithCurrentSettings(ctx: "")

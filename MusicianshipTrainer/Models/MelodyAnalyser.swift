@@ -41,7 +41,7 @@ class MelodyAnalyser {
             }
             ///Calculate the multiplier for the first note to have the same value as the question score note
             ///Then use that multiplier for all teh following notes to get their value from their time durations
-            if n == 1 {
+            if n == 1 && tapTimes.count > 1 {
                 let timeDuractionInSeconds = tapTimes[n].timeIntervalSince(lastNoteTime!)
                 if let firstNoteValue = firstNoteValue {
                     tempo = Int(60.0 * firstNoteValue / timeDuractionInSeconds)
@@ -75,7 +75,6 @@ class MelodyAnalyser {
             }
         }
         outputScore.tempo = tempo
-        //outputScore.debugScorexx("============== End of make", withBeam: false)
         return outputScore
     }
 }

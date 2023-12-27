@@ -31,15 +31,10 @@ struct TappingView: View {
 
     func drumView() -> some View {
         ZStack {
-            //Text(" ").padding()
             Image("drum_transparent")
                 .resizable()
                 .scaledToFit()
                 .padding().padding().padding()
-                //.frame(width: UIScreen.main.bounds.width / 4.0)
-                //.padding()
-                //.clipShape(Circle())
-                //.padding()
                 .overlay(Circle().stroke(invert.invert ? Color.white : Color.black, lineWidth: 4))
                 .shadow(radius: 10)
             
@@ -48,23 +43,22 @@ struct TappingView: View {
                     Image(systemName: "stop.circle")
                         .foregroundColor(Color.red)
                         .font(.system(size: 60))
-//                        .onAppear {
-//                            self.isScaled.toggle()
-//                        }
                 }
             }
             Text(" ").padding()
         }
+        .padding()
+        .roundedBorderRectangle()
     }
 
     var body: some View {
         VStack {
-            ///18Nov23 - useUpstrokeTaps - removed option - is now alwasy false
+            ///18Nov23 - useUpstrokeTaps - removed option - is now always false
             ///Using the geture on iPhone is problematic. It generates 4-6 notifications per tap. Use use upstroke for phone
             if Settings.shared.useUpstrokeTaps { //}|| UIDevice.current.userInterfaceIdiom == .phone {
                 ZStack {
                     drumView()
-                        .frame(width: UIScreen.main.bounds.width / (UIDevice.current.userInterfaceIdiom == .pad ? 3 : 2))
+                        .frame(width: UIScreen.main.bounds.width / (UIDevice.current.userInterfaceIdiom == .pad ? 4 : 2))
                 }
                 .padding()
                 .onTapGesture {
@@ -77,9 +71,7 @@ struct TappingView: View {
                 }
             }
             else {
-                //ZStack {
                 drumView()
-                //}
                 .frame(width: UIScreen.main.bounds.width / (UIDevice.current.userInterfaceIdiom == .pad ? 3 : 2))
                 .gesture(
                     ///Fires on downstroke

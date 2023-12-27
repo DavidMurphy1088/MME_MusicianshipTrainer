@@ -57,7 +57,9 @@ struct ConfigurationView: View {
                         }
                     }
                 }
-                .padding().overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.black, lineWidth: 1)).padding()
+                .padding()
+                .roundedBorderRectangle()
+                .padding()
 
                 VStack {
                     Circle()
@@ -76,7 +78,9 @@ struct ConfigurationView: View {
                         }
                     }
                 }
-                .padding().overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.black, lineWidth: 1)).padding()
+                .padding()
+                .roundedBorderRectangle()
+                .padding()
 
                 VStack {
                     Circle()
@@ -96,7 +100,9 @@ struct ConfigurationView: View {
                     }
 
                 }
-                .padding().overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.black, lineWidth: 1)).padding()
+                .padding()
+                .roundedBorderRectangle()
+                .padding()
             }
             
             VStack {
@@ -105,15 +111,6 @@ struct ConfigurationView: View {
                         Text("Age Group")
                         ConfigSelectAgeMode(selectedIndex: $settings.ageGroup)
                     }
-                    .onAppear {
-//                            if settings.ageGroup == .Group_5To10 {
-//                                settings.selectedAge = .G
-//                            }
-//                            else {
-//                                settings.selectedAge = 1
-//                            }
-                    }
-                    //.overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.black, lineWidth: 1))
                     .padding()
                     
                     Button(action: {
