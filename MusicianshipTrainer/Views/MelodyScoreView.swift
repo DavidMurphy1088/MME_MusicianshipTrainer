@@ -146,7 +146,6 @@ struct ListMelodiesView: View {
                                 selectedMelodyId = melody.id
                                 selectedMelody = melody
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                    ///Force the melody view to reinit
                                     presentScoreView = true
                                 }
                             }) {
@@ -154,10 +153,10 @@ struct ListMelodiesView: View {
                                     Text(melody.name)
                                         .padding()
                                         .foregroundColor(selectedMelodyId == melody.id ? .black : .black)
-                                        //.background(selectedMelodyId == melody.id ? Color.blue : Settings.shared.colorBackground)
                                         .background(selectedMelodyId == melody.id ? Color.blue : Color.white)
                                         .cornerRadius(8)
                                         .padding()
+                                        .roundedBorderRectangle()
                                     HStack {
                                         Spacer()
                                         Image(systemName: "play")
@@ -170,10 +169,9 @@ struct ListMelodiesView: View {
                         }
                     }
                     .padding()
-                    .roundedBorderRectangle()
                     Spacer()
                 }
-                
+                .background(Color.yellow.opacity(0.1))
                 .padding()
                 .onAppear {
                     self.selectedMelody = nil

@@ -7,4 +7,5 @@ public class UIGlobalsMT {
     public static let borderColor = Color.gray
     public static let borderLineWidth = 4.0
     public static let backgroundImageOpacity = 0.4
+    public static let app_background = "app_background_4"
 }

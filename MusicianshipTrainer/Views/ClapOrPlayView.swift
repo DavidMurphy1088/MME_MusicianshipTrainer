@@ -105,6 +105,9 @@ struct ClapOrPlayPresentView: View {
         if score.staffs.count > 1 {
             self.score.staffs[1].isHidden = true
         }
+        
+        ///Some iPads too short in landscape mode
+        score.heightPaddingEnabled = UIDevice.current.orientation.isLandscape ? false : true
         self.rhythmHeard = self.questionType == .rhythmVisualClap ? true : false
     }
     
@@ -798,10 +801,15 @@ struct ClapOrPlayAnswerView: View {
                                                    onlyRhythm: questionType == .melodyPlay ? false : true,
                                                    tolerancePercent: UIGlobals.rhythmTolerancePercent)
         self.fittedScore = fitted.0
+        
         let feedback = fitted.1
         
         if self.fittedScore == nil {
             return
+        }
+        else {
+            ///Some iPads too short in landscape mode
+            self.fittedScore!.heightPaddingEnabled = UIDevice.current.orientation.isLandscape ? false : true
         }
 
         self.answerMetronome.setAllowTempoChange(allow: false)
@@ -1083,7 +1091,9 @@ struct ClapOrPlayView: View {
     var body: some View {
         ZStack {
             VStack {
-                Image("app_background_4")
+                let imageName = contentSection.getExamTakingStatus() == .notInExam ? UIGlobalsMT.app_background : "app_background_exam"
+
+                Image(imageName)
                     .resizable()
                     .scaledToFill() // Scales the image to fill the view
                     .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)

@@ -3,29 +3,20 @@ import CoreData
 import CommonLibrary
 
 struct GradeIntroView: View {
-    
     var body: some View {
             VStack  (alignment: .center) {
                 Text("Musicianship Trainer")
-                    //.font(.title)
-                    .font(UIGlobals.font)
+                    .font(.system(size: 42))
                     .fontWeight(.bold)
                     .padding()
-                
-                
-                Text("Grade 1 Piano")
-                    .font(UIGlobals.font)
-                    .fontWeight(.bold)
-                    .padding()
-                
-                //Image("nzmeb_logo_transparent")
-                Image("NZMEB logo aqua bird")
+
+                Image("nzmeb_logo_transparent")
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 200)
+                    .frame(width: UIScreen.main.bounds.width * 0.33)
                     .padding()
             }
-            .padding()
+            //.padding()
     }
 }
 
@@ -37,35 +28,48 @@ struct ContentNavigationView: View {
     var body: some View {
         NavigationView {
             VStack {
-                GradeIntroView()
                 ZStack {
-                    List(contentSection.subSections) { contentSection in
-                        NavigationLink(destination: ContentSectionView(contentSection: contentSection)) {
-                            //parentsSelectedContentIndex: $selectedContentIndex)) {
-                            ZStack {
-                                HStack {
-                                    Spacer()
-                                    Text(contentSection.getTitle()).padding()
-                                        .font(UIGlobals.navigationFont)
-                                    Spacer()
-                                }
-                                ///Required to force SwiftUI's horz line beween Nav links to run full width when text is centered
-                                HStack {
-                                    Text("")
-                                    Spacer()
+                    VStack {
+                        Image(UIGlobalsMT.app_background)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+                            .opacity(UIGlobalsMT.backgroundImageOpacity)
+                    }
+                    VStack {
+                        GradeIntroView()
+                        HStack {
+                            Text("                                          ")
+                            VStack {
+                                List(contentSection.subSections) { contentSection in
+                                    NavigationLink(destination: ContentSectionView(contentSection: contentSection)) {
+                                        ZStack {
+                                            HStack {
+                                                Spacer()
+                                                Text(contentSection.getTitle()).padding()
+                                                    .font(UIGlobals.navigationFont)
+                                                Spacer()
+                                            }
+                                            ///Required to force SwiftUI's horz line beween Nav links to run full width when text is centered
+                                            HStack {
+                                                Text("")
+                                                Spacer()
+                                            }
+                                        }
+                                    }
+                                    .disabled(!contentSection.isActive)
+                                    .padding(.vertical, 4)
                                 }
                             }
+                            .frame(height: UIScreen.main.bounds.height * (UIDevice.current.orientation.isLandscape ? 0.25 : 0.25))
+                            Text("                                          ")
+                       }
+                        .sheet(isPresented: $isShowingConfiguration) {
+                            let newSettings = Settings(copy: Settings.shared)
+                            ConfigurationView(isPresented: $isShowingConfiguration,
+                                              settings: newSettings
+                            )
                         }
-                        .disabled(!contentSection.isActive)
-                        .padding(.vertical, 4)
-                    }
-                    //.listRowBackground(Color.yellow)
-                    .sheet(isPresented: $isShowingConfiguration) {
-                        let newSettings = Settings(copy: Settings.shared)
-                        ConfigurationView(isPresented: $isShowingConfiguration,
-                                          settings: newSettings
-                        )
-                        
                     }
                 }
             }
@@ -78,7 +82,6 @@ struct ContentNavigationView: View {
                     }) {
                         Image(systemName: "music.note.list")
                             .foregroundColor(.blue)
-                            //.font(.largeTitle)
                             .font(UIDevice.current.userInterfaceIdiom == .phone ? .body : .largeTitle)
                     }
                 }

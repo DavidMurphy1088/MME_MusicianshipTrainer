@@ -29,7 +29,7 @@ struct SelectIntervalView: View {
             
             ForEach(0..<columns) { column in
                 
-                Spacer()
+                //Spacer()
                 VStack {
                     let intervalsForColumn = intervals.getVisualColumns(col: column)
                     ForEach(intervalsForColumn, id: \.name) { intervalType in
@@ -58,7 +58,7 @@ struct SelectIntervalView: View {
                 }
                 //.padding(.top, 0)
                 //.padding()
-                Spacer()
+                //Spacer()
             }
         }
         .onChange(of: hintCorrectAnswer) { hintCorrectAnswer in
@@ -170,20 +170,8 @@ struct IntervalPresentView: View { //}, QuestionPartProtocol {
         }
     }
 
-    func isTakingExam() -> Bool {
-        guard let parent = contentSection.parent else {
-            return false
-        }
-        if parent.isExamTypeContentSection() && contentSection.storedAnswer == nil {
-            return true
-        }
-        else {
-            return false
-        }
-    }
-    
     func allowHearInterval() -> Bool {
-        return !(self.isTakingExam() && !examInstructionsWereNarrated)
+        return !(contentSection.isTakingExam() && !examInstructionsWereNarrated)
     }
     
     var body: some View {
@@ -201,7 +189,7 @@ struct IntervalPresentView: View { //}, QuestionPartProtocol {
                             .frame(width: UIScreen.main.bounds.width * 0.75)
                     }
                     
-                    if isTakingExam() {
+                    if contentSection.isTakingExam() {
                         if examInstructionsWereNarrated {
                             if answerState == .notEverAnswered {
                                 Button(action: {
@@ -239,7 +227,7 @@ struct IntervalPresentView: View { //}, QuestionPartProtocol {
                     }
                 }
                 
-                if !isTakingExam() {
+                if !contentSection.isTakingExam() {
                     ///Enable one hint click to reduce number of intervals to choose from
                     if intervals.intervalNames.count > 2 {
                         if (questionType == .intervalVisual) || (scoreWasPlayed && questionType == .intervalAural) {
@@ -257,16 +245,17 @@ struct IntervalPresentView: View { //}, QuestionPartProtocol {
                 }
                 
                 VStack {
-                    if !isTakingExam() {
+                    if !contentSection.isTakingExam() {
                         if scoreWasPlayed {
                             if UIDevice.current.userInterfaceIdiom == .pad {
                                 Text("Please select the correct interval").defaultTextStyle().padding()
-                                    .background(Color.white)
+                                    //.background(Color.white)
+                                    .roundedBorderRectangle()
                             }
                         }
                     }
                     HStack {
-                        if !(self.isTakingExam() && !examInstructionsWereNarrated) {
+                        if !(contentSection.isTakingExam() && !examInstructionsWereNarrated) {
                             SelectIntervalView(answer: $answer,
                                                answerState: $answerState,
                                                intervals: intervals,
@@ -279,6 +268,7 @@ struct IntervalPresentView: View { //}, QuestionPartProtocol {
                     .padding()
                 }
                 .disabled(questionType == .intervalAural && scoreWasPlayed == false)
+                .padding()
                 
                 if answerState == .answered {
                     VStack {
@@ -286,7 +276,7 @@ struct IntervalPresentView: View { //}, QuestionPartProtocol {
                             self.buildAnswer()
                             answerState = .submittedAnswer
                         }) {
-                            Text("\(self.isTakingExam() ? "Submit" : "Check") Your Answer").submitAnswerButtonStyle()
+                            Text("\(contentSection.isTakingExam() ? "Submit" : "Check") Your Answer").submitAnswerButtonStyle()
                         }
                         .padding()
                     }
@@ -295,7 +285,7 @@ struct IntervalPresentView: View { //}, QuestionPartProtocol {
             }
             .onAppear {
                 self.initView()
-                if self.isTakingExam() {
+                if contentSection.isTakingExam() {
                     examInstructionsWereNarrated = false
                     self.contentSection.playExamInstructions(withDelay: true,
                            onLoaded: {
@@ -401,33 +391,37 @@ struct IntervalAnswerView: View {
                 //ScoreSpacerView()
                 //ScoreSpacerView()
                 
-                HStack {
-                    if answer.correct {
-                        Image(systemName: "checkmark.circle").resizable().frame(width: imageSize, height: imageSize).foregroundColor(.green)
-                        Text("Correct - Good Job")
-                            .font(UIGlobals.correctAnswerFont)
-                            .defaultTextStyle()
+                VStack {
+                    HStack {
+                        if answer.correct {
+                            Image(systemName: "checkmark.circle").resizable().frame(width: imageSize, height: imageSize).foregroundColor(.green)
+                            Text("Correct - Good Job")
+                                .font(UIGlobals.correctAnswerFont)
+                                .defaultTextStyle()
+                        }
+                        else {
+                            Image(systemName: "staroflife.circle").resizable().frame(width: imageSize, height: imageSize).foregroundColor(.red)
+                            Text("Sorry - not correct")
+                                .font(UIGlobals.correctAnswerFont)
+                                .defaultTextStyle()
+                        }
                     }
-                    else {
-                        Image(systemName: "staroflife.circle").resizable().frame(width: imageSize, height: imageSize).foregroundColor(.red)
-                        Text("Sorry - not correct")
-                            .font(UIGlobals.correctAnswerFont)
-                            .defaultTextStyle()
-                    }
-                }
-                //.padding()
-                
-                if !answer.correct {
-                    Text("You said that the interval was a \(answer.selectedIntervalName )").defaultTextStyle()
+                    //.padding()
+                    
+                    if !answer.correct {
+                        Text("You said that the interval was a \(answer.selectedIntervalName )").defaultTextStyle()
                         //.padding()
-                }
-                Text("The interval is a \(answer.correctIntervalName)").defaultTextStyle().padding()
-                if questionType == .intervalVisual {
-                    if answer.correct == false {
-                        Text(answer.explanation).defaultTextStyle()
+                    }
+                    Text("The interval is a \(answer.correctIntervalName)").defaultTextStyle().padding()
+                    if questionType == .intervalVisual {
+                        if answer.correct == false {
+                            Text(answer.explanation).defaultTextStyle()
                             //.padding()
+                        }
                     }
                 }
+                .padding()
+                .roundedBorderRectangle()
                 
                 HStack {
                     Button(action: {
@@ -503,7 +497,8 @@ struct IntervalView: View {
     var body: some View {
         ZStack {
             VStack {
-                Image("app_background_4")
+                let imageName = contentSection.getExamTakingStatus() == .notInExam ? UIGlobalsMT.app_background : "app_background_exam"
+                Image(imageName)
                     .resizable()
                     .scaledToFill() // Scales the image to fill the view
                     .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)

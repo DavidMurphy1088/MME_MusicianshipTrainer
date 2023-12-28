@@ -5,7 +5,7 @@ import AVKit
 import UIKit
 import CommonLibrary
 
-///The view that runs a specifc example or test
+///The view that runs a specifc example type
 struct ContentTypeView: View {
     //let contentSection:ContentSection
     @ObservedObject var contentSection:ContentSection
@@ -393,22 +393,35 @@ struct ContentSectionView: View {
             //let log = log()
             if contentSection.getNavigableChildSections().count > 0 {
                 if contentSection.isExamTypeContentSection() {
-                    //No ContentSectionHeaderView in any exam mode content section except the exam start
-                    if contentSection.hasExamModeChildren() {
-                        ContentSectionHeaderView(contentSection: contentSection)
-                            //.border(Color.red)
-                            //.padding(.vertical, 0)
-                        SectionsNavigationView(contentSection: contentSection)
-                    }
-                    else {
-                        if contentSection.hasStoredAnswers() {
-                            //Exam was taken
-                            SectionsNavigationView(contentSection: contentSection)
+                    ///Navigating to a specific exam
+                    ///No ContentSectionHeaderView in any exam mode content section except the exam start
+                    ZStack {
+                        VStack {
+                            Image("app_background_exam")
+                                .resizable()
+                                .scaledToFill() // Scales the image to fill the view
+                                .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+                                .opacity(UIGlobalsMT.backgroundImageOpacity)
                         }
-                        else {
-                            GeometryReader { geo in
-                                ExamView(contentSection: contentSection)
-                                    .frame(width: geo.size.width)
+
+                        VStack {
+                            if contentSection.hasExamModeChildren() {
+                                ContentSectionHeaderView(contentSection: contentSection)
+                                //.border(Color.red)
+                                //.padding(.vertical, 0)
+                                SectionsNavigationView(contentSection: contentSection)
+                            }
+                            else {
+                                if contentSection.hasStoredAnswers() {
+                                    //Exam was taken
+                                    SectionsNavigationView(contentSection: contentSection)
+                                }
+                                else {
+                                    GeometryReader { geo in
+                                        ExamView(contentSection: contentSection)
+                                            .frame(width: geo.size.width)
+                                    }
+                                }
                             }
                         }
                     }
@@ -416,7 +429,7 @@ struct ContentSectionView: View {
                 else {
                     ZStack {
                         VStack {
-                            Image("app_background_4")
+                            Image(UIGlobalsMT.app_background)
                                 .resizable()
                                 .scaledToFill() // Scales the image to fill the view
                                 .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)

@@ -78,8 +78,7 @@ struct LaunchScreenView: View {
                         Spacer()
                         HStack {
                             Spacer()
-                            //Image("nzmeb_logo_transparent")
-                            Image("NZMEB logo aqua bird")
+                            Image("NZMEB_logo_splash_screen")
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
                                 .frame(width: geo.size.width * 0.40)
