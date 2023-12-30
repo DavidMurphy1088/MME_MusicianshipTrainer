@@ -7,7 +7,6 @@ import CommonLibrary
 
 ///The view that runs a specifc example type
 struct ContentTypeView: View {
-    //let contentSection:ContentSection
     @ObservedObject var contentSection:ContentSection
     @Binding var answerState:AnswerState
     @Binding var answer:Answer
@@ -163,7 +162,8 @@ struct ContentSectionHeaderView: View {
     @State private var tipsAndTricksExists = false
     @State private var tipsAndTricksData:String?=nil
     @State private var audioInstructionsFileName:String? = nil
-    
+    @State var promptForLicense = false
+
     func getInstructions(bypassCache:Bool)  {
         var pathSegments = contentSection.getPathAsArray()
         if pathSegments.count < 1 {
@@ -221,10 +221,10 @@ struct ContentSectionHeaderView: View {
         return p
     }
     
-    func log(contentSection: ContentSection, index:Int?) -> Bool {
-        //print(contentSection.getPathTitle(), "index", index)
-        return true
-    }
+//    func log(contentSection: ContentSection, index:Int?) -> Bool {
+//        //print(contentSection.getPathTitle(), "index", index)
+//        return true
+//    }
     
     var body: some View {
         VStack {
@@ -253,6 +253,22 @@ struct ContentSectionHeaderView: View {
             }
             
             HStack {
+                if contentSection.getPathAsArray().count == 1 {
+                    Spacer()
+                    Button(action: {
+                        self.promptForLicense = true
+                    }) {
+                        VStack {
+                            VStack {
+                                Text("License Purchase")
+                                    .font(UIDevice.current.userInterfaceIdiom == .phone ? .footnote : UIGlobals.navigationFont)
+                                Image(systemName: "applelogo")
+                                    .foregroundColor(colorScheme == .dark ? .white : .black)
+                                    .font(.title)
+                            }
+                        }
+                    }
+                }
                 if tipsAndTricksExists {
                     Spacer()
                     NavigationLink(destination: ContentSectionWebView(htmlDocument: tipsAndTricksData!, contentSection: contentSection)) {
@@ -355,7 +371,10 @@ struct ContentSectionHeaderView: View {
             
         }
         .roundedBorderRectangle()
-        
+        .sheet(isPresented: $promptForLicense) {
+            PurchaseLicenseView(contentSection: contentSection)
+        }
+
         .onAppear() {
             getAudio()
             getInstructions(bypassCache: false)
@@ -375,7 +394,6 @@ struct ContentSectionView: View {
     @State var answerState:AnswerState = .notEverAnswered
     @State var answer:Answer = Answer()
     @State var isShowingConfiguration:Bool = false
-    @State var promptForLicense = false
     
     let id = UUID()
     
@@ -384,13 +402,13 @@ struct ContentSectionView: View {
     }
     
 //    func log() -> String {
-//        print("==== ContentSectionView", contentSection.getPath())
+//        print("==== ContentSectionView", contentSection.getPathAsArray())
 //        return ""
 //    }
     
     var body: some View {
         VStack {
-            //let log = log()
+           
             if contentSection.getNavigableChildSections().count > 0 {
                 if contentSection.isExamTypeContentSection() {
                     ///Navigating to a specific exam
@@ -429,7 +447,7 @@ struct ContentSectionView: View {
                 else {
                     ZStack {
                         VStack {
-                            Image(UIGlobalsMT.app_background)
+                            Image("app_background_exam")
                                 .resizable()
                                 .scaledToFill() // Scales the image to fill the view
                                 .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
@@ -463,21 +481,25 @@ struct ContentSectionView: View {
         //.background(UIGlobals.colorNavigationBackground)
         .background(Color(.secondarySystemBackground))
         .onAppear {
-            if let licenseManager = IAPManager.shared {
-                //licenseManager.restorePurchases()
-            }
-            
             if contentSection.storedAnswer != nil {
                 self.answerState = .submittedAnswer
                 self.answer = contentSection.storedAnswer!
             }
-            //promptForLicense = contentSection.getPathAsArray().count == 1
+            if contentSection.getPathAsArray().count == 1 {
+                let licenseManager = IAPManager.shared
+                //if let licenseManager = IAPManager.shared {
+                    //if licenseManager.licensingEnabled {
+                        //if licenseManager.transactionState != nil {
+                            //if licenseManager.transactionState != .purchased {
+                                //promptForLicense = true
+                            //}
+                        //}
+                    //}
+                //}
+            }
         }
         .onDisappear() {
             AudioRecorder.shared.stopPlaying()
-//            if Settings.shared.companionOn {
-//
-//            }
         }
         .navigationBarTitle(contentSection.getTitle(), displayMode: .inline)//.font(.title)
         .toolbar {
@@ -497,10 +519,6 @@ struct ContentSectionView: View {
                               settings: newSettings)
             
         }
-        .sheet(isPresented: $promptForLicense) {
-            let newSettings = Settings(copy: Settings.shared)
-            PurchaseLicenseView(contentSection: contentSection)
-        }
     }
 }
 
@@ -509,14 +527,14 @@ struct SectionsNavigationView:View {
     @State var homeworkIndex:Int?
     @State var showHomework = false
     
-    func log(cs:ContentSection) -> String {
-//        print("🤢 ===================== SectionsNavigationView [", cs.getPath(),
-//              //"]  ISCS", cs.isExamTypeContentSection(), "Stored", cs.hasStoredAnswers(),
-////              "child", cs.hasExamModeChildren(),
-//              "HOMEWORK", contentSection.homeworkIsAssigned
-//        )
-        return ""
-    }
+//    func log(cs:ContentSection) -> String {
+////        print("🤢 ===================== SectionsNavigationView [", cs.getPath(),
+////              //"]  ISCS", cs.isExamTypeContentSection(), "Stored", cs.hasStoredAnswers(),
+//////              "child", cs.hasExamModeChildren(),
+////              "HOMEWORK", contentSection.homeworkIsAssigned
+////        )
+//        return ""
+//    }
     
     struct HomeworkView: View {
         @ObservedObject var contentSection:ContentSection
@@ -594,11 +612,10 @@ struct SectionsNavigationView:View {
         return im
     }
     
-    func log() -> String {
-        print("==== Sections NAVIGATION View", contentSection.getPath())
-        print("============landscape", UIDevice.current.orientation.isLandscape, UIScreen.main.bounds.height)
-        return ""
-    }
+//    func log() -> String {
+//        print("==== Sections NAVIGATION View", contentSection.getPathAsArray(), contentSection.subSections.count)
+//        return ""
+//    }
     
     ///Need to be separate View to force the image to change immediately after answer is made
     struct HomeworkStatusIconView:View {
@@ -620,7 +637,7 @@ struct SectionsNavigationView:View {
     var body: some View {
         VStack {
             let contentSections = contentSection.getNavigableChildSections()
-            let log = log()
+            //let log = log()
             
             ScrollViewReader { proxy in
                 List(Array(contentSections.indices), id: \.self) { index in
@@ -683,10 +700,12 @@ struct SectionsNavigationView:View {
                             }
                         }
                     }
+                    .disabled(contentSections[index].needLicense)
                     ///End of Nav link view
                     //.background(Color.clear)
                     //.padding()
                 }
+                
                 ///End of List
                 .roundedBorderRectangle()
                 .padding()

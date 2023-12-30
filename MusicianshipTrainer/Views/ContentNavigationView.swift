@@ -30,7 +30,7 @@ struct ContentNavigationView: View {
             VStack {
                 ZStack {
                     VStack {
-                        Image(UIGlobalsMT.app_background)
+                        Image(UIGlobalsMT.appBackground)
                             .resizable()
                             .scaledToFill()
                             .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
@@ -39,7 +39,12 @@ struct ContentNavigationView: View {
                     VStack {
                         GradeIntroView()
                         HStack {
-                            Text("                                          ")
+                            if UIDevice.current.userInterfaceIdiom == .phone {
+                                Text("      ")
+                            }
+                            else {
+                                Text("                                          ")
+                            }
                             VStack {
                                 List(contentSection.subSections) { contentSection in
                                     NavigationLink(destination: ContentSectionView(contentSection: contentSection)) {
@@ -58,11 +63,16 @@ struct ContentNavigationView: View {
                                         }
                                     }
                                     .disabled(!contentSection.isActive)
-                                    .padding(.vertical, 4)
+                                    .padding(.vertical, UIDevice.current.userInterfaceIdiom == .phone ? 0.0 : 4.0)
                                 }
                             }
-                            .frame(height: UIScreen.main.bounds.height * (UIDevice.current.orientation.isLandscape ? 0.25 : 0.25))
-                            Text("                                          ")
+                            .frame(height: UIScreen.main.bounds.height * (UIDevice.current.orientation.isLandscape ? 0.25 : 0.40))
+                            if UIDevice.current.userInterfaceIdiom == .phone {
+                                Text("      ")
+                            }
+                            else {
+                                Text("                                          ")
+                            }
                        }
                         .sheet(isPresented: $isShowingConfiguration) {
                             let newSettings = Settings(copy: Settings.shared)

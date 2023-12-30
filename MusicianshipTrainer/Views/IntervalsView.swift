@@ -401,7 +401,7 @@ struct IntervalAnswerView: View {
                         }
                         else {
                             Image(systemName: "staroflife.circle").resizable().frame(width: imageSize, height: imageSize).foregroundColor(.red)
-                            Text("Sorry - not correct")
+                            Text("Incorrect")
                                 .font(UIGlobals.correctAnswerFont)
                                 .defaultTextStyle()
                         }
@@ -497,7 +497,7 @@ struct IntervalView: View {
     var body: some View {
         ZStack {
             VStack {
-                let imageName = contentSection.getExamTakingStatus() == .notInExam ? UIGlobalsMT.app_background : "app_background_exam"
+                let imageName = contentSection.getExamTakingStatus() == .notInExam ? UIGlobalsMT.appBackground : "app_background_exam"
                 Image(imageName)
                     .resizable()
                     .scaledToFill() // Scales the image to fill the view

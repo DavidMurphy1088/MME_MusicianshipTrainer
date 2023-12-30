@@ -1,6 +1,7 @@
 import SwiftUI
 import AVFoundation
 import CommonLibrary
+import StoreKit
 
 enum LaunchScreenStep {
     case firstStep
@@ -117,7 +118,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? ""
         let buildNumber = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? ""
-        IAPManager.shared = IAPManager()
+        SKPaymentQueue.default().add(IAPManager.shared)
         
         Logger.logger.log(self, "Version.Build \(appVersion).\(buildNumber)")
         
@@ -148,24 +149,24 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
 @main
 struct MusicianshipTrainerApp: App {
+    ///Must be @State to notify view when loaded
+    @ObservedObject var exampleData:ExampleData
     @StateObject var launchScreenState = LaunchScreenStateManager()
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     var logger = Logger.logger
     static let productionMode = true
     let settings:Settings = Settings.shared
-    var exampleData:ExampleData
+    
     //product licensed by grade 14Jun23
-    //static let root:ContentSection = ContentSection(parent: nil, type: ContentSection.SectionType.none, name: "Grade 1")
-    let rootContentSection:ContentSection = ContentSection(parent: nil, name: "", type: "")
+    let rootContentSection:ContentSection// = ContentSection(parent: nil, name: "", type: "")//ContentSection(parent: nil, name: "Grade 1", type: ContentSection.SectionType.none)
     var launchTimeSecs = 4.5
 
     init() {
         UIDevice.current.beginGeneratingDeviceOrientationNotifications()
         //Playback supposedly gives better playback than play and record. So only set record when needed
-        let settings = Settings.shared
-        let content = settings.useTestData ? "ContentSheetID_TEST" : "ContentSheetID"
         AudioManager.shared.setSession(.playback)
-        exampleData = ExampleData(sheetName: content, rootContentSection: rootContentSection)
+        rootContentSection = ContentSection(parent: nil, name: "", type: "")
+        exampleData = ExampleData(sheetName: Settings.shared.useTestData ? "ContentSheetID_TEST" : "ContentSheetID", rootContentSection: rootContentSection)
     }
     
     func getStartContentSection() -> ContentSection {
@@ -179,24 +180,22 @@ struct MusicianshipTrainerApp: App {
         return cs
     }
     
+    func getDataLoadedStatus() -> RequestStatus {
+        return self.exampleData.dataStatus
+    }
+    
     var body: some Scene {
         WindowGroup {
             VStack {
                 if launchScreenState.state == .finished {
-                    if exampleData.dataStatus == RequestStatus.success {
-                        if !MusicianshipTrainerApp.productionMode {
-//                            if UIDevice.current.userInterfaceIdiom == .pad {
-//                                TestView().padding(.horizontal)
-//                            }
-                        }
-
+                    if getDataLoadedStatus() == RequestStatus.success {
                         ContentNavigationView(contentSection: getStartContentSection())
                         ///No colour here appears to make a difference. i.e. be visible
                             //.background(Color(red: 0.0, green: 0.7, blue: 0.7))
                             //.tabItem {Label("Exercises", image: "music.note")}
                     }
                     else {
-                        if exampleData.dataStatus == RequestStatus.waiting {
+                        if getDataLoadedStatus() == RequestStatus.waiting {
                             Spacer()
                             Image(systemName: "hourglass.tophalf.fill")
                                 .resizable()

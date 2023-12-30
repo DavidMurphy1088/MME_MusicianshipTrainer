@@ -1091,7 +1091,7 @@ struct ClapOrPlayView: View {
     var body: some View {
         ZStack {
             VStack {
-                let imageName = contentSection.getExamTakingStatus() == .notInExam ? UIGlobalsMT.app_background : "app_background_exam"
+                let imageName = contentSection.getExamTakingStatus() == .notInExam ? UIGlobalsMT.appBackground : "app_background_exam"
 
                 Image(imageName)
                     .resizable()
