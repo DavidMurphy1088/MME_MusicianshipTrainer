@@ -79,7 +79,7 @@ struct MelodyScoreView: View {
                         if let note = getNote(ts) {
                             let newNote = Note(timeSlice: ts, num: note.midiNumber + pitchAdjust, value: note.getValue(), staffNum: 0)
                             if pitchAdjust == 0 {
-                                newNote.accidental = note.accidental
+                                newNote.writtenAccidental = note.writtenAccidental
                             }
                             newTS.addNote(n: newNote)
                         }
@@ -127,7 +127,8 @@ struct ListMelodiesView: View {
                 Text("Hear Melody").defaultButtonStyle()
             }
             .padding()
-            .sheet(isPresented: $presentMelodies) {
+            .fullScreenCover(isPresented: $presentMelodies) {
+            //.sheet(isPresented: $presentMelodies) {
                 VStack {
                     Spacer()
                     Text("Examples of a \(intervalName)").font(.title).padding()
@@ -149,7 +150,7 @@ struct ListMelodiesView: View {
                                     presentScoreView = true
                                 }
                             }) {
-                                ZStack {
+                                //ZStack {
                                     Text(melody.name)
                                         .padding()
                                         .foregroundColor(selectedMelodyId == melody.id ? .black : .black)
@@ -157,21 +158,25 @@ struct ListMelodiesView: View {
                                         .cornerRadius(8)
                                         .padding()
                                         .roundedBorderRectangle()
-                                    HStack {
-                                        Spacer()
-                                        Image(systemName: "play")
-                                            .foregroundColor(.blue)
-                                            .font(.largeTitle)
-                                            .padding()
-                                    }
-                                }
+//                                    HStack {
+//                                        Spacer()
+//                                        Image(systemName: "play")
+//                                            .foregroundColor(.blue)
+//                                            .font(.largeTitle)
+//                                            .padding()
+//                                    }
+                                //}
                             }
                         }
+                        Button("Dismiss") {
+                            presentMelodies = false
+                        }
+                        .padding()
                     }
                     .padding()
                     Spacer()
                 }
-                .background(Color.yellow.opacity(0.1))
+                
                 .padding()
                 .onAppear {
                     self.selectedMelody = nil

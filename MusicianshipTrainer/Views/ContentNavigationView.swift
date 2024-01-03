@@ -52,7 +52,7 @@ struct ContentNavigationView: View {
                                             HStack {
                                                 Spacer()
                                                 Text(contentSection.getTitle()).padding()
-                                                    .font(UIGlobals.navigationFont)
+                                                    .font(UIGlobalsCommon.navigationFont)
                                                 Spacer()
                                             }
                                             ///Required to force SwiftUI's horz line beween Nav links to run full width when text is centered
@@ -66,7 +66,7 @@ struct ContentNavigationView: View {
                                     .padding(.vertical, UIDevice.current.userInterfaceIdiom == .phone ? 0.0 : 4.0)
                                 }
                             }
-                            .frame(height: UIScreen.main.bounds.height * (UIDevice.current.orientation.isLandscape ? 0.25 : 0.40))
+                            .frame(height: UIScreen.main.bounds.height * (UIGlobalsCommon.isLandscape() ? 0.25 : 0.40))
                             if UIDevice.current.userInterfaceIdiom == .phone {
                                 Text("      ")
                             }
@@ -75,7 +75,7 @@ struct ContentNavigationView: View {
                             }
                        }
                         .sheet(isPresented: $isShowingConfiguration) {
-                            let newSettings = Settings(copy: Settings.shared)
+                            let newSettings = SettingsMT(copy: SettingsMT.shared)
                             ConfigurationView(isPresented: $isShowingConfiguration,
                                               settings: newSettings
                             )

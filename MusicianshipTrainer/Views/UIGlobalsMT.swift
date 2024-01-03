@@ -9,3 +9,4 @@ public class UIGlobalsMT {
     public static let backgroundImageOpacity = 0.5
     public static let appBackground = "app_background_4"
 }
+

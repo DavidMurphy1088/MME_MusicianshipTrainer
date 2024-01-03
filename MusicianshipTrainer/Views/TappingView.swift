@@ -53,24 +53,24 @@ struct TappingView: View {
 
     var body: some View {
         VStack {
-            ///18Nov23 - useUpstrokeTaps - removed option - is now always false
-            ///Using the geture on iPhone is problematic. It generates 4-6 notifications per tap. Use use upstroke for phone
-            if Settings.shared.useUpstrokeTaps { //}|| UIDevice.current.userInterfaceIdiom == .phone {
-                ZStack {
-                    drumView()
-                        .frame(width: UIScreen.main.bounds.width / (UIDevice.current.userInterfaceIdiom == .pad ? 4 : 2))
-                }
-                .padding()
-                .onTapGesture {
-                    ///Fires on up stroke
-                    if isRecording {
-                        invert.switchBorder()
-                        ///Too much sound lag on phone so dont use sound
-                        tapRecorder.makeTap(useSoundPlayer:Settings.shared.soundOnTaps) // && UIDevice.current.userInterfaceIdiom == .pad)
-                    }
-                }
-            }
-            else {
+            ///18Nov23 - useUpstrokeTaps - removed option - is now always false. Use down strokes everywhere
+            ///comment deprecated - Using the gesture on iPhone is problematic. It generates 4-6 notifications per tap. Use use upstroke for phone
+//            if Settings.shared.useUpstrokeTaps { //}|| UIDevice.current.userInterfaceIdiom == .phone {
+//                ZStack {
+//                    drumView()
+//                        .frame(width: UIScreen.main.bounds.width / (UIDevice.current.userInterfaceIdiom == .pad ? 4 : 2))
+//                }
+//                .padding()
+//                .onTapGesture {
+//                    ///Fires on up stroke
+//                    if isRecording {
+//                        invert.switchBorder()
+//                        ///Too much sound lag on phone so dont use sound
+//                        tapRecorder.makeTap(useSoundPlayer:Settings.shared.soundOnTaps) // && UIDevice.current.userInterfaceIdiom == .pad)
+//                    }
+//                }
+//            }
+//            else {
                 drumView()
                 .frame(width: UIScreen.main.bounds.width / (UIDevice.current.userInterfaceIdiom == .pad ? 3 : 2))
                 .gesture(
@@ -94,14 +94,14 @@ struct TappingView: View {
                             if doTap {
                                 self.lastGestureTime = gesture.time
                                 invert.switchBorder()
-                                tapRecorder.makeTap(useSoundPlayer:Settings.shared.soundOnTaps)
+                                tapRecorder.makeTap(useSoundPlayer:SettingsMT.shared.soundOnTaps)
                             }
                             tapCtr += 1
                         }
                     })
                 )
                 .padding()
-            }
+//            }
 
             Button(action: {
                 onDone()
@@ -110,7 +110,7 @@ struct TappingView: View {
             }
         }
         .onAppear() {
-            self.tapSoundOn = UIGlobals.rhythmTapSoundOn
+            self.tapSoundOn = UIGlobalsCommon.rhythmTapSoundOn
         }
     }
     

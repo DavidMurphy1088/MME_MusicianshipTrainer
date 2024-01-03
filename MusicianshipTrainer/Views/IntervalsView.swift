@@ -74,7 +74,7 @@ struct IntervalPresentView: View { //}, QuestionPartProtocol {
     @ObservedObject var score:Score
     @ObservedObject private var logger = Logger.logger
     @ObservedObject var audioRecorder = AudioRecorder.shared
-
+    
     @State var examInstructionsWereNarrated = false
     
     @State var intervalNotes:[Note] = []
@@ -83,7 +83,8 @@ struct IntervalPresentView: View { //}, QuestionPartProtocol {
     @State private var scoreWasPlayed = false
     @State var intervals:Intervals
     @State var hintCorrectAnswer:String = ""
-
+    @State var presentInstructions = false
+    
     @Binding var answerState:AnswerState
     @Binding var answer:Answer
     
@@ -100,7 +101,7 @@ struct IntervalPresentView: View { //}, QuestionPartProtocol {
         self.grade = contentSection.getGrade()
         self.intervals = Intervals(grade: grade, questionType: questionType)
     }
-
+    
     func initView() {
         let staff = Staff(score: score, type: .treble, staffNum: 0, linesInStaff: 5)
         self.score.createStaff(num: 0, staff: staff)
@@ -115,7 +116,7 @@ struct IntervalPresentView: View { //}, QuestionPartProtocol {
                 intervalNotes.append(note)
                 if let chord = chord {
                     let chordNote = Note(timeSlice: timeSlice, num: note.midiNumber, value:2, staffNum: note.staffNum)
-                    chordNote.accidental = note.accidental
+                    chordNote.writtenAccidental = note.writtenAccidental
                     chord.addNote(note: chordNote)
                 }
             }
@@ -169,26 +170,49 @@ struct IntervalPresentView: View { //}, QuestionPartProtocol {
             }
         }
     }
-
+    
     func allowHearInterval() -> Bool {
         return !(contentSection.isTakingExam() && !examInstructionsWereNarrated)
+    }
+    
+    func getInstruction(mode: QuestionType) -> String? {
+        if mode == .intervalVisual {
+            return "Look at the given interval and choose the correct one."
+        }
+        if mode == .intervalAural {
+            return "Tap to hear the given interval then choose the correct one."
+        }
+        return nil
+    }
+    
+    func instructionView(instruction:String) -> some View {
+        ScrollView {
+            VStack {
+                Text("Instructions").font(.title).foregroundStyle(Color.blue)
+                Text(instruction)
+                    .defaultTextStyle()
+                    .padding()
+            }
+        }
+        .padding()
     }
     
     var body: some View {
         AnyView(
             VStack {
-                VStack {
-                    ScoreSpacerView() //keep for top ledger line notes
-                    if UIDevice.current.userInterfaceIdiom == .pad {
-                        ScoreSpacerView()
-                    }
-                    //keep the score in the UI for consistent UIlayout between various usages of this view
-                    if questionType == .intervalVisual {
-                        ScoreView(score: score, widthPadding: true).padding()
-                            .opacity(questionType == .intervalAural ? 0.0 : 1.0)
-                            .frame(width: UIScreen.main.bounds.width * 0.75)
-                    }
-                    
+                
+                ScoreSpacerView() //keep for top ledger line notes
+                if UIDevice.current.userInterfaceIdiom == .pad {
+                    ScoreSpacerView()
+                }
+                //keep the score in the UI for consistent UIlayout between various usages of this view
+                if questionType == .intervalVisual {
+                    ScoreView(score: score, widthPadding: true).padding()
+                        .opacity(questionType == .intervalAural ? 0.0 : 1.0)
+                        .frame(width: UIScreen.main.bounds.width * 0.75)
+                }
+                
+                HStack {
                     if contentSection.isTakingExam() {
                         if examInstructionsWereNarrated {
                             if answerState == .notEverAnswered {
@@ -207,7 +231,7 @@ struct IntervalPresentView: View { //}, QuestionPartProtocol {
                             Text("Please wait for narrated instructions ...").hintAnswerButtonStyle(selected: false)
                         }
                     }
-
+                    
                     if questionType == .intervalAural {
                         VStack {
                             Text("").padding()
@@ -225,25 +249,41 @@ struct IntervalPresentView: View { //}, QuestionPartProtocol {
                             Text("").padding()
                         }
                     }
-                }
-                
-                if !contentSection.isTakingExam() {
-                    ///Enable one hint click to reduce number of intervals to choose from
-                    if intervals.intervalNames.count > 2 {
-                        if (questionType == .intervalVisual) || (scoreWasPlayed && questionType == .intervalAural) {
-                            if self.hintCorrectAnswer.count == 0 {
-                                Button(action: {
-                                    self.buildAnswer()
-                                    self.hintCorrectAnswer = answer.correctIntervalName
-                                }) {
-                                    hintButtonView("Get a Hint")
+                    
+                    
+                    if let instruction = self.getInstruction(mode: self.questionType) {
+                        Button(action: {
+                            presentInstructions.toggle()
+                        }) {
+                            VStack {
+                                if UIDevice.current.userInterfaceIdiom == .pad {
+                                    Text("Instructions")
                                 }
-                                .padding()
+                                Image(systemName: "questionmark.circle")
+                            }
+                            .padding()
+                            .roundedBorderRectangle()
+                        }
+                    }
+                    
+                    if !contentSection.isTakingExam() {
+                        ///Enable one hint click to reduce number of intervals to choose from
+                        if intervals.intervalNames.count > 2 {
+                            if (questionType == .intervalVisual) || (scoreWasPlayed && questionType == .intervalAural) {
+                                if self.hintCorrectAnswer.count == 0 {
+                                    Button(action: {
+                                        self.buildAnswer()
+                                        self.hintCorrectAnswer = answer.correctIntervalName
+                                    }) {
+                                        hintButtonView("Get a Hint")
+                                    }
+                                    .padding()
+                                }
                             }
                         }
                     }
                 }
-                
+
                 VStack {
                     if !contentSection.isTakingExam() {
                         if scoreWasPlayed {
@@ -282,6 +322,11 @@ struct IntervalPresentView: View { //}, QuestionPartProtocol {
                     }
                 }
                 //Spacer()
+            }
+            .sheet(isPresented: $presentInstructions) {
+                if let instructions = self.getInstruction(mode: questionType) {
+                    self.instructionView(instruction: instructions)
+                }
             }
             .onAppear {
                 self.initView()
@@ -396,13 +441,13 @@ struct IntervalAnswerView: View {
                         if answer.correct {
                             Image(systemName: "checkmark.circle").resizable().frame(width: imageSize, height: imageSize).foregroundColor(.green)
                             Text("Correct - Good Job")
-                                .font(UIGlobals.correctAnswerFont)
+                                .font(UIGlobalsCommon.correctAnswerFont)
                                 .defaultTextStyle()
                         }
                         else {
                             Image(systemName: "staroflife.circle").resizable().frame(width: imageSize, height: imageSize).foregroundColor(.red)
                             Text("Incorrect")
-                                .font(UIGlobals.correctAnswerFont)
+                                .font(UIGlobalsCommon.correctAnswerFont)
                                 .defaultTextStyle()
                         }
                     }
@@ -435,6 +480,7 @@ struct IntervalAnswerView: View {
                         ListMelodiesView(firstNote: score.getAllTimeSlices()[0].getTimeSliceNotes()[0],
                                          intervalName: answer.correctIntervalName,
                                          interval: answer.correctIntervalHalfSteps, melodies: getMelodies())
+                        //.background(Color.yellow.opacity(0.1))
                     }
                 }
                 
@@ -521,7 +567,7 @@ struct IntervalView: View {
                                                score: self.score,
                                                answer: answer,
                                                questionType:questionType)
-                            if Settings.shared.useAnimations {
+                            if SettingsMT.shared.useAnimations {
                                 if !contentSection.isExamTypeContentSection() {
                                     FlyingImageView(answer: answer)
                                 }

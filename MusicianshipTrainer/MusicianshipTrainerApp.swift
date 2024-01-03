@@ -118,8 +118,18 @@ class AppDelegate: NSObject, UIApplicationDelegate {
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? ""
         let buildNumber = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? ""
-        SKPaymentQueue.default().add(IAPManager.shared)
         
+#if targetEnvironment(simulator)
+        ///Simulator asks for password every time even though its signed in with Apple ID. By design for IAP purchasing... :(
+    // Code to run on the Simulator
+    print("Running on the Simulator")
+#else
+        SKPaymentQueue.default().add(IAPManager.shared) ///Do this as early as possible
+        IAPManager.shared.requestProducts() ///Get products
+        IAPManager.shared.restoreTransactions() ///Get licenses
+#endif
+        UIDevice.current.beginGeneratingDeviceOrientationNotifications()
+
         Logger.logger.log(self, "Version.Build \(appVersion).\(buildNumber)")
         
         //Make navigation titles at top larger font
@@ -155,18 +165,17 @@ struct MusicianshipTrainerApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     var logger = Logger.logger
     static let productionMode = true
-    let settings:Settings = Settings.shared
+    let settings:SettingsMT = SettingsMT.shared
     
     //product licensed by grade 14Jun23
     let rootContentSection:ContentSection// = ContentSection(parent: nil, name: "", type: "")//ContentSection(parent: nil, name: "Grade 1", type: ContentSection.SectionType.none)
     var launchTimeSecs = 4.5
 
     init() {
-        UIDevice.current.beginGeneratingDeviceOrientationNotifications()
         //Playback supposedly gives better playback than play and record. So only set record when needed
         AudioManager.shared.setSession(.playback)
         rootContentSection = ContentSection(parent: nil, name: "", type: "")
-        exampleData = ExampleData(sheetName: Settings.shared.useTestData ? "ContentSheetID_TEST" : "ContentSheetID", rootContentSection: rootContentSection)
+        exampleData = ExampleData(sheetName: SettingsMT.shared.useTestData ? "ContentSheetID_TEST" : "ContentSheetID", rootContentSection: rootContentSection)
     }
     
     func getStartContentSection() -> ContentSection {

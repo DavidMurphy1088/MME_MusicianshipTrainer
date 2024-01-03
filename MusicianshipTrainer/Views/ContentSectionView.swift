@@ -74,12 +74,12 @@ struct ContentTypeView: View {
         .navigationBarHidden(isNavigationHidden())
         .onDisappear() {
             AudioRecorder.shared.stopPlaying()
-            if Settings.shared.companionOn {
-                if contentSection.homeworkIsAssigned {
-                    contentSection.setStoredAnswer(answer: answer.copyAnwser(), ctx: "ContentTypeView DISAPPEAR")
-                    contentSection.saveAnswerToFile(answer: answer.copyAnwser())
-                }
-            }
+//            if Settings.shared.companionOn {
+//                if contentSection.homeworkIsAssigned {
+//                    contentSection.setStoredAnswer(answer: answer.copyAnwser(), ctx: "ContentTypeView DISAPPEAR")
+//                    contentSection.saveAnswerToFile(answer: answer.copyAnwser())
+//                }
+//            }
         }
     }
 }
@@ -170,7 +170,7 @@ struct ContentSectionHeaderView: View {
             return
         }
         let filename = "Instructions" //instructionContent.contentSectionData.data[0]
-        pathSegments.append(Settings.shared.getAgeGroup())
+        pathSegments.append(SettingsMT.shared.getAgeGroup())
         googleAPI.getDocumentByName(pathSegments: pathSegments, name: filename, reportError: false, bypassCache: bypassCache) {status,document in
             if status == .success {
                 self.instructions = document
@@ -181,7 +181,7 @@ struct ContentSectionHeaderView: View {
     func getTipsTricksData(bypassCache: Bool)  {
         let filename = "Tips_Tricks"
         var pathSegments = contentSection.getPathAsArray()
-        pathSegments.append(Settings.shared.getAgeGroup())
+        pathSegments.append(SettingsMT.shared.getAgeGroup())
 
         googleAPI.getDocumentByName(pathSegments: pathSegments, name: filename, reportError: false, bypassCache: bypassCache) {status,document in
             if status == .success {
@@ -221,10 +221,15 @@ struct ContentSectionHeaderView: View {
         return p
     }
     
-//    func log(contentSection: ContentSection, index:Int?) -> Bool {
-//        //print(contentSection.getPathTitle(), "index", index)
-//        return true
-//    }
+    func isRandomPickLicensed(contentSection:ContentSection) -> Bool {
+        guard let gradeSection = contentSection.parentSearch(testCondition: {section in
+            return section.name.contains("Grade")
+        }) else {
+            return true
+        }
+        let license = IAPManager.shared.getLicense(grade: gradeSection.name, email: SettingsMT.shared.licenseEmail)
+        return license != nil
+    }
     
     var body: some View {
         VStack {
@@ -260,8 +265,8 @@ struct ContentSectionHeaderView: View {
                     }) {
                         VStack {
                             VStack {
-                                Text("License Purchase")
-                                    .font(UIDevice.current.userInterfaceIdiom == .phone ? .footnote : UIGlobals.navigationFont)
+                                Text("Licenses")
+                                    .font(UIDevice.current.userInterfaceIdiom == .phone ? .footnote : UIGlobalsCommon.navigationFont)
                                 Image(systemName: "applelogo")
                                     .foregroundColor(colorScheme == .dark ? .white : .black)
                                     .font(.title)
@@ -274,7 +279,7 @@ struct ContentSectionHeaderView: View {
                     NavigationLink(destination: ContentSectionWebView(htmlDocument: tipsAndTricksData!, contentSection: contentSection)) {
                         VStack {
                             Text("Tips and Tricks")
-                                .font(UIDevice.current.userInterfaceIdiom == .phone ? .footnote : UIGlobals.navigationFont)
+                                .font(UIDevice.current.userInterfaceIdiom == .phone ? .footnote : UIGlobalsCommon.navigationFont)
                             Image(systemName: "questionmark.circle")
                                 .foregroundColor(colorScheme == .dark ? .white : .black)
                                 .font(.largeTitle)
@@ -287,7 +292,7 @@ struct ContentSectionHeaderView: View {
                         VStack {
                             VStack {
                                 Text("Video")
-                                    .font(UIDevice.current.userInterfaceIdiom == .phone ? .footnote : UIGlobals.navigationFont)
+                                    .font(UIDevice.current.userInterfaceIdiom == .phone ? .footnote : UIGlobalsCommon.navigationFont)
                                 Image(systemName: "video")
                                     .foregroundColor(colorScheme == .dark ? .white : .black)
                                     .font(.largeTitle)
@@ -296,7 +301,7 @@ struct ContentSectionHeaderView: View {
                     }
                     .sheet(isPresented: $isVideoPresented) {
                         let urlStr = "https://storage.googleapis.com/musicianship_trainer/NZMEB/" +
-                        contentSection.getPath() + "." + Settings.shared.getAgeGroup() + ".video.mp4"
+                        contentSection.getPath() + "." + SettingsMT.shared.getAgeGroup() + ".video.mp4"
                         let allowedCharacterSet = CharacterSet.urlQueryAllowed
                         if let encodedString = urlStr.addingPercentEncoding(withAllowedCharacters: allowedCharacterSet) {
                             if let url = URL(string: encodedString) {
@@ -323,35 +328,36 @@ struct ContentSectionHeaderView: View {
                         VStack {
                             VStack {
                                 Text("Random Pick")
-                                    .font(UIDevice.current.userInterfaceIdiom == .phone ? .footnote : UIGlobals.navigationFont)
+                                    .font(UIDevice.current.userInterfaceIdiom == .phone ? .footnote : UIGlobalsCommon.navigationFont)
                                 Image(systemName: "tornado")
                                     .foregroundColor(colorScheme == .dark ? .white : .black)
                                     .font(.title)
-                            }
+                            }                            
                         }
                     }
+                    .disabled(!isRandomPickLicensed(contentSection: contentSection))
                 }
-                if Settings.shared.companionOn {
-                    if contentSection.getPathAsArray().count == 2 {
-                        Spacer()
-                        Button(action: {
-                        }) {
-                            NavigationLink(destination: SetHomeworkView(contentSection: contentSection)) {
-                                VStack {
-                                    Text("Set Homework")
-                                        .font(UIDevice.current.userInterfaceIdiom == .phone ? .footnote : UIGlobals.navigationFont)
-                                    Image(systemName: "highlighter")
-                                        .foregroundColor(.black)
-                                        .font(.title)
-                                }
-                            }
-                        }
-                    }
-                }
+//                if Settings.shared.companionOn {
+//                    if contentSection.getPathAsArray().count == 2 {
+//                        Spacer()
+//                        Button(action: {
+//                        }) {
+//                            NavigationLink(destination: SetHomeworkView(contentSection: contentSection)) {
+//                                VStack {
+//                                    Text("Set Homework")
+//                                        .font(UIDevice.current.userInterfaceIdiom == .phone ? .footnote : UIGlobalsCommon.navigationFont)
+//                                    Image(systemName: "highlighter")
+//                                        .foregroundColor(.black)
+//                                        .font(.title)
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
                 Spacer()
             }
             .padding()
-            if Settings.shared.showReloadHTMLButton {
+            if SettingsMT.shared.showReloadHTMLButton {
                 Button(action: {
                     DispatchQueue.main.async {
                         self.getInstructions(bypassCache: true)
@@ -372,7 +378,7 @@ struct ContentSectionHeaderView: View {
         }
         .roundedBorderRectangle()
         .sheet(isPresented: $promptForLicense) {
-            PurchaseLicenseView(contentSection: contentSection)
+            LicenseManagerView(contentSection: contentSection, email: SettingsMT.shared.licenseEmail)
         }
 
         .onAppear() {
@@ -468,12 +474,12 @@ struct ContentSectionView: View {
                                 answerState: $answerState,
                                 answer: $answer)
                 .onDisappear() {
-                    if Settings.shared.companionOn {
-                        if contentSection.homeworkIsAssigned {
-                            contentSection.setStoredAnswer(answer: answer.copyAnwser(), ctx: "ContentSectionView DISAPPEAR")
-                            contentSection.saveAnswerToFile(answer: answer.copyAnwser())
-                        }
-                    }
+//                    if SettingsMT.shared.companionOn {
+//                        if contentSection.homeworkIsAssigned {
+//                            contentSection.setStoredAnswer(answer: answer.copyAnwser(), ctx: "ContentSectionView DISAPPEAR")
+//                            contentSection.saveAnswerToFile(answer: answer.copyAnwser())
+//                        }
+//                    }
                 }
 
             }
@@ -485,18 +491,9 @@ struct ContentSectionView: View {
                 self.answerState = .submittedAnswer
                 self.answer = contentSection.storedAnswer!
             }
-            if contentSection.getPathAsArray().count == 1 {
-                let licenseManager = IAPManager.shared
-                //if let licenseManager = IAPManager.shared {
-                    //if licenseManager.licensingEnabled {
-                        //if licenseManager.transactionState != nil {
-                            //if licenseManager.transactionState != .purchased {
-                                //promptForLicense = true
-                            //}
-                        //}
-                    //}
-                //}
-            }
+//            if contentSection.getPathAsArray().count == 1 {
+//                let licenseManager = IAPManager.shared
+//            }
         }
         .onDisappear() {
             AudioRecorder.shared.stopPlaying()
@@ -514,7 +511,7 @@ struct ContentSectionView: View {
             }
         }
         .sheet(isPresented: $isShowingConfiguration) {
-            let newSettings = Settings(copy: Settings.shared)
+            let newSettings = SettingsMT(copy: SettingsMT.shared)
             ConfigurationView(isPresented: $isShowingConfiguration,
                               settings: newSettings)
             
@@ -528,7 +525,7 @@ struct SectionsNavigationView:View {
     @State var showHomework = false
     
 //    func log(cs:ContentSection) -> String {
-////        print("🤢 ===================== SectionsNavigationView [", cs.getPath(),
+//        print("🤢 ===================== SectionsNavigationView [", cs.getPath(),
 ////              //"]  ISCS", cs.isExamTypeContentSection(), "Stored", cs.hasStoredAnswers(),
 //////              "child", cs.hasExamModeChildren(),
 ////              "HOMEWORK", contentSection.homeworkIsAssigned
@@ -633,6 +630,31 @@ struct SectionsNavigationView:View {
         }
     }
     
+    func isExampleLicensed(contentSection:ContentSection) -> Bool {
+        ///Licenses example depending on its example numbers
+        if contentSection.getPathAsArray().count < 3 {
+            return true
+        }
+        let parts = contentSection.name.split(separator: " ")
+        if parts.count != 2 {
+            return true
+        }
+        guard let exNum = Int(parts[1]) else {
+            return true
+        }
+        if exNum <= 2 {
+            return true
+        }
+        guard let grade = contentSection.parentSearch(testCondition: {section in
+                    return section.name.contains("Grade")
+        }) else {
+            return true
+        }
+        let license = IAPManager.shared.getLicense(grade:grade.name, email: SettingsMT.shared.licenseEmail)
+        //print("  +++ grade", grade.name, lic)
+        return license != nil
+    }
+    
     ///The list of examples. The navigation link takes the user  to the specific question next
     var body: some View {
         VStack {
@@ -655,7 +677,7 @@ struct SectionsNavigationView:View {
                                     HStack {
                                         Spacer()
                                         Text(contentSections[index].getTitle())
-                                            .font(UIGlobals.navigationFont)
+                                            .font(UIGlobalsCommon.navigationFont)
                                             .padding(.vertical, 8)
                                         Spacer()
                                     }
@@ -673,7 +695,7 @@ struct SectionsNavigationView:View {
                                         }
                                     }
                                     else {
-                                        if Settings.shared.companionOn {
+                                        if SettingsMT.shared.companionOn {
                                             //Show correct answer icon for a homework question
                                             HStack {
                                                 Spacer()
@@ -700,7 +722,7 @@ struct SectionsNavigationView:View {
                             }
                         }
                     }
-                    .disabled(contentSections[index].needLicense)
+                    .disabled(!isExampleLicensed(contentSection: contentSections[index]))
                     ///End of Nav link view
                     //.background(Color.clear)
                     //.padding()
@@ -710,7 +732,7 @@ struct SectionsNavigationView:View {
                 .roundedBorderRectangle()
                 .padding()
                 ///Force list view height to stop it taking whole height of screen
-                .frame(height: UIScreen.main.bounds.height * (UIDevice.current.orientation.isLandscape ? 0.45 : 0.45))
+                .frame(height: UIScreen.main.bounds.height * (UIGlobalsCommon.isLandscape() ? 0.45 : 0.45))
 
                 ///This color matches the NavigationView background which cannot be changed.
                 ///i.e. any other colour here causes the navigation link rows to have a different background than the background of the navigationView's own background

@@ -42,30 +42,30 @@ class Intervals : ObservableObject {
     @Published var enabledChanged = false
 
     init(grade:Int, questionType:QuestionType) {
-        let ageGroup = Settings.shared.getAgeGroup()
+        let ageGroup = SettingsMT.shared.getAgeGroup()
         self.intervalNames = []
         
         if grade >= 1 {
             ///Grade 1 calls both minor and major third just a 3rd
-            intervalNames.append(IntervalGroup(name: ageGroup == Settings.shared.AGE_GROUP_11_PLUS ? "Second" : "2nd", noteSpan: 1, intervals:[1,2,3]))
-            intervalNames.append(IntervalGroup(name: ageGroup == Settings.shared.AGE_GROUP_11_PLUS ? "Third" : "3rd", noteSpan: 2, intervals:[3,4]))
+            intervalNames.append(IntervalGroup(name: ageGroup == SettingsMT.shared.AGE_GROUP_11_PLUS ? "Second" : "2nd", noteSpan: 1, intervals:[1,2,3]))
+            intervalNames.append(IntervalGroup(name: ageGroup == SettingsMT.shared.AGE_GROUP_11_PLUS ? "Third" : "3rd", noteSpan: 2, intervals:[3,4]))
         }
 
         if grade >= 2 {
             ///Intervals (visual): The entrant will be shown three notes, and will be asked to identify the intervals as either a second, third, fourth or fifth.
 
             ///Perfect and augmented 4ths
-            intervalNames.append(IntervalGroup(name: ageGroup == Settings.shared.AGE_GROUP_11_PLUS ? "Fourth" : "4th", noteSpan: 3, intervals:[5,6]))
+            intervalNames.append(IntervalGroup(name: ageGroup == SettingsMT.shared.AGE_GROUP_11_PLUS ? "Fourth" : "4th", noteSpan: 3, intervals:[5,6]))
             
             ///Diminished, perfect and augmented 5ths
-            intervalNames.append(IntervalGroup(name: ageGroup == Settings.shared.AGE_GROUP_11_PLUS ? "Fifth" : "5th", noteSpan: 4, intervals:[6,7,8]))
+            intervalNames.append(IntervalGroup(name: ageGroup == SettingsMT.shared.AGE_GROUP_11_PLUS ? "Fifth" : "5th", noteSpan: 4, intervals:[6,7,8]))
 
         }
         if grade >= 3 && questionType == .intervalVisual {
             ///The entrant will be shown three notes, and will be asked to identify the intervals as either a second, third, fourth, fifth, sixth, seventh or octave.
-            intervalNames.append(IntervalGroup(name: ageGroup == Settings.shared.AGE_GROUP_11_PLUS ? "Sixth" : "6th", noteSpan: 5, intervals:[8,9,10]))
-            intervalNames.append(IntervalGroup(name: ageGroup == Settings.shared.AGE_GROUP_11_PLUS ? "Seventh" : "7th", noteSpan: 6, intervals:[10,11]))
-            intervalNames.append(IntervalGroup(name: ageGroup == Settings.shared.AGE_GROUP_11_PLUS ? "Octave" : "Octave", noteSpan: 7, intervals:[12]))
+            intervalNames.append(IntervalGroup(name: ageGroup == SettingsMT.shared.AGE_GROUP_11_PLUS ? "Sixth" : "6th", noteSpan: 5, intervals:[8,9,10]))
+            intervalNames.append(IntervalGroup(name: ageGroup == SettingsMT.shared.AGE_GROUP_11_PLUS ? "Seventh" : "7th", noteSpan: 6, intervals:[10,11]))
+            intervalNames.append(IntervalGroup(name: ageGroup == SettingsMT.shared.AGE_GROUP_11_PLUS ? "Octave" : "Octave", noteSpan: 7, intervals:[12]))
         }
         self.intervalsPerColumn = Int(Double((self.intervalNames.count + 1)) / 2.0)
         if intervalsPerColumn == 0 {

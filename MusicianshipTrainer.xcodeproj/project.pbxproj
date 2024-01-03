@@ -31,6 +31,7 @@
 		7B5EA0652B3B7DD600DE7CF3 /* UIGlobalsMT.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B5EA0642B3B7DD600DE7CF3 /* UIGlobalsMT.swift */; };
 		7BA804782B2D05CE007FBE83 /* SightReadingPianoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA804772B2D05CE007FBE83 /* SightReadingPianoView.swift */; };
 		7BA8047E2B2EFDE6007FBE83 /* MelodyAnalyser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA8047D2B2EFDE6007FBE83 /* MelodyAnalyser.swift */; };
+		7BE7BAA02B43D370000B09C0 /* SettingsMT.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE7BA9F2B43D370000B09C0 /* SettingsMT.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -78,6 +79,7 @@
 		7B5EA0642B3B7DD600DE7CF3 /* UIGlobalsMT.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIGlobalsMT.swift; sourceTree = "<group>"; };
 		7BA804772B2D05CE007FBE83 /* SightReadingPianoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SightReadingPianoView.swift; sourceTree = "<group>"; };
 		7BA8047D2B2EFDE6007FBE83 /* MelodyAnalyser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MelodyAnalyser.swift; sourceTree = "<group>"; };
+		7BE7BA9F2B43D370000B09C0 /* SettingsMT.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsMT.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -137,6 +139,7 @@
 			children = (
 				7B1815AB2B0B7134000418CB /* Intervals.swift */,
 				7BA8047D2B2EFDE6007FBE83 /* MelodyAnalyser.swift */,
+				7BE7BA9F2B43D370000B09C0 /* SettingsMT.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -354,6 +357,7 @@
 				7B3FC9A92B0B62D6004A7987 /* MusicianshipTrainerApp.swift in Sources */,
 				7B1815AC2B0B7134000418CB /* Intervals.swift in Sources */,
 				7B1815B62B0BF47A000418CB /* SetHomeworkView.swift in Sources */,
+				7BE7BAA02B43D370000B09C0 /* SettingsMT.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
