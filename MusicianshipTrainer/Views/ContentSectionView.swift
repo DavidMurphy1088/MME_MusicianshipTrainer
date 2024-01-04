@@ -729,6 +729,7 @@ struct SectionsNavigationView:View {
                 }
                 
                 ///End of List
+                .listStyle(PlainListStyle()) // Removes default List styling
                 .roundedBorderRectangle()
                 .padding()
                 ///Force list view height to stop it taking whole height of screen
@@ -736,7 +737,7 @@ struct SectionsNavigationView:View {
 
                 ///This color matches the NavigationView background which cannot be changed.
                 ///i.e. any other colour here causes the navigation link rows to have a different background than the background of the navigationView's own background
-                //.listRowBackground(Color(.secondarySystemBackground))
+                .listRowBackground(Color(.clear))
 
                 ///If the random row does not require the ScrollViewReader to scroll then the view for that random row is made visible
                 ///If the random row does require the ScrollViewReader to scroll then it scrolls, goes into the new child view briefly but then exits back to the parent view

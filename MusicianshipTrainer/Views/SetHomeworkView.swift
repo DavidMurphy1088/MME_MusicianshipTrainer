@@ -229,7 +229,7 @@ struct WeekRow: View {
                         }
                         .listStyle(PlainListStyle())
                     }
-                    
+                    .listStyle(PlainListStyle()) // Removes default List styling
                     .navigationViewStyle(StackNavigationViewStyle()) // Forces a full screen presentation
                     .frame(height: 220)
                     .edgesIgnoringSafeArea(.all)

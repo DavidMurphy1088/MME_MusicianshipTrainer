@@ -2,18 +2,18 @@ import SwiftUI
 import CoreData
 import CommonLibrary
 
-struct GradeIntroView: View {
+struct ProductIntroView: View {
     var body: some View {
             VStack  (alignment: .center) {
                 Text("Musicianship Trainer")
                     .font(.system(size: 42))
                     .fontWeight(.bold)
-                    .padding()
+                    //.padding()
 
-                Image("nzmeb_logo_transparent")
+                Image("NZMEB_logo_bird_transparent")
                     .resizable()
                     .scaledToFit()
-                    .frame(width: UIScreen.main.bounds.width * 0.33)
+                    .frame(width: UIScreen.main.bounds.height * 0.20)
                     .padding()
             }
             //.padding()
@@ -37,7 +37,7 @@ struct ContentNavigationView: View {
                             .opacity(UIGlobalsMT.backgroundImageOpacity)
                     }
                     VStack {
-                        GradeIntroView()
+                        ProductIntroView()
                         HStack {
                             if UIDevice.current.userInterfaceIdiom == .phone {
                                 Text("      ")
@@ -53,20 +53,26 @@ struct ContentNavigationView: View {
                                                 Spacer()
                                                 Text(contentSection.getTitle()).padding()
                                                     .font(UIGlobalsCommon.navigationFont)
+                                                    .listRowBackground(Color.clear)
                                                 Spacer()
                                             }
                                             ///Required to force SwiftUI's horz line beween Nav links to run full width when text is centered
                                             HStack {
                                                 Text("")
+                                                    .listRowBackground(Color.clear)
                                                 Spacer()
                                             }
                                         }
                                     }
+                                    //.listRowBackground(Color.clear)
                                     .disabled(!contentSection.isActive)
-                                    .padding(.vertical, UIDevice.current.userInterfaceIdiom == .phone ? 0.0 : 4.0)
+                                    .padding(.vertical, UIDevice.current.userInterfaceIdiom == .phone ? 0.0 : 0.0)
                                 }
+                                .background(Color.clear) // Makes List background transparent
+                                .listStyle(PlainListStyle()) // Removes default List styling
+                                .roundedBorderRectangle()
                             }
-                            .frame(height: UIScreen.main.bounds.height * (UIGlobalsCommon.isLandscape() ? 0.25 : 0.40))
+                            .frame(height: UIScreen.main.bounds.height * (UIGlobalsCommon.isLandscape() ? 0.33 : 0.40))
                             if UIDevice.current.userInterfaceIdiom == .phone {
                                 Text("      ")
                             }

@@ -177,9 +177,6 @@ struct ClapOrPlayPresentView: View {
     func helpMetronome() -> String {
         let lname = questionType == .melodyPlay ? "melody" : "rhythm"
         var practiceText = "You can adjust the metronome to hear the given \(lname) at varying tempi."
-        if questionType == .melodyPlay {
-            practiceText += " You can also tap the picture of the metronome to practise along with the tick."
-        }
         return practiceText
     }
     
@@ -387,7 +384,6 @@ struct ClapOrPlayPresentView: View {
     
     func getToleranceLabel(_ setting:Double) -> String {
         var name = UIDevice.current.userInterfaceIdiom == .pad ? "Rhythm Tolerance:" : "Tolerance"
-        //if UIDevice.current.userInterfaceIdiom == .pad {
         var grade:String? = nil
         while grade == nil {
             if setting < 35.0 {
@@ -427,8 +423,6 @@ struct ClapOrPlayPresentView: View {
         if let grade = grade {
             name += " " + grade
         }
-        //let percent = " " + String(format: "%.0f", setting) + "%"
-        //name += percent
         return name
     }
     
@@ -454,10 +448,12 @@ struct ClapOrPlayPresentView: View {
                     }
                     .background(SettingsMT.shared.colorBackground)
                 }
-                Slider(value: $rhythmTolerancePercent, in: 30...70).padding(.horizontal, UIDevice.current.userInterfaceIdiom == .pad ? 50 : 4)
+                //Slider(value: $rhythmTolerancePercent, in: 30...70).padding(.horizontal, UIDevice.current.userInterfaceIdiom == .pad ? 50 : 4)
+                Slider(value: $rhythmTolerancePercent, in: 35...75).padding(.horizontal, UIDevice.current.userInterfaceIdiom == .pad ? 50 : 4)
             }
             .onChange(of: rhythmTolerancePercent) { newValue in
-                let allowedValues = [30, 35, 40, 45, 50, 55, 60, 65, 70]
+                //let allowedValues = [30, 35, 40, 45, 50, 55, 60, 65, 70]
+                let allowedValues = [35, 40, 45, 50, 55, 60, 65, 70, 75]
                 let sortedValues = allowedValues.sorted()
                 let closest = sortedValues.min(by: { abs($0 - Int(newValue)) < abs($1 - Int(newValue)) })
                 UIGlobalsCommon.rhythmTolerancePercent = Double(closest ?? Int(newValue))//newValue
@@ -726,12 +722,7 @@ struct ClapOrPlayPresentView: View {
                 }
 
                 metronome.setTempo(tempo: 90, context: "View init")
-                //if questionType == .rhythmEchoClap || questionType == .melodyPlay {
-                    metronome.setAllowTempoChange(allow: true)
-//                }
-//                else {
-//                    metronome.setAllowTempoChange(allow: false)
-//                }
+                metronome.setAllowTempoChange("ClapOrPlayPresentView", allow: true)
                 if questionType == .melodyPlay {
                     score.addTriadNotes()
                 }
@@ -761,7 +752,6 @@ struct ClapOrPlayAnswerView: View {
     @State var playingStudent = false
     @State var speechEnabled = false
     @State var fittedScore:Score?
-    //@State var tryingAgain = false
 
     @State private var score:Score
     @State var hoveringForHelp = false
@@ -775,7 +765,7 @@ struct ClapOrPlayAnswerView: View {
     
     init(contentSection:ContentSection, score:Score, answerState:Binding<AnswerState>, tryNumber:Binding<Int>, answer:Answer, questionType:QuestionType) {
         self.contentSection = contentSection
-        self.score = score //contentSection.getScore(staffCount: questionType == .melodyPlay ? 2 : 1, onlyRhythm: questionType == .melodyPlay ? false : true)
+        self.score = score
         self.questionType = questionType
         self.answerMetronome = Metronome.getMetronomeWithCurrentSettings(ctx:"ClapOrPlayAnswerView")
         self.answer = answer
@@ -843,7 +833,7 @@ struct ClapOrPlayAnswerView: View {
             self.fittedScore!.heightPaddingEnabled = UIGlobalsCommon.isLandscape() ? false : true
         }
 
-        self.answerMetronome.setAllowTempoChange(allow: false)
+        self.answerMetronome.setAllowTempoChange("analyseStudentSubmittal", allow: false)
         self.answerMetronome.setTempo(tempo: self.questionTempo, context: "ClapOrPlayAnswerView")
 
         if let fittedScore = self.fittedScore {
@@ -851,7 +841,7 @@ struct ClapOrPlayAnswerView: View {
                 feedback.correct = true
                 feedback.feedbackExplanation = "Good job!"
                 if let recordedTempo = tappedScore.tempo {
-                    self.answerMetronome.setAllowTempoChange(allow: true)
+                    self.answerMetronome.setAllowTempoChange("analyseStudentSubmittal GOOD RHYTHM", allow: true)
                     self.answerMetronome.setTempo(tempo: recordedTempo, context: "ClapOrPlayAnswerView")
                     let questionTempo = Metronome.getMetronomeWithCurrentSettings(ctx: "for clap answer").getTempo()
                     let tolerance = Int(CGFloat(questionTempo) * 0.2)
@@ -881,10 +871,7 @@ struct ClapOrPlayAnswerView: View {
     
     func helpMetronome() -> String {
         let lname = questionType == .melodyPlay ? "melody" : "rhythm"
-        var practiceText = "You can adjust the metronome to hear the given \(lname) at varying tempi."
-        //if mode == .melodyPlay {
-            practiceText += " You can also tap the picture of the metronome to practise along with the tick."
-        //}
+        let practiceText = "You can tap the picture of the metronome to practise along with the tick."
         return practiceText
     }
     
@@ -1004,13 +991,7 @@ struct ClapOrPlayAnswerView: View {
     var body: AnyView {
         AnyView(
             VStack {
-                //if questionType != .melodyPlay {
-                    ToolsView(score: score, helpMetronome: helpMetronome())
-//                }
-//                else {
-//                    Text(" ")
-//                }
-
+                ToolsView(score: score, helpMetronome: helpMetronome())
                 ScoreView(score: score, widthPadding: false).padding()
 
                 if let fittedScore = self.fittedScore {

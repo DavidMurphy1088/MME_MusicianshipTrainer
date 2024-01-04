@@ -201,7 +201,6 @@ struct MusicianshipTrainerApp: App {
                         ContentNavigationView(contentSection: getStartContentSection())
                         ///No colour here appears to make a difference. i.e. be visible
                             //.background(Color(red: 0.0, green: 0.7, blue: 0.7))
-                            //.tabItem {Label("Exercises", image: "music.note")}
                     }
                     else {
                         if getDataLoadedStatus() == RequestStatus.waiting {
