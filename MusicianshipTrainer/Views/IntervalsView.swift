@@ -516,6 +516,7 @@ struct IntervalView: View {
         _answerState = answerState
         _answer = answer
         score = contentSection.getScore(staffCount: 1, onlyRhythm: false)
+        contentSection.backgroundImageName = UIGlobalsMT.getRandomBackgroundImageName()
     }
     
     func shouldShowAnswer() -> Bool {
@@ -543,7 +544,7 @@ struct IntervalView: View {
     var body: some View {
         ZStack {
             VStack {
-                let imageName = contentSection.getExamTakingStatus() == .notInExam ? UIGlobalsMT.appBackground : "app_background_exam"
+                let imageName = contentSection.getExamTakingStatus() == .notInExam ? contentSection.backgroundImageName : "app_background_navigation"
                 Image(imageName)
                     .resizable()
                     .scaledToFill() // Scales the image to fill the view

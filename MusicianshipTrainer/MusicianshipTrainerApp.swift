@@ -75,6 +75,7 @@ struct LaunchScreenView: View {
             //hack: for some reason there are 2 instances of LaunchScreenView. The first starts showing too early ??
             //if id == 1 {
                 VStack {
+                    ///Image causes title to be truncated on phone
                     VStack {
                         Spacer()
                         HStack {
@@ -173,7 +174,7 @@ struct MusicianshipTrainerApp: App {
 
     init() {
         //Playback supposedly gives better playback than play and record. So only set record when needed
-        AudioManager.shared.setSession(.playback)
+        AudioManager.shared.setAudioSessionPlayback("MusicianshipTrainerApp")
         rootContentSection = ContentSection(parent: nil, name: "", type: "")
         exampleData = ExampleData(sheetName: SettingsMT.shared.useTestData ? "ContentSheetID_TEST" : "ContentSheetID", rootContentSection: rootContentSection)
     }

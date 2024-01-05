@@ -9,12 +9,13 @@ struct ProductIntroView: View {
                     .font(.system(size: 42))
                     .fontWeight(.bold)
                     //.padding()
-
-                Image("NZMEB_logo_bird_transparent")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: UIScreen.main.bounds.height * 0.20)
-                    .padding()
+                if UIDevice.current.userInterfaceIdiom == .pad {
+                    Image("NZMEB_logo_bird_transparent")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: UIScreen.main.bounds.height * 0.20)
+                        .padding()
+                }
             }
             //.padding()
     }
@@ -30,7 +31,7 @@ struct ContentNavigationView: View {
             VStack {
                 ZStack {
                     VStack {
-                        Image(UIGlobalsMT.appBackground)
+                        Image("app_background_navigation")
                             .resizable()
                             .scaledToFill()
                             .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)

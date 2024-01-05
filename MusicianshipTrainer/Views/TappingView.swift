@@ -50,11 +50,20 @@ struct TappingView: View {
         .padding()
         .roundedBorderRectangle()
     }
-
+    
+    func getDrumWidth() -> Double {
+        var size = UIScreen.main.bounds.width / (UIDevice.current.userInterfaceIdiom == .pad ? 3 : 2)
+        if UIGlobalsCommon.isLandscape() {
+            size *= 0.75
+        }
+        return size
+    }
+    
     var body: some View {
         VStack {
             ///18Nov23 - useUpstrokeTaps - removed option - is now always false. Use down strokes everywhere
             ///comment deprecated - Using the gesture on iPhone is problematic. It generates 4-6 notifications per tap. Use use upstroke for phone
+            ///But leave commented code for the moment
 //            if Settings.shared.useUpstrokeTaps { //}|| UIDevice.current.userInterfaceIdiom == .phone {
 //                ZStack {
 //                    drumView()
@@ -72,7 +81,7 @@ struct TappingView: View {
 //            }
 //            else {
                 drumView()
-                .frame(width: UIScreen.main.bounds.width / (UIDevice.current.userInterfaceIdiom == .pad ? 3 : 2))
+                .frame(width: getDrumWidth())
                 .gesture(
                     ///Fires on downstroke
                     ///Min distance has to be 0 to notify on tap

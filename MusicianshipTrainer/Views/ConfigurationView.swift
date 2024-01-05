@@ -32,9 +32,9 @@ struct ConfigurationView: View {
             Spacer()
             Text("Configuration").font(.largeTitle).padding()
                 .padding()
-            Image(systemName: "music.note.list")
-                .foregroundColor(.blue)
-                .font(UIDevice.current.userInterfaceIdiom == .phone ? .body : .largeTitle)
+//            Image(systemName: "music.note.list")
+//                .foregroundColor(.blue)
+//                .font(UIDevice.current.userInterfaceIdiom == .phone ? .body : .largeTitle)
 
             VStack {
                 HStack {
@@ -56,19 +56,21 @@ struct ConfigurationView: View {
                     }) {
                         HStack {
                             Image(systemName: settings.useAnimations ? "checkmark.square" : "square")
-                            Text("Show animations for correct and incorrect answers")
+                            let text = UIDevice.current.userInterfaceIdiom == .phone ? "Show animations" : "Show animations for correct and incorrect answers"
+                            Text(text)
                         }
                     }
                     .padding()
-
+                    
                     Button(action: {
                         DispatchQueue.main.async {
                             settings.soundOnTaps.toggle()
                         }
                     }) {
                         HStack {
+                            let text = UIDevice.current.userInterfaceIdiom == .phone ? "Drum sound tap" : "Use a drum sound for rhythm tapping"
                             Image(systemName: settings.soundOnTaps ? "checkmark.square" : "square")
-                            Text("Use a drum sound for rhythm tapping")
+                            Text(text)
                         }
                     }
                     .padding()
@@ -79,8 +81,9 @@ struct ConfigurationView: View {
                         }
                     }) {
                         HStack {
+                            let text = UIDevice.current.userInterfaceIdiom == .phone ? "Acoustic piano" : "Use an acoustic piano for sight reading"
                             Image(systemName: settings.useAcousticKeyboard ? "checkmark.square" : "square")
-                            Text("Use an acoustic piano for sight reading")
+                            Text(text)
                         }
                     }
                     .padding()
@@ -101,44 +104,46 @@ struct ConfigurationView: View {
                 .roundedBorderRectangle()
                 .padding()
                 
+                if UIDevice.current.userInterfaceIdiom == .pad {
                 Text("------------------ Testing Only ------------------").padding()
                 
-                HStack {
-                    Button(action: {
-                        DispatchQueue.main.async {
-                            settings.showReloadHTMLButton.toggle()
+                    HStack {
+                        Button(action: {
+                            DispatchQueue.main.async {
+                                settings.showReloadHTMLButton.toggle()
+                            }
+                        }) {
+                            HStack {
+                                Image(systemName: settings.showReloadHTMLButton ? "checkmark.square" : "square")
+                                Text("Reload HTML Button")
+                            }
                         }
-                    }) {
-                        HStack {
-                            Image(systemName: settings.showReloadHTMLButton ? "checkmark.square" : "square")
-                            Text("Reload HTML Button")
+                        .padding()
+                        
+                        Button(action: {
+                            DispatchQueue.main.async {
+                                settings.useTestData.toggle()
+                            }
+                        }) {
+                            HStack {
+                                Image(systemName: settings.useTestData ? "checkmark.square" : "square")
+                                Text("Use Test Data")
+                            }
                         }
+                        .padding()
+                        
+                        Button(action: {
+                            DispatchQueue.main.async {
+                                settings.companionOn.toggle()
+                            }
+                        }) {
+                            HStack {
+                                Image(systemName: settings.companionOn ? "checkmark.square" : "square")
+                                Text("Companion On")
+                            }
+                        }
+                        .padding()
                     }
-                    .padding()
-                    
-                    Button(action: {
-                        DispatchQueue.main.async {
-                            settings.useTestData.toggle()
-                        }
-                    }) {
-                        HStack {
-                            Image(systemName: settings.useTestData ? "checkmark.square" : "square")
-                            Text("Use Test Data")
-                        }
-                    }
-                    .padding()
-                    
-                    Button(action: {
-                        DispatchQueue.main.async {
-                            settings.companionOn.toggle()
-                        }
-                    }) {
-                        HStack {
-                            Image(systemName: settings.companionOn ? "checkmark.square" : "square")
-                            Text("Companion On")
-                        }
-                    }
-                    .padding()
                 }
             }
             

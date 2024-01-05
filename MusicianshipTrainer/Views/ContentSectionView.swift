@@ -155,7 +155,7 @@ struct ContentSectionInstructionsView: UIViewRepresentable {
 struct ContentSectionHeaderView: View {
     @Environment(\.colorScheme) var colorScheme
     var contentSection:ContentSection
-
+    
     let googleAPI = GoogleAPI.shared
     @State private var isVideoPresented = false
     @State private var instructions:String? = nil
@@ -163,7 +163,9 @@ struct ContentSectionHeaderView: View {
     @State private var tipsAndTricksData:String?=nil
     @State private var audioInstructionsFileName:String? = nil
     @State var promptForLicense = false
-
+    @State private var parentsData:String?=nil
+    //@State private var parentsExists = false
+    
     func getInstructions(bypassCache:Bool)  {
         var pathSegments = contentSection.getPathAsArray()
         if pathSegments.count < 1 {
@@ -182,7 +184,7 @@ struct ContentSectionHeaderView: View {
         let filename = "Tips_Tricks"
         var pathSegments = contentSection.getPathAsArray()
         pathSegments.append(SettingsMT.shared.getAgeGroup())
-
+        
         googleAPI.getDocumentByName(pathSegments: pathSegments, name: filename, reportError: false, bypassCache: bypassCache) {status,document in
             if status == .success {
                 self.tipsAndTricksExists = true
@@ -191,18 +193,19 @@ struct ContentSectionHeaderView: View {
         }
     }
     
-//    func getParentsData(bypassCache: Bool)  {
-//        let filename = "Parents"
-//        var pathSegments = contentSection.getPathAsArray()
-//        pathSegments.append(Settings.shared.getAgeGroup())
-//
-//        googleAPI.getDocumentByName(pathSegments: pathSegments, name: filename, reportError: false, bypassCache: bypassCache) {status,document in
-//            if status == .success {
-//                self.parentsExists = true
-//                self.parentsData = document
-//            }
-//        }
-//    }
+    func getParentsData(bypassCache: Bool)  {
+        let filename = "Parents"
+        var pathSegments = contentSection.getPathAsArray()
+        pathSegments.append(SettingsMT.shared.getAgeGroup())
+        self.parentsData = nil
+        
+        googleAPI.getDocumentByName(pathSegments: pathSegments, name: filename, reportError: false, bypassCache: bypassCache) {status,document in
+            if status == .success {
+                //self.parentsExists = true
+                self.parentsData = document
+            }
+        }
+    }
 
     func getAudio()  {
         let audioContent = contentSection.getChildSectionByType(type: "Audio")
@@ -335,8 +338,22 @@ struct ContentSectionHeaderView: View {
                             }                            
                         }
                     }
+                    
                     .disabled(!isRandomPickLicensed(contentSection: contentSection))
                 }
+                if let parents = self.parentsData {
+                    Spacer()
+                    NavigationLink(destination: ContentSectionWebView(htmlDocument: parentsData!, contentSection: contentSection)) {
+                        VStack {
+                            Text("Parents")
+                                .font(UIDevice.current.userInterfaceIdiom == .phone ? .footnote : UIGlobalsCommon.navigationFont)
+                            Image(systemName: "text.bubble")
+                                .foregroundColor(.blue)
+                                .font(.title)
+                        }
+                    }
+                }
+                
 //                if Settings.shared.companionOn {
 //                    if contentSection.getPathAsArray().count == 2 {
 //                        Spacer()
@@ -362,7 +379,7 @@ struct ContentSectionHeaderView: View {
                     DispatchQueue.main.async {
                         self.getInstructions(bypassCache: true)
                         self.getTipsTricksData(bypassCache: true)
-                        //self.getParentsData(bypassCache: true)
+                        self.getParentsData(bypassCache: true)
                     }
                 }) {
                     VStack {
@@ -385,7 +402,7 @@ struct ContentSectionHeaderView: View {
             getAudio()
             getInstructions(bypassCache: false)
             getTipsTricksData(bypassCache: false)
-            //getParentsData(bypassCache: false)
+            getParentsData(bypassCache: false)
         }
         .onDisappear() {
             AudioRecorder.shared.stopPlaying()
@@ -421,7 +438,7 @@ struct ContentSectionView: View {
                     ///No ContentSectionHeaderView in any exam mode content section except the exam start
                     ZStack {
                         VStack {
-                            Image("app_background_exam")
+                            Image("app_background_navigation")
                                 .resizable()
                                 .scaledToFill() // Scales the image to fill the view
                                 .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
@@ -453,7 +470,7 @@ struct ContentSectionView: View {
                 else {
                     ZStack {
                         VStack {
-                            Image("app_background_exam")
+                            Image("app_background_navigation")
                                 .resizable()
                                 .scaledToFill() // Scales the image to fill the view
                                 .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
@@ -723,6 +740,7 @@ struct SectionsNavigationView:View {
                         }
                     }
                     .disabled(!isExampleLicensed(contentSection: contentSections[index]))
+                    //.backgroundColor(isExampleLicensed(contentSection: contentSections[index]) ? Color.black : Color.lightGray)
                     ///End of Nav link view
                     //.background(Color.clear)
                     //.padding()

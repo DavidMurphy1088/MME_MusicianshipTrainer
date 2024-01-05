@@ -372,7 +372,7 @@ struct ClapOrPlayPresentView: View {
                         }
                     }
                     else {
-                        let hand = (questionType == .melodyPlay && SettingsMT.shared.useAcousticKeyboard) ? " Right Hand" : ""
+                        let hand = (questionType == .melodyPlay && !SettingsMT.shared.useAcousticKeyboard) ? " Right Hand" : ""
                         Text("Start Recording \(hand)")
                             .defaultButtonStyle(enabled: rhythmHeard || questionType != .intervalAural)
                     }
@@ -384,6 +384,7 @@ struct ClapOrPlayPresentView: View {
     
     func getToleranceLabel(_ setting:Double) -> String {
         var name = UIDevice.current.userInterfaceIdiom == .pad ? "Rhythm Tolerance:" : "Tolerance"
+        //var name = UIDevice.current.userInterfaceIdiom == .pad ? "Tolerance" : "Tolerance"
         var grade:String? = nil
         while grade == nil {
             if setting < 35.0 {
@@ -519,9 +520,9 @@ struct ClapOrPlayPresentView: View {
                     Text(" ")
                 }
                 else {
-                    if UIDevice.current.userInterfaceIdiom != .phone {
+                    //if UIDevice.current.userInterfaceIdiom != .phone {
                         ToolsView(score: score, helpMetronome: helpMetronome())
-                    }
+                    //}
                 }
 
                 if questionType == .rhythmVisualClap || questionType == .melodyPlay {
@@ -600,7 +601,7 @@ struct ClapOrPlayPresentView: View {
                     }
                 }
                                                 
-                VStack {
+                HStack {
                     if answerState != .recording {
                         buttonsView()
                         Text(" ")
@@ -667,8 +668,10 @@ struct ClapOrPlayPresentView: View {
                     if answerState == .recording {
                         Button(action: {
                             answerState = .recorded
-                            audioRecorder.stopRecording()
-                            answer.recordedData = self.audioRecorder.getRecordedAudio(fileName: contentSection.name)
+                            if SettingsMT.shared.useAcousticKeyboard {
+                                audioRecorder.stopRecording()
+                                answer.recordedData = self.audioRecorder.getRecordedAudio(fileName: contentSection.name)
+                            }
                             answer.sightReadingNoteTimes.append(Date())
                         }) {
                             Text("Stop Recording")
@@ -709,7 +712,6 @@ struct ClapOrPlayPresentView: View {
                 }
             }
             .onAppear() {
-                UIGlobalsCommon.showDeviceOrientation("In ON APPEAR")
                 score.clearAllStatus()
                 examInstructionsNarrated = false
                 if contentSection.getExamTakingStatus() == .inExam {
@@ -1076,6 +1078,7 @@ struct ClapOrPlayView: View {
         _answerState = answerState
         _answer = answer
         self.score = contentSection.parseData(staffCount: questionType == .melodyPlay ? 2 : 1, onlyRhythm: questionType == .melodyPlay ? false : true)
+        contentSection.backgroundImageName = UIGlobalsMT.getRandomBackgroundImageName()
     }
     
     func shouldShowAnswer() -> Bool {
@@ -1103,7 +1106,7 @@ struct ClapOrPlayView: View {
     var body: some View {
         ZStack {
             VStack {
-                let imageName = contentSection.getExamTakingStatus() == .notInExam ? UIGlobalsMT.appBackground : "app_background_exam"
+                let imageName = contentSection.getExamTakingStatus() == .notInExam ? contentSection.backgroundImageName : "app_background_navigation"
 
                 Image(imageName)
                     .resizable()
