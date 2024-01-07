@@ -29,8 +29,10 @@
 		7B3FC9CA2B0B62D8004A7987 /* MusicianshipTrainerUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B3FC9C92B0B62D8004A7987 /* MusicianshipTrainerUITests.swift */; };
 		7B3FC9CC2B0B62D8004A7987 /* MusicianshipTrainerUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B3FC9CB2B0B62D8004A7987 /* MusicianshipTrainerUITestsLaunchTests.swift */; };
 		7B5EA0652B3B7DD600DE7CF3 /* UIGlobalsMT.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B5EA0642B3B7DD600DE7CF3 /* UIGlobalsMT.swift */; };
+		7B89792F2B4A0EFA00B25F67 /* PurchaseLicense.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B89792E2B4A0EFA00B25F67 /* PurchaseLicense.swift */; };
 		7BA804782B2D05CE007FBE83 /* SightReadingPianoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA804772B2D05CE007FBE83 /* SightReadingPianoView.swift */; };
 		7BA8047E2B2EFDE6007FBE83 /* MelodyAnalyser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA8047D2B2EFDE6007FBE83 /* MelodyAnalyser.swift */; };
+		7BB7805B2B4A91310068C061 /* RhythmToleranceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BB7805A2B4A91300068C061 /* RhythmToleranceView.swift */; };
 		7BE7BAA02B43D370000B09C0 /* SettingsMT.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE7BA9F2B43D370000B09C0 /* SettingsMT.swift */; };
 /* End PBXBuildFile section */
 
@@ -77,8 +79,10 @@
 		7B3FC9C92B0B62D8004A7987 /* MusicianshipTrainerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicianshipTrainerUITests.swift; sourceTree = "<group>"; };
 		7B3FC9CB2B0B62D8004A7987 /* MusicianshipTrainerUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicianshipTrainerUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		7B5EA0642B3B7DD600DE7CF3 /* UIGlobalsMT.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIGlobalsMT.swift; sourceTree = "<group>"; };
+		7B89792E2B4A0EFA00B25F67 /* PurchaseLicense.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseLicense.swift; sourceTree = "<group>"; };
 		7BA804772B2D05CE007FBE83 /* SightReadingPianoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SightReadingPianoView.swift; sourceTree = "<group>"; };
 		7BA8047D2B2EFDE6007FBE83 /* MelodyAnalyser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MelodyAnalyser.swift; sourceTree = "<group>"; };
+		7BB7805A2B4A91300068C061 /* RhythmToleranceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RhythmToleranceView.swift; sourceTree = "<group>"; };
 		7BE7BA9F2B43D370000B09C0 /* SettingsMT.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsMT.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -119,10 +123,12 @@
 				7B1815D52B0C29A2000418CB /* FlyingImageView.swift */,
 				7B1815C52B0C1CD3000418CB /* IntervalsView.swift */,
 				7B1815D32B0C289A000418CB /* MelodyScoreView.swift */,
+				7B89792E2B4A0EFA00B25F67 /* PurchaseLicense.swift */,
 				7B1815B52B0BF47A000418CB /* SetHomeworkView.swift */,
 				7BA804772B2D05CE007FBE83 /* SightReadingPianoView.swift */,
 				7B1815DF2B0CADA8000418CB /* TappingView.swift */,
 				7B5EA0642B3B7DD600DE7CF3 /* UIGlobalsMT.swift */,
+				7BB7805A2B4A91300068C061 /* RhythmToleranceView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -343,6 +349,7 @@
 				7B1815D82B0CAAAF000418CB /* ClapOrPlayView.swift in Sources */,
 				7B1815B22B0B7795000418CB /* ContentSectionView.swift in Sources */,
 				7BA8047E2B2EFDE6007FBE83 /* MelodyAnalyser.swift in Sources */,
+				7BB7805B2B4A91310068C061 /* RhythmToleranceView.swift in Sources */,
 				7B1815B02B0B772D000418CB /* ContentNavigationView.swift in Sources */,
 				7B3FC9B22B0B62D8004A7987 /* Persistence.swift in Sources */,
 				7B3FC9AB2B0B62D6004A7987 /* ContentView.swift in Sources */,
@@ -357,6 +364,7 @@
 				7B3FC9A92B0B62D6004A7987 /* MusicianshipTrainerApp.swift in Sources */,
 				7B1815AC2B0B7134000418CB /* Intervals.swift in Sources */,
 				7B1815B62B0BF47A000418CB /* SetHomeworkView.swift in Sources */,
+				7B89792F2B4A0EFA00B25F67 /* PurchaseLicense.swift in Sources */,
 				7BE7BAA02B43D370000B09C0 /* SettingsMT.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -516,7 +524,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"MusicianshipTrainer/Preview Content\"";
 				DEVELOPMENT_TEAM = X9VDGR7PQ7;
 				ENABLE_PREVIEWS = YES;
@@ -533,7 +541,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.0;
+				MARKETING_VERSION = 50;
 				PRODUCT_BUNDLE_IDENTIFIER = com.musicmastereducation.MusicianshipTrainer3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -551,7 +559,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"MusicianshipTrainer/Preview Content\"";
 				DEVELOPMENT_TEAM = X9VDGR7PQ7;
 				ENABLE_PREVIEWS = YES;
@@ -568,7 +576,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.0;
+				MARKETING_VERSION = 50;
 				PRODUCT_BUNDLE_IDENTIFIER = com.musicmastereducation.MusicianshipTrainer3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

@@ -224,16 +224,6 @@ struct ContentSectionHeaderView: View {
         return p
     }
     
-    func isRandomPickLicensed(contentSection:ContentSection) -> Bool {
-        guard let gradeSection = contentSection.parentSearch(testCondition: {section in
-            return section.name.contains("Grade")
-        }) else {
-            return true
-        }
-        let license = IAPManager.shared.getLicense(grade: gradeSection.name, email: SettingsMT.shared.licenseEmail)
-        return license != nil
-    }
-    
     var body: some View {
         VStack {
             VStack {
@@ -339,7 +329,7 @@ struct ContentSectionHeaderView: View {
                         }
                     }
                     
-                    .disabled(!isRandomPickLicensed(contentSection: contentSection))
+                    .disabled(!SettingsMT.shared.isContentSectionLicensed(contentSection: contentSection))
                 }
                 if let parents = self.parentsData {
                     Spacer()
@@ -442,7 +432,7 @@ struct ContentSectionView: View {
                                 .resizable()
                                 .scaledToFill() // Scales the image to fill the view
                                 .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
-                                .opacity(UIGlobalsMT.backgroundImageOpacity)
+                                .opacity(UIGlobalsMT.shared.backgroundImageOpacity)
                         }
 
                         VStack {
@@ -474,7 +464,7 @@ struct ContentSectionView: View {
                                 .resizable()
                                 .scaledToFill() // Scales the image to fill the view
                                 .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
-                                .opacity(UIGlobalsMT.backgroundImageOpacity)
+                                .opacity(UIGlobalsMT.shared.backgroundImageOpacity)
                         }
                         ScrollViewReader { proxy in
                             ContentSectionHeaderView(contentSection: contentSection)
@@ -667,9 +657,9 @@ struct SectionsNavigationView:View {
         }) else {
             return true
         }
-        let license = IAPManager.shared.getLicense(grade:grade.name, email: SettingsMT.shared.licenseEmail)
+        return SettingsMT.shared.isContentSectionLicensed(contentSection:contentSection)
         //print("  +++ grade", grade.name, lic)
-        return license != nil
+        //return license != nil
     }
     
     ///The list of examples. The navigation link takes the user  to the specific question next
@@ -811,6 +801,15 @@ struct ExamView: View {
         
     }
     
+    func examImage() -> some View {
+        VStack {
+            Image("judge")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: UIScreen.main.bounds.width / 3.0)
+        }
+    }
+    
     var body: some View {
         VStack {
             if examState != .examStarted {
@@ -822,17 +821,27 @@ struct ExamView: View {
                     Text("Exam failed to Load").defaultButtonStyle()
                 }
                 if examState == .loadedAndNarrating {
+                    examImage()
                     Text("Preparing the exam ...").defaultButtonStyle()
                 }
                 if examState == .narrated {
-                    Button(action: {
-                        self.examState = .examStarted
-                        AudioRecorder.shared.stopPlaying()
-                    }) {
-                        VStack {
-                            //Text(examInstructionsStatus).padding().font(.title)
-                            Text("The exam has \(contentSection.getQuestionCount()) questions").defaultTextStyle().padding()
-                            Text("Start the Exam").defaultButtonStyle().padding()
+                    VStack {
+                        examImage()
+                        HStack {
+                            RhythmToleranceView(contextText: "Please set the rhythm tolerance you'd like to use for the exam.")
+                                .frame(width: UIScreen.main.bounds.width / 2.0)
+                        }
+                        Button(action: {
+                            self.examState = .examStarted
+                            AudioRecorder.shared.stopPlaying()
+                        }) {
+                            VStack {
+                                //Text(examInstructionsStatus).padding().font(.title)
+                                Text("The exam has \(contentSection.getQuestionCount()) questions").defaultTextStyle().padding()
+                                Text("Start the Exam").defaultButtonStyle().padding()
+                            }
+                            .padding()
+                            .roundedBorderRectangle().padding()
                         }
                     }
                 }
@@ -846,6 +855,7 @@ struct ExamView: View {
                     if sectionIndex < contentSections.count - 1 {
                         VStack {
                             Spacer()
+                            examImage()
                             Text("Completed question \(sectionIndex+1) of \(contentSections.count)").defaultTextStyle().padding()
                             Button(action: {
                                 contentSections[sectionIndex].setStoredAnswer(answer: answer.copyAnwser(), ctx: "")
@@ -892,7 +902,10 @@ struct ExamView: View {
                             contentSection.questionStatus.setStatus(1)
                             presentationMode.wrappedValue.dismiss()
                         }) {
-                            Text("Submit Your Exam").defaultButtonStyle()
+                            VStack {
+                                examImage()
+                                Text("Submit Your Exam").defaultButtonStyle()
+                            }
                         }
                         Spacer()
                     }

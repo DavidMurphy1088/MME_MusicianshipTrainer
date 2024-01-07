@@ -35,7 +35,7 @@ struct ContentNavigationView: View {
                             .resizable()
                             .scaledToFill()
                             .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
-                            .opacity(UIGlobalsMT.backgroundImageOpacity)
+                            .opacity(UIGlobalsMT.shared.backgroundImageOpacity)
                     }
                     VStack {
                         ProductIntroView()

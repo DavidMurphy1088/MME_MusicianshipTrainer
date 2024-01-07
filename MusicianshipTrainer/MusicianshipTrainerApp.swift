@@ -123,7 +123,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 #if targetEnvironment(simulator)
         ///Simulator asks for password every time even though its signed in with Apple ID. By design for IAP purchasing... :(
     // Code to run on the Simulator
-    print("Running on the Simulator")
+    print("Running on the Simulator, will not load IAP licenses")
 #else
         SKPaymentQueue.default().add(IAPManager.shared) ///Do this as early as possible
         IAPManager.shared.requestProducts() ///Get products
@@ -171,6 +171,7 @@ struct MusicianshipTrainerApp: App {
     //product licensed by grade 14Jun23
     let rootContentSection:ContentSection// = ContentSection(parent: nil, name: "", type: "")//ContentSection(parent: nil, name: "Grade 1", type: ContentSection.SectionType.none)
     var launchTimeSecs = 4.5
+    let launchScreen = LaunchScreenView(launchTimeSecs: 4.5)
 
     init() {
         //Playback supposedly gives better playback than play and record. So only set record when needed
@@ -229,7 +230,8 @@ struct MusicianshipTrainerApp: App {
                 }
                 if MusicianshipTrainerApp.productionMode  {
                     if launchScreenState.state != .finished {
-                        LaunchScreenView(launchTimeSecs: launchTimeSecs)
+                        launchScreen
+                        //LaunchScreenView(launchTimeSecs: launchTimeSecs)
                     }
                 }
             }

@@ -7,6 +7,7 @@ enum UserDefaultKeys {
     static let selectedColorInstructions = "SelectedColorInstructions"
     static let selectedColorBackground = "SelectedColorBackground"
     static let selectedAgeGroup = "SelectedAgeGroup"
+    static let selectedBackgroundsSet = "SelectedBackgroundsSet"
     static let showReloadHTMLButton = "showReloadHTMLButton"
     static let useTestData = "useTestData"
     static let useAnimations = "useAnimations"
@@ -29,6 +30,22 @@ public enum AgeGroup: Int, CaseIterable, Identifiable {
             return "5 to 10"
         case .Group_11Plus:
             return "11 Plus"
+        }
+    }
+}
+
+public enum BackgroundsSet: Int, CaseIterable, Identifiable {
+    case landscape = 0
+    case kids = 1
+    
+    public var id: Self { self }
+    
+    public var displayName: String {
+        switch self {
+        case .landscape:
+            return "Landscape"
+        case .kids:
+            return "Kids"
         }
     }
 }
@@ -66,6 +83,19 @@ extension UserDefaults {
         let data = withUnsafeBytes(of: age) { Data($0) }
         set(data, forKey: key)
     }
+    
+    func setSelectedBackgroundSet(key:String, _ backgroundsSet: BackgroundsSet) {
+        var bkg = 0
+        if backgroundsSet == .landscape {
+            bkg = 0
+        }
+        else {
+            bkg = 1
+        }
+        
+        let data = withUnsafeBytes(of: bkg) { Data($0) }
+        set(data, forKey: key)
+    }
 
     func getSelectedAgeGroup(key:String) -> AgeGroup? {
         guard let data = data(forKey: key) else { return nil }
@@ -73,11 +103,12 @@ extension UserDefaults {
         return age == 0 ? .Group_5To10 : .Group_11Plus
     }
     
-//    func setShowReloadHTMLButton(key:String, _ way: Bool) {
-//        set(way, forKey: key)
-//        log()
-//    }
-    
+    func getSelectedBackgroundSet(key:String) -> BackgroundsSet? {
+        guard let data = data(forKey: key) else { return nil }
+        let bkg  = data.withUnsafeBytes { $0.load(as: Int.self) }
+        return bkg == 0 ? .landscape : .kids
+    }
+
     func setBoolean(key:String, _ way: Bool) {
         set(way, forKey: key)
     }
@@ -94,10 +125,6 @@ extension UserDefaults {
         return string(forKey: key)
     }
 
-//    func getUseTestData(key:String) -> Bool {
-//        return bool(forKey: key)
-//    }
-    
     func log() {
         let userDefaults = UserDefaults.standard
         let allValues = userDefaults.dictionaryRepresentation()
@@ -129,7 +156,10 @@ public class SettingsMT : ObservableObject {
     @Published public var useTestData = false
     @Published public var showReloadHTMLButton = false
     @Published public var useAnimations = false
+    
     @Published public var ageGroup:AgeGroup = .Group_11Plus
+    @Published public var backgroundsSet:BackgroundsSet = .landscape
+    
     @Published public var colorScore = UIGlobalsCommon.colorScoreDefault
     @Published public var colorInstructions = UIGlobalsCommon.colorInstructionsDefault
     ///Color of each test's screen background
@@ -139,7 +169,7 @@ public class SettingsMT : ObservableObject {
     @Published public var companionOn = true
     @Published public var useAcousticKeyboard = false
     @Published public var licenseEmail:String = ""
-
+    
     public static var shared = SettingsMT()
     
     public init() {
@@ -154,6 +184,9 @@ public class SettingsMT : ObservableObject {
         }
         if let retrievedAgeGroup = UserDefaults.standard.getSelectedAgeGroup(key: UserDefaultKeys.selectedAgeGroup) {
             ageGroup = retrievedAgeGroup
+        }
+        if let retrievedBackgroundsSet = UserDefaults.standard.getSelectedBackgroundSet(key: UserDefaultKeys.selectedBackgroundsSet) {
+            backgroundsSet = retrievedBackgroundsSet
         }
         showReloadHTMLButton = UserDefaults.standard.getBoolean(key: UserDefaultKeys.showReloadHTMLButton)
         useTestData = UserDefaults.standard.getBoolean(key: UserDefaultKeys.useTestData)
@@ -175,6 +208,7 @@ public class SettingsMT : ObservableObject {
         self.showReloadHTMLButton = settings.showReloadHTMLButton
         self.useAnimations = settings.useAnimations
         self.ageGroup = settings.ageGroup
+        self.backgroundsSet = settings.backgroundsSet
         self.colorScore = settings.colorScore
         self.colorInstructions = settings.colorInstructions
         self.colorBackground = settings.colorBackground
@@ -185,6 +219,36 @@ public class SettingsMT : ObservableObject {
         self.licenseEmail = settings.licenseEmail
     }
     
+    public func getNameOfLicense(grade:String, email:String) -> String? {        
+        let iap = IAPManager.shared
+        let now = Date()
+        let calendar = Calendar.current
+        let currentYear = calendar.component(.year, from: now)
+        let gradeToCheck = grade.replacingOccurrences(of: " ", with: "_")
+        for productId in iap.purchasedProductIds {
+            if productId.contains(gradeToCheck) {
+                if productId.contains(String(currentYear)) {
+                    if let product = iap.availableProducts[productId] {
+                        return product.localizedTitle
+                    }
+                }
+            }
+        }
+        if iap.emailLicenses.contains(email) {
+            return email
+        }
+        return nil
+    }
+    
+    public func isContentSectionLicensed(contentSection:ContentSection) -> Bool {
+        guard let gradeSection = contentSection.parentSearch(testCondition: {section in
+                return section.name.contains("Grade")
+            }) else {
+                return true
+            }
+        return getNameOfLicense(grade: gradeSection.name, email: self.licenseEmail) != nil
+    }
+
     public func getAgeGroup() -> String {
         return ageGroup == .Group_11Plus ? AGE_GROUP_11_PLUS : "5-10"
     }
@@ -194,6 +258,7 @@ public class SettingsMT : ObservableObject {
         UserDefaults.standard.setSelectedColor(key: UserDefaultKeys.selectedColorInstructions, colorInstructions)
         UserDefaults.standard.setSelectedColor(key: UserDefaultKeys.selectedColorBackground, colorBackground)
         UserDefaults.standard.setSelectedAgeGroup(key: UserDefaultKeys.selectedAgeGroup, ageGroup)
+        UserDefaults.standard.setSelectedBackgroundSet(key: UserDefaultKeys.selectedBackgroundsSet, backgroundsSet)
         UserDefaults.standard.setBoolean(key: UserDefaultKeys.showReloadHTMLButton, showReloadHTMLButton)
         UserDefaults.standard.setBoolean(key: UserDefaultKeys.useTestData, useTestData)
         UserDefaults.standard.setBoolean(key: UserDefaultKeys.useAnimations, useAnimations)

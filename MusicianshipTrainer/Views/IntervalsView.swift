@@ -200,7 +200,6 @@ struct IntervalPresentView: View { //}, QuestionPartProtocol {
     var body: some View {
         AnyView(
             VStack {
-                
                 ScoreSpacerView() //keep for top ledger line notes
                 if UIDevice.current.userInterfaceIdiom == .pad {
                     ScoreSpacerView()
@@ -250,19 +249,20 @@ struct IntervalPresentView: View { //}, QuestionPartProtocol {
                         }
                     }
                     
-                    
-                    if let instruction = self.getInstruction(mode: self.questionType) {
-                        Button(action: {
-                            presentInstructions.toggle()
-                        }) {
-                            VStack {
-                                if UIDevice.current.userInterfaceIdiom == .pad {
-                                    Text("Instructions")
+                    if !contentSection.isTakingExam() {
+                        if let instruction = self.getInstruction(mode: self.questionType) {
+                            Button(action: {
+                                presentInstructions.toggle()
+                            }) {
+                                VStack {
+                                    if UIDevice.current.userInterfaceIdiom == .pad {
+                                        Text("Instructions")
+                                    }
+                                    Image(systemName: "questionmark.circle")
                                 }
-                                Image(systemName: "questionmark.circle")
+                                .padding()
+                                .roundedBorderRectangle()
                             }
-                            .padding()
-                            .roundedBorderRectangle()
                         }
                     }
                     
@@ -385,20 +385,19 @@ struct IntervalAnswerView: View {
         VStack {
             Text(" ")
             HStack {
-                //if answerWasCorrect {
-                    Spacer()
-                    Button(action: {
-                        let parent = self.contentSection.parent
-                        if let parent = parent {
-                            parent.setSelected((parent.selectedIndex ?? 0) - 1)
-                        }
-                    }) {
-                        HStack {
-                            Text("\u{2190} Previous").defaultButtonStyle()
-                        }
+                Spacer()
+                Button(action: {
+                    let parent = self.contentSection.parent
+                    if let parent = parent {
+                        parent.setSelected((parent.selectedIndex ?? 0) - 1)
                     }
+                }) {
+                    HStack {
+                        Text("\u{2190} Previous").defaultButtonStyle()
+                    }
+                }
+                if SettingsMT.shared.isContentSectionLicensed(contentSection: contentSection) {
                     Spacer()
-
                     Button(action: {
                         let parent = self.contentSection.parent
                         if let parent = parent {
@@ -409,6 +408,7 @@ struct IntervalAnswerView: View {
                             Text("Next \u{2192}").defaultButtonStyle()
                         }
                     }
+                    
                     Spacer()
                     Button(action: {
                         if let parent = self.contentSection.parent {
@@ -421,8 +421,8 @@ struct IntervalAnswerView: View {
                             Text("\u{2191} Shuffle").defaultButtonStyle()
                         }
                     }
-                    Spacer()
-                //}
+                }
+                Spacer()
             }
         }
     }
@@ -516,7 +516,7 @@ struct IntervalView: View {
         _answerState = answerState
         _answer = answer
         score = contentSection.getScore(staffCount: 1, onlyRhythm: false)
-        contentSection.backgroundImageName = UIGlobalsMT.getRandomBackgroundImageName()
+        contentSection.backgroundImageName = UIGlobalsMT.shared.getRandomBackgroundImageName(backgroundSet: SettingsMT.shared.backgroundsSet)
     }
     
     func shouldShowAnswer() -> Bool {
@@ -549,7 +549,7 @@ struct IntervalView: View {
                     .resizable()
                     .scaledToFill() // Scales the image to fill the view
                     .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
-                    .opacity(UIGlobalsMT.backgroundImageOpacity)
+                    .opacity(UIGlobalsMT.shared.backgroundImageOpacity)
             }
 
             VStack {

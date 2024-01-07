@@ -43,9 +43,15 @@ struct ConfigurationView: View {
                         ConfigSelectAgeMode(selectedIndex: $settings.ageGroup)
                     }
                     .padding()
+                    .roundedBorderRectangle()
                     
+                    HStack {
+                        Text("Backgrounds")
+                        ConfigBackgroundsSet(selectedIndex: $settings.backgroundsSet)
+                    }
+                    .padding()
+                    .roundedBorderRectangle()
                 }
-                .roundedBorderRectangle()
                 .padding()
                 
                 VStack {
@@ -208,6 +214,20 @@ struct ConfigSelectAgeMode: View {
         // .pickerStyle(InlinePickerStyle())
     }
 }
+
+struct ConfigBackgroundsSet: View {
+    @Binding public var selectedIndex: BackgroundsSet
+
+    var body: some View {
+        Picker("Select Backgrounds Set", selection: $selectedIndex) {
+            ForEach(BackgroundsSet.allCases) { bkg in
+                Text(bkg.displayName).tag(bkg).font(.title)
+            }
+        }
+        .pickerStyle(DefaultPickerStyle())
+    }
+}
+
 //            HStack {
 //                VStack {
 //                    Circle()

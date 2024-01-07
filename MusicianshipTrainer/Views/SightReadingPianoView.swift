@@ -18,6 +18,7 @@ struct SightReadingView: PianoUserProtocol, View {
         if let answer = answer {
             answer.sightReadingNotePitches.append(key.midi)
             answer.sightReadingNoteTimes.append(Date())
+            answer.rhythmTolerancePercent = UIGlobalsMT.shared.rhythmTolerancePercent
         }
     }
     

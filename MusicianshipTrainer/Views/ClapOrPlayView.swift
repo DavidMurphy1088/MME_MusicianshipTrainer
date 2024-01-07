@@ -2,18 +2,6 @@ import SwiftUI
 import CommonLibrary
 import AVFoundation
 
-struct PracticeToolView: View {
-    var text:String
-    
-    var body: some View {
-        HStack {
-            Text("Practice Tool:").defaultTextStyle()
-            Text(text).defaultTextStyle()
-        }
-        .roundedBorderRectangle()
-    }
-}
-
 struct PlayRecordingView: View {
     var buttonLabel:String
     @State var metronome:Metronome
@@ -80,9 +68,7 @@ struct ClapOrPlayPresentView: View {
     @State var isTapping = false
     @State var rhythmHeard:Bool = false
     @State var examInstructionsNarrated = false
-    @State private var rhythmTolerancePercent: Double = 50
     @State private var originalScore:Score?
-    @State var isToleranceHelpPresented:Bool = false
 
     @State private var startWasShortended = false
     @State private var endWasShortended = false
@@ -165,7 +151,7 @@ struct ClapOrPlayPresentView: View {
     }
     
     func getStudentTappingAsAScore() -> Score? {
-        if let values = self.answer.values {
+        if let values = self.answer.rhythmValues {
             let rhythmAnalysisScore = tapRecorder.getTappedAsAScore(timeSignatue: score.timeSignature, questionScore: score, tapValues: values)
             return rhythmAnalysisScore
         }
@@ -181,13 +167,13 @@ struct ClapOrPlayPresentView: View {
     }
     
     func rhythmIsCorrect() -> Bool {
-        guard let tapValues = answer.values else {
+        guard let tapValues = answer.rhythmValues else {
             return false
         }
         let tappedScore = tapRecorder.getTappedAsAScore(timeSignatue: score.timeSignature, questionScore: score, tapValues: tapValues)
         let fittedScore = score.fitScoreToQuestionScore(userScore:tappedScore,
                                                         onlyRhythm: questionType == .melodyPlay ? false : true,
-                                                        tolerancePercent: UIGlobalsCommon.rhythmTolerancePercent
+                                                        tolerancePercent: UIGlobalsMT.shared.rhythmTolerancePercent
                                                         ).0
         if fittedScore.errorCount() == 0 && fittedScore.getAllTimeSlices().count > 0 {
             return true
@@ -382,90 +368,6 @@ struct ClapOrPlayPresentView: View {
         }
     }
     
-    func getToleranceLabel(_ setting:Double) -> String {
-        var name = UIDevice.current.userInterfaceIdiom == .pad ? "Rhythm Tolerance:" : "Tolerance"
-        //var name = UIDevice.current.userInterfaceIdiom == .pad ? "Tolerance" : "Tolerance"
-        var grade:String? = nil
-        while grade == nil {
-            if setting < 35.0 {
-                grade = "A+"
-                break
-            }
-            if setting < 40.0 {
-                grade = "A"
-                break
-            }
-            if setting < 45.0 {
-                grade = "A-"
-                break
-            }
-            if setting < 50.0 {
-                grade = "B+"
-                break
-            }
-            if setting < 55.0 {
-                grade = "B"
-                break
-            }
-            if setting < 60.0 {
-                grade = "B-"
-                break
-            }
-            if setting < 65.0 {
-                grade = "C+"
-                break
-            }
-            if setting <= 70.0 {
-                grade = "C"
-                break
-            }
-            break
-        }
-        if let grade = grade {
-            name += " " + grade
-        }
-        return name
-    }
-    
-    func setRhythmToleranceView() -> some View {
-        HStack {
-            VStack {
-                HStack {
-                    Text(getToleranceLabel(rhythmTolerancePercent)).defaultTextStyle()
-                    Button(action: {
-                        self.isToleranceHelpPresented = true
-                    }) {
-                        Image(systemName: "questionmark.circle")
-                            .font(UIDevice.current.userInterfaceIdiom == .pad ? .largeTitle : .title3)
-                    }
-                }
-                .sheet(isPresented: $isToleranceHelpPresented) {
-                    VStack {
-                        Spacer()
-                        Text("Rhythm Matching Tolerance").font(.title).foregroundColor(.blue).padding()
-                        Text("The rhythm tolerance setting affects how precisely your tapped rhythm is measured for correctness.").padding()
-                        Text("Higher grades of tolerance require more precise tapping to achieve a correct rhythm. Lower grades require less precise tapping.").padding()
-                        Spacer()
-                    }
-                    .background(SettingsMT.shared.colorBackground)
-                }
-                //Slider(value: $rhythmTolerancePercent, in: 30...70).padding(.horizontal, UIDevice.current.userInterfaceIdiom == .pad ? 50 : 4)
-                Slider(value: $rhythmTolerancePercent, in: 35...75).padding(.horizontal, UIDevice.current.userInterfaceIdiom == .pad ? 50 : 4)
-            }
-            .onChange(of: rhythmTolerancePercent) { newValue in
-                //let allowedValues = [30, 35, 40, 45, 50, 55, 60, 65, 70]
-                let allowedValues = [35, 40, 45, 50, 55, 60, 65, 70, 75]
-                let sortedValues = allowedValues.sorted()
-                let closest = sortedValues.min(by: { abs($0 - Int(newValue)) < abs($1 - Int(newValue)) })
-                UIGlobalsCommon.rhythmTolerancePercent = Double(closest ?? Int(newValue))//newValue
-                rhythmTolerancePercent = UIGlobalsCommon.rhythmTolerancePercent
-            }
-            .padding()
-            .roundedBorderRectangle()
-            .padding()
-        }
-    }
-    
     func showEditButtons() -> some View {
         VStack {
             if score.getBarCount() > 1 {
@@ -594,7 +496,7 @@ struct ClapOrPlayPresentView: View {
                                 }
                             }
                             //if questionType != .melodyPlay {
-                                setRhythmToleranceView()
+                            RhythmToleranceView(contextText: nil)
                             //}
 
                         }
@@ -650,7 +552,8 @@ struct ClapOrPlayPresentView: View {
                             answerState = .recorded
                             self.isTapping = false
                             ///Record end of playing to calculate the last note's duration
-                            answer.values = self.tapRecorder.stopRecording(score:score)
+                            answer.rhythmValues = self.tapRecorder.stopRecording(score:score)
+                            answer.rhythmTolerancePercent = UIGlobalsMT.shared.rhythmTolerancePercent
                             isTapping = false
                         })
                     }
@@ -728,7 +631,7 @@ struct ClapOrPlayPresentView: View {
                 if questionType == .melodyPlay {
                     score.addTriadNotes()
                 }
-                self.rhythmTolerancePercent = UIGlobalsCommon.rhythmTolerancePercent
+                //self.rhythmTolerancePercent = UIGlobalsMT.shared.rhythmTolerancePercent
                 self.originalScore = contentSection.parseData(staffCount: 1, onlyRhythm: true)
             }
             .onDisappear() {
@@ -792,7 +695,7 @@ struct ClapOrPlayAnswerView: View {
         if questionType == .melodyPlay {
             answer.makeNoteValues()
         }
-        guard let tapValues = answer.values else {
+        guard let tapValues = answer.rhythmValues else {
             return
         }
         tappedScore = tapRecorder.getTappedAsAScore(timeSignatue: score.timeSignature, questionScore: score, tapValues: tapValues)
@@ -822,7 +725,7 @@ struct ClapOrPlayAnswerView: View {
 
         let fitted = score.fitScoreToQuestionScore(userScore:tappedScore, 
                                                    onlyRhythm: questionType == .melodyPlay ? false : true,
-                                                   tolerancePercent: UIGlobalsCommon.rhythmTolerancePercent)
+                                                   tolerancePercent: UIGlobalsMT.shared.rhythmTolerancePercent)
         self.fittedScore = fitted.0
         
         let feedback = fitted.1
@@ -851,6 +754,7 @@ struct ClapOrPlayAnswerView: View {
                         feedback.feedbackExplanation! +=
                         " Your tempo was \(recordedTempo)."
                     }
+                    //rhythmTolerance = UIGlobalsMT.shared.rhythmTolerancePercent
                     if questionType == .rhythmEchoClap {
                         feedback.feedbackExplanation! +=
                         " Your tempo was \(recordedTempo) "
@@ -867,6 +771,16 @@ struct ClapOrPlayAnswerView: View {
             else {
                 feedback.correct = false
             }
+            if let rhythmTolerance = answer.rhythmTolerancePercent {
+                let tol = RhytmTolerance.getToleranceName(rhythmTolerance)
+                if feedback.feedbackExplanation != nil {
+                    if feedback.correct == false {
+                        feedback.feedbackExplanation! +=  "\n• "
+                    }
+                    feedback.feedbackExplanation! += " The rhythm tolerance was set at \(tol)."
+                }
+            }
+
             self.fittedScore!.setStudentFeedback(studentFeedack: feedback)
         }
     }
@@ -892,30 +806,33 @@ struct ClapOrPlayAnswerView: View {
                         Text("\u{2190} Previous").defaultButtonStyle()
                     }
                 }
-                Spacer()
-
-                Button(action: {
-                    let parent = self.contentSection.parent
-                    if let parent = parent {
-                        parent.setSelected((parent.selectedIndex ?? 0) + 1)
+                
+                if SettingsMT.shared.isContentSectionLicensed(contentSection:contentSection) {
+                    Spacer()
+                    Button(action: {
+                        let parent = self.contentSection.parent
+                        if let parent = parent {
+                            parent.setSelected((parent.selectedIndex ?? 0) + 1)
+                        }
+                    }) {
+                        HStack {
+                            Text("Next \u{2192}").defaultButtonStyle()
+                        }
                     }
-                }) {
-                    HStack {
-                        Text("Next \u{2192}").defaultButtonStyle()
+                    Spacer()
+                    Button(action: {
+                        if let parent = self.contentSection.parent {
+                            let c = parent.subSections.count
+                            let r = Int.random(in: 0...c)
+                            parent.setSelected(r)
+                        }
+                    }) {
+                        HStack {
+                            Text("\u{2191} Shuffle").defaultButtonStyle()
+                        }
                     }
                 }
-                Spacer()
-                Button(action: {
-                    if let parent = self.contentSection.parent {
-                        let c = parent.subSections.count
-                        let r = Int.random(in: 0...c)
-                        parent.setSelected(r)
-                    }
-                }) {
-                    HStack {
-                        Text("\u{2191} Shuffle").defaultButtonStyle()
-                    }
-                }
+                
                 Spacer()
             }
         }
@@ -1078,7 +995,7 @@ struct ClapOrPlayView: View {
         _answerState = answerState
         _answer = answer
         self.score = contentSection.parseData(staffCount: questionType == .melodyPlay ? 2 : 1, onlyRhythm: questionType == .melodyPlay ? false : true)
-        contentSection.backgroundImageName = UIGlobalsMT.getRandomBackgroundImageName()
+        contentSection.backgroundImageName = UIGlobalsMT.shared.getRandomBackgroundImageName(backgroundSet: SettingsMT.shared.backgroundsSet)
     }
     
     func shouldShowAnswer() -> Bool {
@@ -1112,7 +1029,7 @@ struct ClapOrPlayView: View {
                     .resizable()
                     .scaledToFill() // Scales the image to fill the view
                     .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
-                    .opacity(UIGlobalsMT.backgroundImageOpacity)
+                    .opacity(UIGlobalsMT.shared.backgroundImageOpacity)
             }
 
             VStack {
