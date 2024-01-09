@@ -120,7 +120,7 @@ struct ClapOrPlayPresentView: View {
                 if grade >= 2 {
                     result += "\n\n\(bullet)For rests, accurately count them but do not touch the screen."
                 }
-                result += "\(linefeed)\(bullet)Note that the using the configuration screen you can ask that a drum sound is heard for each tap."
+                result += "\(linefeed)\(bullet)Note that in the configuration screen you can choose to have the drum sound either on or off."
             }
             
         case .rhythmEchoClap:
@@ -144,8 +144,9 @@ struct ClapOrPlayPresentView: View {
                 result += "play the melody and the final chords."
             }
             result += "\(linefeed)\(bullet)When you have finished, stop the recording."
-            result += "\(linefeed)\(bullet)Note that the using the configuration screen you can ask that instead of using the virtual keyboard, your acoustic piano is recorded for sight reading. "
-            result += "The virtual keyboard can only record your right hand and does not capture which fingers you use."
+            //result += "\(linefeed)\(bullet)Note that the using the configuration screen you can ask that instead of using the virtual keyboard, your acoustic piano is recorded for sight reading. "
+            //result += "The virtual keyboard can only record your right hand and does not capture which fingers you use."
+            result += "\(linefeed)\(bullet)Note that in the configuration screen you can choose to use either a built in virtual keyboard for recording the right hand, or your own acoustic instrument. If you choose to use the built in keyboard you will be able to see your feedback. If you choose to use your instrument, you will be able to hear back your attempt. You should practise both ways."
 
         default:
             result = ""
