@@ -53,8 +53,7 @@ struct PlayRecordingView: View {
 
 struct ClapOrPlayPresentView: View {
     let contentSection:ContentSection
-
-    @ObservedObject var score:Score
+    @ObservedObject var score:Score     
     @ObservedObject var audioRecorder = AudioRecorder.shared
     @ObservedObject public var tapRecorder = TapRecorder.shared
     @ObservedObject private var logger = Logger.logger
@@ -119,9 +118,10 @@ struct ClapOrPlayPresentView: View {
                 result += "\(linefeed)\(bullet)Advice: For a clear result, you should tap and then immediately release"
                 result += " your finger from the screen, rather than holding it down."
                 if grade >= 2 {
-                result += "\n\n\(bullet)For rests, accurately count them but do not touch the screen."
+                    result += "\n\n\(bullet)For rests, accurately count them but do not touch the screen."
+                }
+                result += "\(linefeed)\(bullet)Note that the using the configuration screen you can ask that a drum sound is heard for each tap."
             }
-        }
             
         case .rhythmEchoClap:
             result += "\(bullet)Listen to the given rhythm."
@@ -132,6 +132,7 @@ struct ClapOrPlayPresentView: View {
                 result += "\(linefeed)\(bullet)Advice: For a clear result, you should tap with the pad of your finger and then immediately release"
                 result += " your finger from the screen, rather than holding it down."
                 result += "\n\n\(bullet)If you tap the rhythm incorrectly, you will be able to hear your rhythm attempt and the correct given rhythm at crotchet = 90 on the Answer Page."
+                result += "\(linefeed)\(bullet)Note that the using the configuration screen you can ask that a drum sound is heard for each tap."
             }
 
         case .melodyPlay:
@@ -143,7 +144,9 @@ struct ClapOrPlayPresentView: View {
                 result += "play the melody and the final chords."
             }
             result += "\(linefeed)\(bullet)When you have finished, stop the recording."
-            
+            result += "\(linefeed)\(bullet)Note that the using the configuration screen you can ask that instead of using the virtual keyboard, your acoustic piano is recorded for sight reading. "
+            result += "The virtual keyboard can only record your right hand and does not capture which fingers you use."
+
         default:
             result = ""
         }
@@ -498,7 +501,6 @@ struct ClapOrPlayPresentView: View {
                             //if questionType != .melodyPlay {
                             RhythmToleranceView(contextText: nil)
                             //}
-
                         }
                     }
                 }
@@ -540,10 +542,8 @@ struct ClapOrPlayPresentView: View {
                                     }
                                 }
                             }
-                    
                         }
                     }
-
                 }
                 
                 if questionType == .rhythmVisualClap || questionType == .rhythmEchoClap {
@@ -604,7 +604,6 @@ struct ClapOrPlayPresentView: View {
                         }
                     }
                 }
-                
             }
             .font(.system(size: UIDevice.current.userInterfaceIdiom == .phone ? UIFont.systemFontSize : UIFont.systemFontSize * 1.6))
             .sheet(isPresented: $presentInstructions) {
@@ -639,7 +638,6 @@ struct ClapOrPlayPresentView: View {
                 self.metronome.stopTicking()
                 //self.metronome.stopPlayingScore()
             }
-
         )
     }
 }
@@ -775,9 +773,14 @@ struct ClapOrPlayAnswerView: View {
                 let tol = RhytmTolerance.getToleranceName(rhythmTolerance)
                 if feedback.feedbackExplanation != nil {
                     if feedback.correct == false {
-                        feedback.feedbackExplanation! +=  "\n• "
+                        if UIGlobalsCommon.isLandscape() {
+                            feedback.feedbackExplanation! +=  "  "
+                        }
+                        else {
+                            feedback.feedbackExplanation! +=  "\n"
+                        }
                     }
-                    feedback.feedbackExplanation! += " The rhythm tolerance was set at \(tol)."
+                    feedback.feedbackExplanation! += "• The rhythm tolerance was set at \(tol)"
                 }
             }
 
@@ -832,7 +835,6 @@ struct ClapOrPlayAnswerView: View {
                         }
                     }
                 }
-                
                 Spacer()
             }
         }
@@ -880,26 +882,24 @@ struct ClapOrPlayAnswerView: View {
     
     func nextStepsView() -> some View {
         HStack {
-            if contentSection.getExamTakingStatus() == .notInExam {
-                if let fittedScore = self.fittedScore {
-                    if let studentFeedback = fittedScore.studentFeedback {
-                        if studentFeedback.correct {
-                            if self.originalScore != nil {
-                                if studentFeedback.correct {
-                                    nextButtons()
-                                }
+            if let fittedScore = self.fittedScore {
+                if let studentFeedback = fittedScore.studentFeedback {
+                    if studentFeedback.correct {
+                        if self.originalScore != nil {
+                            if studentFeedback.correct {
+                                nextButtons()
                             }
                         }
-                        else {
-                            HStack {
-                                Button(action: {
-                                    answerState = .notEverAnswered
-                                    self.tryNumber += 1
-                                }) {
-                                    Text("Try Again").submitAnswerButtonStyle() //defaultButtonStyle()
-                                }
-                                .padding()
+                    }
+                    else {
+                        HStack {
+                            Button(action: {
+                                answerState = .notEverAnswered
+                                self.tryNumber += 1
+                            }) {
+                                Text("Try Again").submitAnswerButtonStyle() //defaultButtonStyle()
                             }
+                            .padding()
                         }
                     }
                 }
@@ -941,7 +941,10 @@ struct ClapOrPlayAnswerView: View {
                 }
                 
                 restoreQuestionView()
-                nextStepsView()
+                
+                if contentSection.getExamTakingStatus() == .notInExam {
+                    nextStepsView()
+                }
                 
                 //Spacer() //Keep - required to align the page from the top
             }
@@ -1036,7 +1039,7 @@ struct ClapOrPlayView: View {
                 if answerState  != .submittedAnswer {
                     ///ScrollView Forces everthing to top align, not center align. Top of metronome truncated but still operable.
                     ///Without ScrollView various screens can't see all buttons
-                    ScrollView {
+                    //ScrollView {
                         ClapOrPlayPresentView(
                             contentSection: contentSection,
                             score: score,
@@ -1045,11 +1048,11 @@ struct ClapOrPlayView: View {
                             tryNumber: $tryNumber,
                             questionType: questionType)
                         .frame(width: UIScreen.main.bounds.width)
-                    }
+                    //}
                 }
                 else {
                     if shouldShowAnswer() {
-                        ScrollView {
+                        //ScrollView {
                             ZStack {
                                 ClapOrPlayAnswerView(contentSection: contentSection,
                                                      score: score,
@@ -1065,7 +1068,7 @@ struct ClapOrPlayView: View {
                                     }
                                 }
                             }
-                        }
+                        //}
                     }
                     //Spacer() //Force it to align from the top
                 }

@@ -177,10 +177,10 @@ struct IntervalPresentView: View { //}, QuestionPartProtocol {
     
     func getInstruction(mode: QuestionType) -> String? {
         if mode == .intervalVisual {
-            return "Look at the given interval and choose the correct one."
+            return "Look at the given interval and choose the correct answer."
         }
         if mode == .intervalAural {
-            return "Tap to hear the given interval then choose the correct one."
+            return "Tap to hear the given interval then choose the correct answer."
         }
         return nil
     }
@@ -305,7 +305,7 @@ struct IntervalPresentView: View { //}, QuestionPartProtocol {
                             .padding()
                         }
                     }
-                    .padding()
+                    //.padding() ///Dont use - truncates iPhone
                 }
                 .disabled(questionType == .intervalAural && scoreWasPlayed == false)
                 .padding()
@@ -318,7 +318,7 @@ struct IntervalPresentView: View { //}, QuestionPartProtocol {
                         }) {
                             Text("\(contentSection.isTakingExam() ? "Submit" : "Check") Your Answer").submitAnswerButtonStyle()
                         }
-                        .padding()
+                        //.padding()
                     }
                 }
                 //Spacer()

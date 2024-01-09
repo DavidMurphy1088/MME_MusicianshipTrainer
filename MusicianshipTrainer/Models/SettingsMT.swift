@@ -35,15 +35,15 @@ public enum AgeGroup: Int, CaseIterable, Identifiable {
 }
 
 public enum BackgroundsSet: Int, CaseIterable, Identifiable {
-    case landscape = 0
+    case scene = 0
     case kids = 1
     
     public var id: Self { self }
     
     public var displayName: String {
         switch self {
-        case .landscape:
-            return "Landscape"
+        case .scene:
+            return "Scene"
         case .kids:
             return "Kids"
         }
@@ -86,7 +86,7 @@ extension UserDefaults {
     
     func setSelectedBackgroundSet(key:String, _ backgroundsSet: BackgroundsSet) {
         var bkg = 0
-        if backgroundsSet == .landscape {
+        if backgroundsSet == .scene {
             bkg = 0
         }
         else {
@@ -106,7 +106,7 @@ extension UserDefaults {
     func getSelectedBackgroundSet(key:String) -> BackgroundsSet? {
         guard let data = data(forKey: key) else { return nil }
         let bkg  = data.withUnsafeBytes { $0.load(as: Int.self) }
-        return bkg == 0 ? .landscape : .kids
+        return bkg == 0 ? .scene : .kids
     }
 
     func setBoolean(key:String, _ way: Bool) {
@@ -158,7 +158,7 @@ public class SettingsMT : ObservableObject {
     @Published public var useAnimations = false
     
     @Published public var ageGroup:AgeGroup = .Group_11Plus
-    @Published public var backgroundsSet:BackgroundsSet = .landscape
+    @Published public var backgroundsSet:BackgroundsSet = .scene
     
     @Published public var colorScore = UIGlobalsCommon.colorScoreDefault
     @Published public var colorInstructions = UIGlobalsCommon.colorInstructionsDefault
@@ -234,7 +234,7 @@ public class SettingsMT : ObservableObject {
                 }
             }
         }
-        if iap.emailLicenses.contains(email) {
+        if iap.emailIsLicensed(email: email) {
             return email
         }
         return nil

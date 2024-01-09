@@ -1,5 +1,6 @@
 import Foundation
 import CommonLibrary
+import SwiftUI
 
 ///The same pitch difference can be a different interval depending on how its written
 ///e.g. pitch interval 6 can be an augmented 4th or diminished 5th. They are differentiated by the number of notes the interval spans. i.e. how it is written.
@@ -67,9 +68,18 @@ class Intervals : ObservableObject {
             intervalNames.append(IntervalGroup(name: ageGroup == SettingsMT.shared.AGE_GROUP_11_PLUS ? "Seventh" : "7th", noteSpan: 6, intervals:[10,11]))
             intervalNames.append(IntervalGroup(name: ageGroup == SettingsMT.shared.AGE_GROUP_11_PLUS ? "Octave" : "Octave", noteSpan: 7, intervals:[12]))
         }
-        self.intervalsPerColumn = Int(Double((self.intervalNames.count + 1)) / 2.0)
-        if intervalsPerColumn == 0 {
-            intervalsPerColumn = 1
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            intervalsPerColumn = 3
+        }
+        else {
+            if UIGlobalsCommon.isLandscape() {
+                intervalsPerColumn = 1
+            } else {
+                intervalsPerColumn = Int(Double((self.intervalNames.count + 1)) / 2.0)
+            }
+            if intervalsPerColumn <= 0 {
+                intervalsPerColumn = 1
+            }
         }
     }
     

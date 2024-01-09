@@ -93,7 +93,7 @@ struct NarrationView : View {
         VStack {
             HStack {
                 Button(action: {
-                    TTS.shared.speakText(contentSection: contentSection, context: context, htmlContent: htmlDocument)
+                    TextToSpeech.shared.speakText(contentSection: contentSection, context: context, htmlContent: htmlDocument)
                 }) {
                     Image(systemName: "speaker.wave.2")
                         .foregroundColor(.blue)
@@ -105,7 +105,7 @@ struct NarrationView : View {
             Spacer()
         }
         .onDisappear() {
-            TTS.shared.stop()
+            TextToSpeech.shared.stop()
         }
     }
 }
@@ -407,6 +407,8 @@ struct ContentSectionView: View {
     @State var answerState:AnswerState = .notEverAnswered
     @State var answer:Answer = Answer()
     @State var isShowingConfiguration:Bool = false
+    @State var showLicenseChange:Bool = false
+    @State var emailLicenseIsValidPriorConfig = false
     
     let id = UUID()
     
@@ -523,6 +525,26 @@ struct ContentSectionView: View {
                               settings: newSettings)
             
         }
+        .onChange(of: isShowingConfiguration) { showingConfig in
+            if !SettingsMT.shared.licenseEmail.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                if showingConfig {
+                    self.emailLicenseIsValidPriorConfig = IAPManager.shared.emailIsLicensed(email:SettingsMT.shared.licenseEmail)
+                }
+                else {
+                    if !self.emailLicenseIsValidPriorConfig {
+                        if IAPManager.shared.emailIsLicensed(email:SettingsMT.shared.licenseEmail) {
+                            DispatchQueue.main.async {
+                                showLicenseChange = true
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .alert(isPresented: $showLicenseChange) {
+            Alert(title: Text("Licensing"), message: Text("Your email \(SettingsMT.shared.licenseEmail) is now licensed"), dismissButton: .default(Text("OK")))
+        }
+
     }
 }
 

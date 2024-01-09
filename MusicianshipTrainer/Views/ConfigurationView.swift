@@ -4,15 +4,14 @@ import SwiftUI
 import CommonLibrary
 
 struct LogView: View {
-    let items: [LogMessage] = Logger.logger.recordedMsgs
-    
+    let items: [LogMessage] = Logger.logger.loggedMsgs    
     var body: some View {
         Text("Log messages")
         ScrollView {
             VStack(spacing: 20) {
                 ForEach(items) { item in
                     HStack {
-                        Text(item.message).padding(0)
+                        Text(item.getLogEvent()).padding(0)
                         Spacer()
                     }
                 }
@@ -26,6 +25,7 @@ struct ConfigurationView: View {
     @Binding var isPresented: Bool
     @ObservedObject var settings:SettingsMT
     let colorCircleSize = 60.0
+    @State var showLog = false
     
     var body: some View {
         VStack(alignment: .center) {
@@ -97,8 +97,7 @@ struct ConfigurationView: View {
                 .roundedBorderRectangle()
                 .padding()
                 
-                VStack {
-                    Text("Teacher Section")
+                HStack {
                     HStack {
                         Text("Email")
                         TextField("Enter your email", text: $settings.licenseEmail)
@@ -106,49 +105,65 @@ struct ConfigurationView: View {
                             .autocapitalization(.none)
                     }
                     .padding()
+                    .roundedBorderRectangle()
+                    
+                    HStack {
+                        Button(action: {
+                            //Logger.logger.reportError(IAPManager.shared, "test test test test test test test test test test test test test test ")
+                            showLog.toggle()
+                        }) {
+                            Text("Show System Log")
+                        }
+                    }
+                    .padding()
+                    .roundedBorderRectangle()
                 }
-                .roundedBorderRectangle()
+                
                 .padding()
                 
                 if UIDevice.current.userInterfaceIdiom == .pad {
-                Text("------------------ Testing Only ------------------").padding()
-                
-                    HStack {
-                        Button(action: {
-                            DispatchQueue.main.async {
-                                settings.showReloadHTMLButton.toggle()
-                            }
-                        }) {
+                    if let user = IAPManager.shared.getLicenseUser(email: settings.licenseEmail) {
+                        if user.allowTest {
+                            Text("------------------ Testing Only ------------------").padding()
+                            
                             HStack {
-                                Image(systemName: settings.showReloadHTMLButton ? "checkmark.square" : "square")
-                                Text("Reload HTML Button")
+                                Button(action: {
+                                    DispatchQueue.main.async {
+                                        settings.showReloadHTMLButton.toggle()
+                                    }
+                                }) {
+                                    HStack {
+                                        Image(systemName: settings.showReloadHTMLButton ? "checkmark.square" : "square")
+                                        Text("Reload HTML Button")
+                                    }
+                                }
+                                .padding()
+                                
+                                Button(action: {
+                                    DispatchQueue.main.async {
+                                        settings.useTestData.toggle()
+                                    }
+                                }) {
+                                    HStack {
+                                        Image(systemName: settings.useTestData ? "checkmark.square" : "square")
+                                        Text("Use Test Data")
+                                    }
+                                }
+                                .padding()
+                                
+                                Button(action: {
+                                    DispatchQueue.main.async {
+                                        settings.companionOn.toggle()
+                                    }
+                                }) {
+                                    HStack {
+                                        Image(systemName: settings.companionOn ? "checkmark.square" : "square")
+                                        Text("Companion On")
+                                    }
+                                }
+                                .padding()
                             }
                         }
-                        .padding()
-                        
-                        Button(action: {
-                            DispatchQueue.main.async {
-                                settings.useTestData.toggle()
-                            }
-                        }) {
-                            HStack {
-                                Image(systemName: settings.useTestData ? "checkmark.square" : "square")
-                                Text("Use Test Data")
-                            }
-                        }
-                        .padding()
-                        
-                        Button(action: {
-                            DispatchQueue.main.async {
-                                settings.companionOn.toggle()
-                            }
-                        }) {
-                            HStack {
-                                Image(systemName: settings.companionOn ? "checkmark.square" : "square")
-                                Text("Companion On")
-                            }
-                        }
-                        .padding()
                     }
                 }
             }
@@ -181,6 +196,10 @@ struct ConfigurationView: View {
             }
             Spacer()
         }
+        .sheet(isPresented: $showLog) {
+            LogView()
+        }
+
         //.background(Settings.shared.colorBackground)
     }
     

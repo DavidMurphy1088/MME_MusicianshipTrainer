@@ -77,6 +77,9 @@ public struct LicenseManagerView: View {
                 }
                 else {
                     Text("Sorry, no license is available yet")
+#if targetEnvironment(simulator)
+                    Text("SIMULATOR CANNOT DO LICENSING")
+#endif
                 }
             }
             HStack {
