@@ -118,7 +118,7 @@ struct ClapOrPlayPresentView: View {
                 result += "\(linefeed)\(bullet)Advice: For a clear result, you should tap and then immediately release"
                 result += " your finger from the screen, rather than holding it down."
                 if grade >= 2 {
-                    result += "\n\n\(bullet)For rests, accurately count them but do not touch the screen."
+                    result += "\n\(bullet)For rests, accurately count them but do not touch the screen."
                 }
                 result += "\(linefeed)\(bullet)Note that in the configuration screen you can choose to have the drum sound either on or off."
             }
@@ -131,7 +131,7 @@ struct ClapOrPlayPresentView: View {
             if !examMode {
                 result += "\(linefeed)\(bullet)Advice: For a clear result, you should tap with the pad of your finger and then immediately release"
                 result += " your finger from the screen, rather than holding it down."
-                result += "\n\n\(bullet)If you tap the rhythm incorrectly, you will be able to hear your rhythm attempt and the correct given rhythm at crotchet = 90 on the Answer Page."
+                result += "\n\(bullet)If you tap the rhythm incorrectly, you will be able to hear your rhythm attempt and the correct given rhythm at crotchet = 90 on the Answer Page."
                 result += "\(linefeed)\(bullet)Note that the using the configuration screen you can ask that a drum sound is heard for each tap."
             }
 
@@ -147,6 +147,9 @@ struct ClapOrPlayPresentView: View {
             //result += "\(linefeed)\(bullet)Note that the using the configuration screen you can ask that instead of using the virtual keyboard, your acoustic piano is recorded for sight reading. "
             //result += "The virtual keyboard can only record your right hand and does not capture which fingers you use."
             result += "\(linefeed)\(bullet)Note that in the configuration screen you can choose to use either a built in virtual keyboard for recording the right hand, or your own acoustic instrument. If you choose to use the built in keyboard you will be able to see your feedback. If you choose to use your instrument, you will be able to hear back your attempt. You should practise both ways."
+            if !SettingsMT.shared.useAcousticKeyboard {
+                result += "\(linefeed)\(bullet)Advice for using the virtual keyboard: For a clear result, you should tap and then immediately release your finger from the keyboard after playing each note. Don't try to be legato'."
+            }
 
         default:
             result = ""
@@ -219,7 +222,7 @@ struct ClapOrPlayPresentView: View {
     }
     
     func nextStepText() -> String? {
-        var next:String? 
+        var next:String?
         if questionType == .melodyPlay {
             if contentSection.getExamTakingStatus() == .inExam {
                 next = "Submit Your Answer"
@@ -781,7 +784,7 @@ struct ClapOrPlayAnswerView: View {
                             feedback.feedbackExplanation! +=  "\n"
                         }
                     }
-                    feedback.feedbackExplanation! += "• The rhythm tolerance was set at \(tol)"
+                    feedback.feedbackExplanation! += " The rhythm tolerance was set at \(tol)"
                 }
             }
 
@@ -956,6 +959,7 @@ struct ClapOrPlayAnswerView: View {
                     //answerMetronome.setTempo(tempo: questionTempo, context: "AnswerMode::OnAppear")
                 }
                 else {
+                    ///50.3 - It appears it never gets here since acoustic sight reading never leaves the question page ....
                     analyseStudentMelody()
                 }
                 ///Load score again since it may have changed due student simplifying the rhythm. The parent of this view that loaded the original score is not inited again on a retry of a simplified rhythm.
@@ -1040,6 +1044,7 @@ struct ClapOrPlayView: View {
                 if answerState  != .submittedAnswer {
                     ///ScrollView Forces everthing to top align, not center align. Top of metronome truncated but still operable.
                     ///Without ScrollView various screens can't see all buttons
+                    ///Better to drop scroll view and make sure everythning fits instead
                     //ScrollView {
                         ClapOrPlayPresentView(
                             contentSection: contentSection,

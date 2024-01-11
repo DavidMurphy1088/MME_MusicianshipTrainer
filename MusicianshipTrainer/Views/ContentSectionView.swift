@@ -831,6 +831,12 @@ struct ExamView: View {
                 .frame(width: UIScreen.main.bounds.width / 3.0)
         }
     }
+    func getExamInstrucons() -> String {
+        var text = "The exam has \(contentSection.getQuestionCount()) questions. Before starting the exam be sure to choose your preferences in the configuration screen for -"
+        text += "\n• Having a drum sound for tapping rhythms"
+        text += "\n• Using an acoustic piano or the built in virtual keyboard for sight reading"
+        return text
+    }
     
     var body: some View {
         VStack {
@@ -849,17 +855,24 @@ struct ExamView: View {
                 if examState == .narrated {
                     VStack {
                         examImage()
-                        HStack {
+                        VStack {
+                            Text(getExamInstrucons())
+                                .defaultTextStyle()
+                                .padding()
+                                .frame(height: UIScreen.main.bounds.height / 5.0)
                             RhythmToleranceView(contextText: "Please set the rhythm tolerance you'd like to use for the exam.")
                                 .frame(width: UIScreen.main.bounds.width / 2.0)
                         }
+                        
+                        .roundedBorderRectangle().padding()
+
                         Button(action: {
                             self.examState = .examStarted
                             AudioRecorder.shared.stopPlaying()
                         }) {
                             VStack {
                                 //Text(examInstructionsStatus).padding().font(.title)
-                                Text("The exam has \(contentSection.getQuestionCount()) questions").defaultTextStyle().padding()
+                                
                                 Text("Start the Exam").defaultButtonStyle().padding()
                             }
                             .padding()

@@ -18,6 +18,19 @@ struct LogView: View {
             }
             .padding()
         }
+        Button(action: {
+            var log = ""
+            for item in items {
+                log += item.getLogEvent() + "\n\n"
+            }
+            UIPasteboard.general.string = log
+        }) {
+            HStack {
+                Text("Copy Log to Clipboard").font(.title)
+                    .padding()
+            }
+        }
+        .padding()
     }
 }
 
@@ -129,24 +142,24 @@ struct ConfigurationView: View {
                             HStack {
                                 Button(action: {
                                     DispatchQueue.main.async {
-                                        settings.showReloadHTMLButton.toggle()
-                                    }
-                                }) {
-                                    HStack {
-                                        Image(systemName: settings.showReloadHTMLButton ? "checkmark.square" : "square")
-                                        Text("Reload HTML Button")
-                                    }
-                                }
-                                .padding()
-                                
-                                Button(action: {
-                                    DispatchQueue.main.async {
                                         settings.useTestData.toggle()
                                     }
                                 }) {
                                     HStack {
                                         Image(systemName: settings.useTestData ? "checkmark.square" : "square")
                                         Text("Use Test Data")
+                                    }
+                                }
+                                .padding()
+                                
+                                Button(action: {
+                                    DispatchQueue.main.async {
+                                        settings.showReloadHTMLButton.toggle()
+                                    }
+                                }) {
+                                    HStack {
+                                        Image(systemName: settings.showReloadHTMLButton ? "checkmark.square" : "square")
+                                        Text("Reload HTML")
                                     }
                                 }
                                 .padding()

@@ -122,8 +122,8 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         
 #if targetEnvironment(simulator)
         ///Simulator asks for password every time even though its signed in with Apple ID. By design for IAP purchasing... :(
-    // Code to run on the Simulator
-    print("Running on the Simulator, will not load IAP licenses")
+        ///Code to run on the Simulator
+        print("Running on the Simulator, will not load IAP licenses")
 #else
         SKPaymentQueue.default().add(IAPManager.shared) ///Do this as early as possible
         IAPManager.shared.requestProducts() ///Get products
