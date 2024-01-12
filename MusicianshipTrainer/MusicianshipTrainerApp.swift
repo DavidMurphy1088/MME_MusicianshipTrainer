@@ -175,7 +175,7 @@ struct MusicianshipTrainerApp: App {
 
     init() {
         //Playback supposedly gives better playback than play and record. So only set record when needed
-        //AudioManager.shared.setAudioSessionPlayback("MusicianshipTrainerApp")
+        //AudioManager.shared.initAudio("MusicianshipTrainerApp")
         rootContentSection = ContentSection(parent: nil, name: "", type: "")
         exampleData = ExampleData(sheetName: SettingsMT.shared.useTestData ? "ContentSheetID_TEST" : "ContentSheetID", rootContentSection: rootContentSection)
     }

@@ -118,7 +118,7 @@ struct ClapOrPlayPresentView: View {
                 result += "\(linefeed)\(bullet)Advice: For a clear result, you should tap and then immediately release"
                 result += " your finger from the screen, rather than holding it down."
                 if grade >= 2 {
-                    result += "\n\(bullet)For rests, accurately count them but do not touch the screen."
+                    result += "\(linefeed)\(bullet)For rests, accurately count them but do not touch the screen."
                 }
                 result += "\(linefeed)\(bullet)Note that in the configuration screen you can choose to have the drum sound either on or off."
             }
@@ -131,8 +131,9 @@ struct ClapOrPlayPresentView: View {
             if !examMode {
                 result += "\(linefeed)\(bullet)Advice: For a clear result, you should tap with the pad of your finger and then immediately release"
                 result += " your finger from the screen, rather than holding it down."
-                result += "\n\(bullet)If you tap the rhythm incorrectly, you will be able to hear your rhythm attempt and the correct given rhythm at crotchet = 90 on the Answer Page."
+                result += "\(linefeed)\(bullet)If you tap the rhythm incorrectly, you will be able to hear your rhythm attempt and the correct given rhythm at crotchet = 90 on the Answer Page."
                 result += "\(linefeed)\(bullet)Note that the using the configuration screen you can ask that a drum sound is heard for each tap."
+                result += "\(linefeed)\(bullet)Note that in the configuration screen you can choose to have the drum sound either on or off."
             }
 
         case .melodyPlay:
@@ -144,8 +145,6 @@ struct ClapOrPlayPresentView: View {
                 result += "play the melody and the final chords."
             }
             result += "\(linefeed)\(bullet)When you have finished, stop the recording."
-            //result += "\(linefeed)\(bullet)Note that the using the configuration screen you can ask that instead of using the virtual keyboard, your acoustic piano is recorded for sight reading. "
-            //result += "The virtual keyboard can only record your right hand and does not capture which fingers you use."
             result += "\(linefeed)\(bullet)Note that in the configuration screen you can choose to use either a built in virtual keyboard for recording the right hand, or your own acoustic instrument. If you choose to use the built in keyboard you will be able to see your feedback. If you choose to use your instrument, you will be able to hear back your attempt. You should practise both ways."
             if !SettingsMT.shared.useAcousticKeyboard {
                 result += "\(linefeed)\(bullet)Advice for using the virtual keyboard: For a clear result, you should tap and then immediately release your finger from the keyboard after playing each note. Don't try to be legato'."
@@ -171,6 +170,30 @@ struct ClapOrPlayPresentView: View {
         let lname = questionType == .melodyPlay ? "melody" : "rhythm"
         var practiceText = "You can adjust the metronome to hear the given \(lname) at varying tempi."
         return practiceText
+    }
+    
+    ///Get a score that can be used to playback the student's keyboard melody recording
+    func getKeyboardScore() -> Score? {
+        var tappedScore:Score? = nil
+        answer.makeNoteValues()
+        guard let tapValues = answer.rhythmValues else {
+            return nil
+        }
+        tappedScore = tapRecorder.getTappedAsAScore(timeSignatue: score.timeSignature, questionScore: score, tapValues: tapValues)
+        guard let tappedScore = tappedScore else {
+            return nil
+        }
+        ///Add note pitches from the piano to the score
+        var pitchIndex = 0
+        for timeslice in tappedScore.getAllTimeSlices() {
+            let notes = timeslice.getTimeSliceNotes(staffNum: 0)
+            if notes.count > 0 {
+                notes[0].midiNumber = answer.sightReadingNotePitches[pitchIndex]
+                notes[0].isOnlyRhythmNote = false
+                pitchIndex += 1
+            }
+        }
+        return tappedScore
     }
     
     func rhythmIsCorrect() -> Bool {
@@ -309,8 +332,13 @@ struct ClapOrPlayPresentView: View {
                                           fileName: contentSection.name,
                                           onStart: ({
                             if questionType == .melodyPlay {
-                                ///Play from the audio ecording
-                                return nil
+                                if SettingsMT.shared.useAcousticKeyboard {
+                                    ///Play from the audio recording
+                                    return nil
+                                }
+                                else {
+                                    return getKeyboardScore()
+                                }
                             }
                             else {
                                 if let recordedScore = getStudentTappingAsAScore() {
@@ -629,7 +657,7 @@ struct ClapOrPlayPresentView: View {
                     })
                 }
 
-                metronome.setTempo(tempo: 90, context: "View init")
+                metronome.setTempo(tempo: metronome.defaultTempo, context: "View init")
                 metronome.setAllowTempoChange("ClapOrPlayPresentView", allow: true)
                 if questionType == .melodyPlay {
                     score.addTriadNotes()

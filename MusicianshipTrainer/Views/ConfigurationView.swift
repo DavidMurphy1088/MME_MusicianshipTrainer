@@ -119,15 +119,17 @@ struct ConfigurationView: View {
                     }
                     .padding()
                     .roundedBorderRectangle()
+                    .padding()
+                }
                     
-                    HStack {
-                        Button(action: {
-                            //Logger.logger.reportError(IAPManager.shared, "test test test test test test test test test test test test test test ")
-                            showLog.toggle()
-                        }) {
-                            Text("Show System Log")
-                        }
+                HStack {
+                    Button(action: {
+                        //Logger.logger.reportError(IAPManager.shared, "test test test test test test test test test test test test test test ")
+                        showLog.toggle()
+                    }) {
+                        Text("Show System Log")
                     }
+                    //}
                     .padding()
                     .roundedBorderRectangle()
                 }
@@ -140,6 +142,17 @@ struct ConfigurationView: View {
                             Text("------------------ Testing Only ------------------").padding()
                             
                             HStack {
+                                Button(action: {
+                                    DispatchQueue.main.async {
+                                        AudioManager.shared.fullReset(manual: true)
+                                    }
+                                }) {
+                                    HStack {
+                                        Text("Reset Audio")
+                                    }
+                                }
+                                .padding()
+
                                 Button(action: {
                                     DispatchQueue.main.async {
                                         settings.useTestData.toggle()
