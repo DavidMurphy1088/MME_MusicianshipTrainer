@@ -5,10 +5,16 @@ import CommonLibrary
 struct ProductIntroView: View {
     var body: some View {
             VStack  (alignment: .center) {
-                Text("Musicianship Trainer")
+                Text("Musicianship")
                     .font(.system(size: 42))
                     .fontWeight(.bold)
                     //.padding()
+
+                Text("Trainer")
+                    .font(.system(size: 42))
+                    .fontWeight(.bold)
+                    //.padding()
+                
                 if UIDevice.current.userInterfaceIdiom == .pad {
                     Image("NZMEB_logo_bird_transparent")
                         .resizable()

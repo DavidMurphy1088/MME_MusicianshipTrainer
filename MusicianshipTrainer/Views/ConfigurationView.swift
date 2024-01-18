@@ -144,7 +144,7 @@ struct ConfigurationView: View {
                             HStack {
                                 Button(action: {
                                     DispatchQueue.main.async {
-                                        AudioManager.shared.fullReset(manual: true)
+                                        AudioManager.shared.fullReset()
                                     }
                                 }) {
                                     HStack {

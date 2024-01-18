@@ -465,6 +465,7 @@ struct ClapOrPlayPresentView: View {
                 if questionType == .rhythmVisualClap || questionType == .melodyPlay {
                     //ScoreSpacerView()
                     ScoreView(score: score, widthPadding: false).padding()
+                        .roundedBorderRectangle()
                     //ScoreSpacerView()
                 }
                 
@@ -944,9 +945,11 @@ struct ClapOrPlayAnswerView: View {
             VStack {
                 ToolsView(score: score, helpMetronome: helpMetronome())
                 ScoreView(score: score, widthPadding: false).padding()
+                    .roundedBorderRectangle()
 
                 if let fittedScore = self.fittedScore {
                     ScoreView(score: fittedScore, widthPadding: false).padding()
+                        .roundedBorderRectangle()
                 }
 
                 HStack {

@@ -280,7 +280,18 @@ struct ContentSectionHeaderView: View {
                     }
                     Spacer()
                     Button(action: {
-                        isVideoPresented.toggle()
+                        //isVideoPresented.toggle()
+                        //if let url = URL(string: "https://www.example.com") {
+                        let urlStr = "https://storage.googleapis.com/musicianship_trainer/NZMEB/" +
+                        contentSection.getPath() + "." + SettingsMT.shared.getAgeGroup() + ".video.mp4"
+                        let allowedCharacterSet = CharacterSet.urlQueryAllowed
+                        if let encodedString = urlStr.addingPercentEncoding(withAllowedCharacters: allowedCharacterSet) {
+                            if let url = URL(string: encodedString) {
+                                UIApplication.shared.open(url)
+                            }
+                        }
+                        //}
+
                     }) {
                         VStack {
                             VStack {
@@ -292,21 +303,27 @@ struct ContentSectionHeaderView: View {
                             }
                         }
                     }
-                    .sheet(isPresented: $isVideoPresented) {
-                        let urlStr = "https://storage.googleapis.com/musicianship_trainer/NZMEB/" +
-                        contentSection.getPath() + "." + SettingsMT.shared.getAgeGroup() + ".video.mp4"
-                        let allowedCharacterSet = CharacterSet.urlQueryAllowed
-                        if let encodedString = urlStr.addingPercentEncoding(withAllowedCharacters: allowedCharacterSet) {
-                            if let url = URL(string: encodedString) {
-                                GeometryReader { geo in
-                                    VStack {
-                                        VideoPlayer(player: AVPlayer(url: url))
-                                    }
-                                    .frame(height: geo.size.height)
-                                }
-                            }
-                        }
-                    }
+//                    .sheet(isPresented: $isVideoPresented) {
+//                        let urlStr = "https://storage.googleapis.com/musicianship_trainer/NZMEB/" +
+//                        contentSection.getPath() + "." + SettingsMT.shared.getAgeGroup() + ".video.mp4"
+//                        let allowedCharacterSet = CharacterSet.urlQueryAllowed
+//                        if let encodedString = urlStr.addingPercentEncoding(withAllowedCharacters: allowedCharacterSet) {
+//                            if let url = URL(string: encodedString) {
+//                                GeometryReader { geo in
+//                                    VStack {
+//                                        VideoPlayer(player: AVPlayer(url: url))
+//                                    }
+//                                    .frame(height: geo.size.height)
+//                                    .onAppear() {
+//                                        AudioManager.shared.pause("VideoPlayer .OnAppear", pause: true)
+//                                    }
+//                                    .onDisappear() {
+//                                        AudioManager.shared.pause("VideoPlayer .OnDisappear", pause: false)
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
                 }
                 
                 if contentSection.getPathAsArray().count > 2 {

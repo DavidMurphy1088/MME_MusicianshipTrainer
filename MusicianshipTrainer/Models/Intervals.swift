@@ -69,7 +69,8 @@ class Intervals : ObservableObject {
             intervalNames.append(IntervalGroup(name: ageGroup == SettingsMT.shared.AGE_GROUP_11_PLUS ? "Octave" : "Octave", noteSpan: 7, intervals:[12]))
         }
         if UIDevice.current.userInterfaceIdiom == .phone {
-            intervalsPerColumn = 3
+            //intervalsPerColumn = 3
+            intervalsPerColumn = Int(Double((self.intervalNames.count + 1)) / 2.0)
         }
         else {
             if UIGlobalsCommon.isLandscape() {
