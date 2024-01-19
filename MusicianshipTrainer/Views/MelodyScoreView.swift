@@ -155,7 +155,7 @@ struct ListMelodiesView: View {
                             }) {
                                 //ZStack {
                                     Text(melody.name)
-                                        .padding()
+                                        //.padding()
                                         .foregroundColor(selectedMelodyId == melody.id ? .black : .black)
                                         .background(selectedMelodyId == melody.id ? Color.blue : Color.white)
                                         .cornerRadius(8)

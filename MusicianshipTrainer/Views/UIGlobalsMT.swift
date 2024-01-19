@@ -13,7 +13,8 @@ public class UIGlobalsMT {
     private var lastRandom = -1
     public func getRandomBackgroundImageName(backgroundSet:BackgroundsSet) -> String {
         var random:Int = -1
-        var number = backgroundSet == .scene ? 12 : 4
+        //var number = backgroundSet == .scene ? 1 : 4
+        var number = backgroundSet == .scene ? 12 : 8
         while random < 0 {
             let r = Int.random(in: 0...number)
             if number > 1 {
