@@ -16,7 +16,7 @@ enum UserDefaultKeys {
     static let companionOn = "companionOn"
     static let useAcousticKeyboard = "useAcousticKeyboard"
     static let licenseEmail = "licenseEmail"
-}
+}    
 
 public enum AgeGroup: Int, CaseIterable, Identifiable {
     case Group_5To10 = 0
