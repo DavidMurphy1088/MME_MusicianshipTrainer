@@ -36,7 +36,7 @@ public enum AgeGroup: Int, CaseIterable, Identifiable {
 
 public enum BackgroundsSet: Int, CaseIterable, Identifiable {
     case scene = 0
-    case kids = 1
+    case people = 1
     
     public var id: Self { self }
     
@@ -44,8 +44,8 @@ public enum BackgroundsSet: Int, CaseIterable, Identifiable {
         switch self {
         case .scene:
             return "Scene"
-        case .kids:
-            return "Kids"
+        case .people:
+            return "People"
         }
     }
 }
@@ -106,7 +106,7 @@ extension UserDefaults {
     func getSelectedBackgroundSet(key:String) -> BackgroundsSet? {
         guard let data = data(forKey: key) else { return nil }
         let bkg  = data.withUnsafeBytes { $0.load(as: Int.self) }
-        return bkg == 0 ? .scene : .kids
+        return bkg == 0 ? .scene : .people
     }
 
     func setBoolean(key:String, _ way: Bool) {
