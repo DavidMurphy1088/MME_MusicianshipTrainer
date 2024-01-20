@@ -147,7 +147,7 @@ struct ClapOrPlayPresentView: View {
             result += "\(linefeed)\(bullet)When you have finished, stop the recording."
             result += "\(linefeed)\(bullet)Note that in the configuration screen you can choose to use either a built in virtual keyboard for recording the right hand, or your own acoustic instrument. If you choose to use the built in keyboard you will be able to see your feedback. If you choose to use your instrument, you will be able to hear back your attempt. You should practise both ways."
             if !SettingsMT.shared.useAcousticKeyboard {
-                result += "\(linefeed)\(bullet)Advice for using the virtual keyboard: For a clear result, you should tap and then immediately release your finger from the keyboard after playing each note. Don't try to be legato'."
+                result += "\(linefeed)\(bullet)Advice for using the virtual keyboard: For a clear result, you should tap and then immediately release your finger from the keyboard after playing each note. Don't try to be legato."
             }
 
         default:

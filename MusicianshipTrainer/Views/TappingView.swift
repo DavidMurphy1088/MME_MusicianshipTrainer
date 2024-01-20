@@ -12,6 +12,10 @@ class Invert : ObservableObject {
     func switchBorder() {
         DispatchQueue.main.async {
             self.invert.toggle()
+            DispatchQueue.main.async {
+                Thread.sleep(forTimeInterval: 0.05)
+                self.invert.toggle()
+            }
         }
     }
 }
