@@ -89,7 +89,7 @@ struct IntervalPresentView: View { //}, QuestionPartProtocol {
     @Binding var answer:Answer
     
     let questionType:QuestionType
-    let metronome = Metronome.getMetronomeWithSettings(initialTempo: 40, allowChangeTempo: false, ctx:"IntervalPresentView")
+    let metronome = Metronome.getMetronomeWithSettings("IntervalPresentView", initialTempo: 40, allowChangeTempo: false)
     let googleAPI = GoogleAPI.shared
     
     init(contentSection:ContentSection, score:Score, answerState:Binding<AnswerState>, answer:Binding<Answer>, questionType:QuestionType, refresh:(() -> Void)? = nil) {
@@ -213,24 +213,6 @@ struct IntervalPresentView: View { //}, QuestionPartProtocol {
                 }
                 
                 HStack {
-                    if contentSection.isTakingExam() {
-                        if examInstructionsWereNarrated {
-                            if answerState == .notEverAnswered {
-                                Button(action: {
-                                    audioRecorder.stopPlaying()
-                                    self.contentSection.playExamInstructions(withDelay:false,
-                                                                             onLoaded: {status in},
-                                                                             onNarrated: {})
-                                }) {
-                                    Text("Repeat The Instructions").defaultButtonStyle()
-                                }
-                                .padding()
-                            }
-                        }
-                        else {
-                            Text("Please wait for narrated instructions ...").hintAnswerButtonStyle(selected: false)
-                        }
-                    }
                     
                     if questionType == .intervalAural {
                         VStack {
@@ -311,6 +293,25 @@ struct IntervalPresentView: View { //}, QuestionPartProtocol {
                 .disabled(questionType == .intervalAural && scoreWasPlayed == false)
                 .padding()
                 
+                if contentSection.isTakingExam() {
+                    if examInstructionsWereNarrated {
+                        if answerState == .notEverAnswered {
+                            Button(action: {
+                                audioRecorder.stopPlaying()
+                                self.contentSection.playExamInstructions(withDelay:false,
+                                                                         onLoaded: {status in},
+                                                                         onNarrated: {})
+                            }) {
+                                Text("Repeat The Instructions").defaultButtonStyle()
+                            }
+                            .padding()
+                        }
+                    }
+                    else {
+                        Text("Please wait for narrated instructions ...").hintAnswerButtonStyle(selected: false)
+                    }
+                }
+                
                 if answerState == .answered {
                     VStack {
                         Button(action: {
@@ -353,7 +354,7 @@ struct IntervalAnswerView: View {
     private var questionType:QuestionType
     private var score:Score
     private let imageSize = Double(48)
-    private let metronome = Metronome.getMetronomeWithSettings(initialTempo: 40, allowChangeTempo: false, ctx:"Interval answer View")
+    private let metronome = Metronome.getMetronomeWithSettings("Interval answer View", initialTempo: 40, allowChangeTempo: false)
     private var noteIsSpace:Bool
     private var answer:Answer
     private let intervals:Intervals
@@ -482,6 +483,8 @@ struct IntervalAnswerView: View {
                         ListMelodiesView(firstNote: score.getAllTimeSlices()[0].getTimeSliceNotes()[0],
                                          intervalName: answer.correctIntervalName,
                                          interval: answer.correctIntervalHalfSteps, melodies: getMelodies())
+                        .padding(.horizontal, 0)
+                        
                         //.background(Color.yellow.opacity(0.1))
                     }
                 }

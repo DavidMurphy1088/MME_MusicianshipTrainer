@@ -6,7 +6,7 @@ struct MelodyScoreView: View {
     let interval:Int
     let melody:Melody
     @State var score:Score?
-    let metronome = Metronome.getMetronomeWithSettings(initialTempo: 90, allowChangeTempo: false, ctx:"Melody example")
+    let metronome = Metronome.getMetronomeWithSettings("Melody example", initialTempo: 90, allowChangeTempo: false)
     
     init(basePitch:Int, interval:Int, melody:Melody) {
         self.basePitch = basePitch
@@ -19,6 +19,7 @@ struct MelodyScoreView: View {
             if let score = score {
                 ScoreView(score: score, widthPadding: false)
                     .padding(.horizontal, 0)
+                    //.border(Color.red)
             }
         }
         
@@ -131,7 +132,6 @@ struct ListMelodiesView: View {
             }
             .padding()
             .fullScreenCover(isPresented: $presentMelodies) {
-            //.sheet(isPresented: $presentMelodies) {
                 VStack {
                     Spacer()
                     Text("Examples of a \(intervalName)").font(.title).padding()
@@ -139,7 +139,8 @@ struct ListMelodiesView: View {
                         if presentScoreView {
                             if let selectedMelody = selectedMelody {
                                 MelodyScoreView(basePitch: firstNote.midiNumber, interval:interval, melody: selectedMelody)
-                                .padding()
+                                    .padding(.horizontal, 0)
+                                //.border(Color.green)      
                             }
                         }
                     }
@@ -179,8 +180,7 @@ struct ListMelodiesView: View {
                     .padding()
                     Spacer()
                 }
-                
-                .padding()
+                //.padding()
                 .onAppear {
                     self.selectedMelody = nil
                 }

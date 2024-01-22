@@ -287,7 +287,9 @@ struct ContentSectionHeaderView: View {
                         let allowedCharacterSet = CharacterSet.urlQueryAllowed
                         if let encodedString = urlStr.addingPercentEncoding(withAllowedCharacters: allowedCharacterSet) {
                             if let url = URL(string: encodedString) {
+                                //Run Safari externally
                                 UIApplication.shared.open(url)
+                                //isVideoPresented = true
                             }
                         }
                         //}
@@ -303,6 +305,7 @@ struct ContentSectionHeaderView: View {
                             }
                         }
                     }
+                    ///Use external Safari broswer- the in-app browser has no sound sometimes ...
 //                    .sheet(isPresented: $isVideoPresented) {
 //                        let urlStr = "https://storage.googleapis.com/musicianship_trainer/NZMEB/" +
 //                        contentSection.getPath() + "." + SettingsMT.shared.getAgeGroup() + ".video.mp4"
@@ -315,10 +318,10 @@ struct ContentSectionHeaderView: View {
 //                                    }
 //                                    .frame(height: geo.size.height)
 //                                    .onAppear() {
-//                                        AudioManager.shared.pause("VideoPlayer .OnAppear", pause: true)
+//                                        //AudioManager.shared.pause("VideoPlayer .OnAppear", pause: true)
 //                                    }
 //                                    .onDisappear() {
-//                                        AudioManager.shared.pause("VideoPlayer .OnDisappear", pause: false)
+//                                        //AudioManager.shared.pause("VideoPlayer .OnDisappear", pause: false)
 //                                    }
 //                                }
 //                            }
@@ -816,7 +819,7 @@ struct ExamView: View {
     @State var sectionIndex = 0
     @State var answerState:AnswerState = .notEverAnswered
     @State var answer = Answer()
-    @State private var showingConfirm = false
+    @State private var showingConfirmExit = false
     @State private var examState:ExamState = .notStartedLoad
     
     enum ExamState {
@@ -849,8 +852,8 @@ struct ExamView: View {
         }
     }
     func getExamInstrucons() -> String {
-        var text = "The exam has \(contentSection.getQuestionCount()) questions. Before starting the exam be sure to choose your preferences in the configuration screen for -"
-        text += "\n• Having a drum sound for tapping rhythms"
+        var text = "The exam has \(contentSection.getQuestionCount()) questions. Before starting the exam be sure to choose your preferences in the configuration screen for:"
+        text += "\n• Having the drum sound on or off for tapping rhythms"
         text += "\n• Using an acoustic piano or the built in virtual keyboard for sight reading"
         return text
     }
@@ -877,23 +880,21 @@ struct ExamView: View {
                                 .defaultTextStyle()
                                 .padding()
                                 .frame(height: UIScreen.main.bounds.height / 5.0)
-                            RhythmToleranceView(contextText: "Please set the rhythm tolerance you'd like to use for the exam.")
-                                .frame(width: UIScreen.main.bounds.width / 2.0)
                         }
-                        
                         .roundedBorderRectangle().padding()
-
+                        RhythmToleranceView(contextText: "Please set the rhythm tolerance you'd like to use for the exam.")
+                            //.frame(width: UIScreen.main.bounds.width / 2.0)
                         Button(action: {
                             self.examState = .examStarted
                             AudioRecorder.shared.stopPlaying()
                         }) {
-                            VStack {
-                                //Text(examInstructionsStatus).padding().font(.title)
-                                
-                                Text("Start the Exam").defaultButtonStyle().padding()
-                            }
-                            .padding()
-                            .roundedBorderRectangle().padding()
+                        VStack {
+                            //Text(examInstructionsStatus).padding().font(.title)
+
+                            Text("Start the Exam").defaultButtonStyle().padding()
+                        }
+                        .padding()
+                        .roundedBorderRectangle().padding()
                         }
                     }
                 }
@@ -923,14 +924,15 @@ struct ExamView: View {
                             Spacer()
                             
                             Button(action: {
-                                showingConfirm = true
+                                showingConfirmExit = true
+                                //print("===========SHOW", showingConfirmExit)
                             }) {
                                 HStack {
                                     Spacer()
                                     Text("Exit Exam").defaultButtonStyle().padding()
                                 }
                             }
-                            .alert(isPresented: $showingConfirm) {
+                            .alert(isPresented: $showingConfirmExit) {
                                 Alert(title: Text("Are you sure?"),
                                       message: Text("You cannot restart an exam you exit from"),
                                       primaryButton: .destructive(Text("Yes, I'm sure")) {

@@ -88,13 +88,16 @@ struct ClapOrPlayPresentView: View {
         _answer = answer
         _tryNumber = tryNumber
         self.score = score
-        if score.staffs.count > 1 {
-            self.score.staffs[1].isHidden = true
-        }
-        
+
         ///Some iPads too short in landscape mode
         score.heightPaddingEnabled = UIGlobalsCommon.isLandscape() ? false : true
         self.rhythmHeard = self.questionType == .rhythmVisualClap ? true : false
+        if score.staffs.count > 1 {
+            ///Only show triad in bass in answer mode
+            self.score.staffs[1].isHidden = true
+            //self.score.setHiddenStaff(num: 1, isHidden: true)
+        }
+
     }
     
     func examInstructionsDone(status:RequestStatus) {
@@ -343,7 +346,7 @@ struct ClapOrPlayPresentView: View {
                             else {
                                 if let recordedScore = getStudentTappingAsAScore() {
                                     if let recordedtempo = recordedScore.tempo {
-                                        metronome.setTempo(tempo: recordedtempo, context:"start hear student")
+                                        metronome.setTempo("start hear student", tempo: recordedtempo)
                                     }
                                 }
                                 return getStudentTappingAsAScore()
@@ -351,7 +354,7 @@ struct ClapOrPlayPresentView: View {
                         }),
                         onDone: ({
                             //recording was played at the student's tempo and now reset metronome
-                            metronome.setTempo(tempo: self.questionTempo, context: "end hear student")
+                            metronome.setTempo("end hear student", tempo: self.questionTempo)
                         })
                         )
                     }
@@ -500,35 +503,37 @@ struct ClapOrPlayPresentView: View {
                                 }
                             }
 
-                            if questionType == .rhythmVisualClap {
-                                if score.getBarCount() > 1 {
-                                    ///Enable bar manager to edit out bars in the given rhythm
-                                    HStack {
-                                        if score.barEditor == nil {
-                                            Button(action: {
-                                                score.createBarEditor(onEdit: scoreEditedNotification)
-                                            }) {
-                                                hintButtonView("Simplify the Rhythm", selected: self.rhythmWasSimplified)
+                            if UIDevice.current.userInterfaceIdiom == .pad {
+                                if questionType == .rhythmVisualClap {
+                                    if score.getBarCount() > 1 {
+                                        ///Enable bar manager to edit out bars in the given rhythm
+                                        HStack {
+                                            if score.barEditor == nil {
+                                                Button(action: {
+                                                    score.createBarEditor(onEdit: scoreEditedNotification)
+                                                }) {
+                                                    hintButtonView("Simplify the Rhythm", selected: self.rhythmWasSimplified)
+                                                }
+                                                .padding()
                                             }
-                                            .padding()
-                                        }
-                                        if let originalScore = originalScore {
-                                            if score.getBarCount() != originalScore.getBarCount() {
-                                                if UIDevice.current.userInterfaceIdiom == .pad {
-                                                    //This button just cant fit on iPhone display
-                                                    Button(action: {
-                                                        score.barLayoutPositions = BarLayoutPositions()
-                                                        score.copyEntries(from: originalScore)
-                                                        self.rhythmWasSimplified = false
-                                                    }) {
-                                                        hintButtonView("Put Back The Question Rhythm", selected: false)
+                                            if let originalScore = originalScore {
+                                                if score.getBarCount() != originalScore.getBarCount() {
+                                                    if UIDevice.current.userInterfaceIdiom == .pad {
+                                                        //This button just cant fit on iPhone display
+                                                        Button(action: {
+                                                            score.barLayoutPositions = BarLayoutPositions()
+                                                            score.copyEntries(from: originalScore)
+                                                            self.rhythmWasSimplified = false
+                                                        }) {
+                                                            hintButtonView("Put Back The Question Rhythm", selected: false)
+                                                        }
+                                                        .padding()
                                                     }
-                                                    .padding()
                                                 }
                                             }
                                         }
+                                        .roundedBorderRectangle()
                                     }
-                                    .roundedBorderRectangle()
                                 }
                             }
                             //if questionType != .melodyPlay {
@@ -658,7 +663,7 @@ struct ClapOrPlayPresentView: View {
                     })
                 }
 
-                metronome.setTempo(tempo: metronome.defaultTempo, context: "View init")
+                metronome.setTempo("Question View Init", tempo: 90)
                 metronome.setAllowTempoChange("ClapOrPlayPresentView", allow: true)
                 if questionType == .melodyPlay {
                     score.addTriadNotes()
@@ -697,7 +702,7 @@ struct ClapOrPlayAnswerView: View {
     private var questionType:QuestionType
     private var answer:Answer
     let questionTempo = 90
-    let melodyAnalyser = MelodyAnalyser()
+//    let melodyAnalyser = MelodyAnalyser()
     
     init(contentSection:ContentSection, score:Score, answerState:Binding<AnswerState>, tryNumber:Binding<Int>, answer:Answer, questionType:QuestionType) {
         self.contentSection = contentSection
@@ -708,18 +713,23 @@ struct ClapOrPlayAnswerView: View {
         _answerState = answerState
         _tryNumber = tryNumber
         answerMetronome.setSpeechEnabled(enabled: self.speechEnabled)
-    }
-    
-    func analyseStudentMelody() {
-        if let answer = contentSection.storedAnswer {
-            let tappedScore = melodyAnalyser.makeScoreFromTaps(questionScore: score, questionTempo: 60,
-                                                               tapPitches: answer.sightReadingNotePitches,
-                                                               tapTimes: answer.sightReadingNoteTimes
-            )
-            tappedScore.label = "Your Melody"
-            self.fittedScore = tappedScore
+        if score.staffs.count > 1 {
+            ///Only show triad in bass in answer mode
+            self.score.staffs[1].isHidden = false
+            //self.score.setHiddenStaff(num: 1, isHidden: true)
         }
     }
+    
+//    func analyseStudentMelody() {
+//        if let answer = contentSection.storedAnswer {
+//            let tappedScore = melodyAnalyser.makeScoreFromTaps(questionScore: score, questionTempo: 60,
+//                                                               tapPitches: answer.sightReadingNotePitches,
+//                                                               tapTimes: answer.sightReadingNoteTimes
+//            )
+//            tappedScore.label = "Your Melody"
+//            self.fittedScore = tappedScore
+//        }
+//    }
     
     func analyseStudentSubmittal() {
         var tappedScore:Score? = nil
@@ -770,15 +780,23 @@ struct ClapOrPlayAnswerView: View {
         }
 
         self.answerMetronome.setAllowTempoChange("analyseStudentSubmittal", allow: false)
-        self.answerMetronome.setTempo(tempo: self.questionTempo, context: "ClapOrPlayAnswerView")
-
+        ///23Jan2024 - changed to playback at whatever tempo student tapped
+        //self.answerMetronome.setTempo("ClapOrPlayAnswerView", tempo: self.questionTempo)
+        if let recordedTempo = tappedScore.tempo {
+            self.answerMetronome.setTempo("ClapOrPlayAnswerView", tempo: recordedTempo)
+        }
+        else {
+            self.answerMetronome.setTempo("ClapOrPlayAnswerView", tempo: self.questionTempo)
+        }
+        self.answerMetronome.setAllowTempoChange("analyseStudentSubmittal GOOD RHYTHM", allow: true)
+        
         if let fittedScore = self.fittedScore {
             if fittedScore.errorCount() == 0 && fittedScore.getAllTimeSlices().count > 0 {
                 feedback.correct = true
                 feedback.feedbackExplanation = "Good job!"
                 if let recordedTempo = tappedScore.tempo {
-                    self.answerMetronome.setAllowTempoChange("analyseStudentSubmittal GOOD RHYTHM", allow: true)
-                    self.answerMetronome.setTempo(tempo: recordedTempo, context: "ClapOrPlayAnswerView")
+                    //self.answerMetronome.setAllowTempoChange("analyseStudentSubmittal GOOD RHYTHM", allow: true)
+                    //self.answerMetronome.setTempo("ClapOrPlayAnswerView", tempo: recordedTempo)
                     let questionTempo = Metronome.getMetronomeWithCurrentSettings(ctx: "for clap answer").getTempo()
                     let tolerance = Int(CGFloat(questionTempo) * 0.2)
                     if questionType == .rhythmVisualClap || questionType == .melodyPlay {
@@ -984,15 +1002,19 @@ struct ClapOrPlayAnswerView: View {
                 //Spacer() //Keep - required to align the page from the top
             }
             .onAppear() {
-                if questionType == .rhythmVisualClap || questionType == .rhythmEchoClap ||
-                    (questionType == .melodyPlay && !SettingsMT.shared.useAcousticKeyboard) {
-                    analyseStudentSubmittal()
+//                if questionType == .rhythmVisualClap || questionType == .rhythmEchoClap
+////                    || (questionType == .melodyPlay && !SettingsMT.shared.useAcousticKeyboard)
+//                {
+                
+                analyseStudentSubmittal()
+                
                     //answerMetronome.setTempo(tempo: questionTempo, context: "AnswerMode::OnAppear")
-                }
-                else {
-                    ///50.3 - It appears it never gets here since acoustic sight reading never leaves the question page ....
-                    analyseStudentMelody()
-                }
+//                }
+//                else {
+//                    ///50.3 - It appears it never gets here since acoustic sight reading never leaves the question page ....
+//                    //what about exam
+//                    analyseStudentMelody()
+//                }
                 ///Load score again since it may have changed due student simplifying the rhythm. The parent of this view that loaded the original score is not inited again on a retry of a simplified rhythm.
                 //score = contentSection.getScore(staffCount: questionType == .melodyPlay ? 2 : 1, onlyRhythm: questionType != .melodyPlay)
 

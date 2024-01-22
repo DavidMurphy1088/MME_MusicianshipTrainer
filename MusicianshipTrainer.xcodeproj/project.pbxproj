@@ -124,11 +124,11 @@
 				7B1815C52B0C1CD3000418CB /* IntervalsView.swift */,
 				7B1815D32B0C289A000418CB /* MelodyScoreView.swift */,
 				7B89792E2B4A0EFA00B25F67 /* PurchaseLicense.swift */,
+				7BB7805A2B4A91300068C061 /* RhythmToleranceView.swift */,
 				7B1815B52B0BF47A000418CB /* SetHomeworkView.swift */,
 				7BA804772B2D05CE007FBE83 /* SightReadingPianoView.swift */,
 				7B1815DF2B0CADA8000418CB /* TappingView.swift */,
 				7B5EA0642B3B7DD600DE7CF3 /* UIGlobalsMT.swift */,
-				7BB7805A2B4A91300068C061 /* RhythmToleranceView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -524,7 +524,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_ASSET_PATHS = "\"MusicianshipTrainer/Preview Content\"";
 				DEVELOPMENT_TEAM = X9VDGR7PQ7;
 				ENABLE_PREVIEWS = YES;
@@ -559,7 +559,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_ASSET_PATHS = "\"MusicianshipTrainer/Preview Content\"";
 				DEVELOPMENT_TEAM = X9VDGR7PQ7;
 				ENABLE_PREVIEWS = YES;
