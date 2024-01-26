@@ -152,6 +152,39 @@ struct ContentSectionInstructionsView: UIViewRepresentable {
     }
 }
 
+struct InstructionsView: View {
+    var contentSection:ContentSection
+    let audioInstructionsFileName:String?
+    let instructions:String?
+
+    var body: some View {
+        VStack {
+            if let audioInstructionsFileName = audioInstructionsFileName {
+                Button(action: {
+                    AudioRecorder.shared.playAudioFromCloudURL(urlString: audioInstructionsFileName)
+                }) {
+                    Text("Aural Instructions").defaultButtonStyle()
+                }
+                .padding()
+            }
+
+            if let instructions = self.instructions {
+                HStack {
+                    ZStack {
+                        ContentSectionInstructionsView(htmlDocument: instructions)
+                        NarrationView(contentSection: contentSection, htmlDocument: instructions, context: "Instructions")
+                    }
+                    //.frame(height: CGFloat((getParagraphCount(html: instructions)))/12.0 * UIScreen.main.bounds.height)
+                    //.frame(height: 0.25 * UIScreen.main.bounds.height)
+                    //.padding()
+                    //.background(UIGlobals.colorNavigationBackground)
+                    //.background(Color(.secondarySystemBackground))
+                }
+            }
+        }
+    }
+}
+   
 struct ContentSectionHeaderView: View {
     @Environment(\.colorScheme) var colorScheme
     var contentSection:ContentSection
@@ -164,7 +197,6 @@ struct ContentSectionHeaderView: View {
     @State private var audioInstructionsFileName:String? = nil
     @State var promptForLicense = false
     @State private var parentsData:String?=nil
-    //@State private var parentsExists = false
     
     func getInstructions(bypassCache:Bool)  {
         var pathSegments = contentSection.getPathAsArray()
@@ -226,29 +258,7 @@ struct ContentSectionHeaderView: View {
     
     var body: some View {
         VStack {
-            VStack {
-                if let audioInstructionsFileName = audioInstructionsFileName {
-                    Button(action: {
-                        AudioRecorder.shared.playAudioFromCloudURL(urlString: audioInstructionsFileName)
-                    }) {
-                        Text("Aural Instructions").defaultButtonStyle()
-                    }
-                    .padding()
-                }
-                
-                if let instructions = self.instructions {
-                    HStack {
-                        ZStack {
-                            ContentSectionInstructionsView(htmlDocument: instructions)
-                            NarrationView(contentSection: contentSection, htmlDocument: instructions, context: "Instructions")
-                        }
-                        .frame(height: CGFloat((getParagraphCount(html: instructions)))/12.0 * UIScreen.main.bounds.height)
-                        //.padding()
-                        //.background(UIGlobals.colorNavigationBackground)
-                        //.background(Color(.secondarySystemBackground))
-                    }
-                }
-            }
+            //InstructionsView(contentSection: contentSection, audioInstructionsFileName: self.audioInstructionsFileName, instructions: self.instructions)
             
             HStack {
                 if contentSection.getPathAsArray().count == 1 {
@@ -267,6 +277,19 @@ struct ContentSectionHeaderView: View {
                         }
                     }
                 }
+                Spacer()
+                NavigationLink(destination: InstructionsView(contentSection: contentSection,
+                                                             audioInstructionsFileName: self.audioInstructionsFileName,
+                                                             instructions: self.instructions)) {
+                    VStack {
+                        Text("Exam Instructions")
+                            .font(UIDevice.current.userInterfaceIdiom == .phone ? .footnote : UIGlobalsCommon.navigationFont)
+                        Image(systemName: "questionmark.circle")
+                            .foregroundColor(colorScheme == .dark ? .white : .black)
+                            .font(.largeTitle)
+                    }
+                }
+
                 if tipsAndTricksExists {
                     Spacer()
                     NavigationLink(destination: ContentSectionWebView(htmlDocument: tipsAndTricksData!, contentSection: contentSection)) {
@@ -280,8 +303,6 @@ struct ContentSectionHeaderView: View {
                     }
                     Spacer()
                     Button(action: {
-                        //isVideoPresented.toggle()
-                        //if let url = URL(string: "https://www.example.com") {
                         let urlStr = "https://storage.googleapis.com/musicianship_trainer/NZMEB/" +
                         contentSection.getPath() + "." + SettingsMT.shared.getAgeGroup() + ".video.mp4"
                         let allowedCharacterSet = CharacterSet.urlQueryAllowed
@@ -292,8 +313,6 @@ struct ContentSectionHeaderView: View {
                                 //isVideoPresented = true
                             }
                         }
-                        //}
-
                     }) {
                         VStack {
                             VStack {
@@ -330,26 +349,26 @@ struct ContentSectionHeaderView: View {
                 }
                 
                 if contentSection.getPathAsArray().count > 2 {
-                    Spacer()
-                    Button(action: {
-                        DispatchQueue.main.async {
-                            let c = contentSection.subSections.count
-                            let r = Int.random(in: 0...c)
-                            contentSection.setSelected(r)
-                        }
-                    }) {
-                        VStack {
+                    if SettingsMT.shared.isContentSectionLicensed(contentSection: contentSection) {
+                        Spacer()
+                        Button(action: {
+                            DispatchQueue.main.async {
+                                let c = contentSection.subSections.count
+                                let r = Int.random(in: 0...c)
+                                contentSection.setSelected(r)
+                            }
+                        }) {
                             VStack {
-                                Text("Random Pick")
-                                    .font(UIDevice.current.userInterfaceIdiom == .phone ? .footnote : UIGlobalsCommon.navigationFont)
-                                Image(systemName: "tornado")
-                                    .foregroundColor(colorScheme == .dark ? .white : .black)
-                                    .font(.title)
-                            }                            
+                                VStack {
+                                    Text("Random Pick")
+                                        .font(UIDevice.current.userInterfaceIdiom == .phone ? .footnote : UIGlobalsCommon.navigationFont)
+                                    Image(systemName: "tornado")
+                                        .foregroundColor(colorScheme == .dark ? .white : .black)
+                                        .font(.title)
+                                }
+                            }
                         }
                     }
-                    
-                    .disabled(!SettingsMT.shared.isContentSectionLicensed(contentSection: contentSection))
                 }
                 if let parents = self.parentsData {
                     Spacer()
@@ -401,13 +420,12 @@ struct ContentSectionHeaderView: View {
                     .padding(0)
                 }
             }
-            
         }
         .roundedBorderRectangle()
+        
         .sheet(isPresented: $promptForLicense) {
             LicenseManagerView(contentSection: contentSection, email: SettingsMT.shared.licenseEmail)
         }
-
         .onAppear() {
             getAudio()
             getInstructions(bypassCache: false)
@@ -488,13 +506,15 @@ struct ContentSectionView: View {
                                 .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
                                 .opacity(UIGlobalsMT.shared.backgroundImageOpacity)
                         }
-                        ScrollViewReader { proxy in
+                        //ScrollViewReader { proxy in
+                        VStack {
                             ContentSectionHeaderView(contentSection: contentSection)
                                 .padding()
-                            
+                                //.frame(height: 0.1 * UIScreen.main.bounds.height)
                             SectionsNavigationView(contentSection: contentSection)
                                 .padding()
                         }
+                        //}
                     }
                 }
             }
@@ -564,11 +584,11 @@ struct ContentSectionView: View {
         .alert(isPresented: $showLicenseChange) {
             Alert(title: Text("Licensing"), message: Text("Your email \(SettingsMT.shared.licenseEmail) is now licensed"), dismissButton: .default(Text("OK")))
         }
-
     }
 }
 
 struct SectionsNavigationView:View {
+    @Environment(\.presentationMode) private var presentationMode
     @ObservedObject var contentSection:ContentSection
     @State var homeworkIndex:Int?
     @State var showHomework = false
@@ -839,18 +859,15 @@ struct ExamView: View {
         return answer.correct ? 1 : 0
     }
     
-    func testFunc() {
-        
-    }
-    
     func examImage() -> some View {
         VStack {
             Image("judge")
                 .resizable()
                 .aspectRatio(contentMode: .fit)
-                .frame(width: UIScreen.main.bounds.width / 3.0)
+                .frame(width: UIScreen.main.bounds.height / 4.0)
         }
     }
+    
     func getExamInstrucons() -> String {
         var text = "The exam has \(contentSection.getQuestionCount()) questions. Before starting the exam be sure to choose your preferences in the configuration screen for:"
         text += "\n• Having the drum sound on or off for tapping rhythms"
@@ -925,6 +942,7 @@ struct ExamView: View {
                             
                             Button(action: {
                                 showingConfirmExit = true
+                                //presentationMode.wrappedValue.dismiss()
                                 //print("===========SHOW", showingConfirmExit)
                             }) {
                                 HStack {
@@ -944,6 +962,7 @@ struct ExamView: View {
                                     presentationMode.wrappedValue.dismiss()
                                 }, secondaryButton: .cancel())
                             }
+
                             .padding()
                         }
                     }
@@ -977,6 +996,7 @@ struct ExamView: View {
         .onAppear() {
             self.sectionIndex = 0
             self.examState = .loading
+            showingConfirmExit = false
             contentSection.playExamInstructions(withDelay:true,
                 onLoaded: {status in
                     if status == .success {

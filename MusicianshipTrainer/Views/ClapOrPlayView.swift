@@ -77,7 +77,6 @@ struct ClapOrPlayPresentView: View {
     @State var presentInstructions = false
     
     var questionType:QuestionType
-    let questionTempo = 90
     let googleAPI = GoogleAPI.shared
     
     init(contentSection:ContentSection, score:Score, answerState:Binding<AnswerState>, answer:Binding<Answer>,
@@ -99,9 +98,9 @@ struct ClapOrPlayPresentView: View {
         }
 
     }
-    
-    func examInstructionsDone(status:RequestStatus) {
-    }
+//    
+//    func examInstructionsDone(status:RequestStatus) {
+//    }
     
     func getInstruction(mode:QuestionType, grade:Int, examMode:Bool) -> String? {
         var result = ""
@@ -206,7 +205,7 @@ struct ClapOrPlayPresentView: View {
         let tappedScore = tapRecorder.getTappedAsAScore(timeSignatue: score.timeSignature, questionScore: score, tapValues: tapValues)
         let fittedScore = score.fitScoreToQuestionScore(userScore:tappedScore,
                                                         onlyRhythm: questionType == .melodyPlay ? false : true,
-                                                        tolerancePercent: UIGlobalsMT.shared.rhythmTolerancePercent
+                                                        toleranceSetting: UIGlobalsMT.shared.rhythmToleranceSetting
                                                         ).0
         if fittedScore.errorCount() == 0 && fittedScore.getAllTimeSlices().count > 0 {
             return true
@@ -334,27 +333,34 @@ struct ClapOrPlayPresentView: View {
                                           metronome: self.metronome,
                                           fileName: contentSection.name,
                                           onStart: ({
+
                             if questionType == .melodyPlay {
                                 if SettingsMT.shared.useAcousticKeyboard {
                                     ///Play from the audio recording
                                     return nil
                                 }
                                 else {
-                                    return getKeyboardScore()
+                                    let melodyScore = getKeyboardScore()
+                                    if let melodyScore = melodyScore {
+                                        if let recordedtempo =  melodyScore.tempo {
+                                            metronome.setTempo("start hear student", tempo: recordedtempo)
+                                        }
+                                    }
+                                    return melodyScore
                                 }
                             }
-                            else {
+                            else {                            
                                 if let recordedScore = getStudentTappingAsAScore() {
                                     if let recordedtempo = recordedScore.tempo {
                                         metronome.setTempo("start hear student", tempo: recordedtempo)
                                     }
                                 }
-                                return getStudentTappingAsAScore()
+                               return getStudentTappingAsAScore()
                             }
                         }),
                         onDone: ({
                             //recording was played at the student's tempo and now reset metronome
-                            metronome.setTempo("end hear student", tempo: self.questionTempo)
+                            metronome.setTempo("end hear student", tempo: ClapOrPlayView.defaultQuestionTempo)
                         })
                         )
                     }
@@ -363,7 +369,22 @@ struct ClapOrPlayPresentView: View {
         }
     }
     
+    public struct StartRecordingView: View {
+        @ObservedObject var acousticPianoSettings:SettingsMT = SettingsMT.shared
+        @State var  questionType:QuestionType
+        @State var rhythmHeard:Bool
+
+        public var body: some View {
+            HStack {
+                let hand = (questionType == .melodyPlay && !acousticPianoSettings.useAcousticKeyboard) ? " Right Hand" : ""
+                Text("Start Recording \(hand)")
+                    .defaultButtonStyle(enabled: rhythmHeard || questionType != .intervalAural)
+            }
+        }
+    }
+    
     func recordingStartView() -> some View {
+
         VStack {
             ///For echo clap present the tapping view right after the rhythm is heard (without requiring a button press)
             if questionType == .melodyPlay || questionType == .rhythmVisualClap || !recordingWasStarted() {
@@ -396,9 +417,10 @@ struct ClapOrPlayPresentView: View {
                         }
                     }
                     else {
-                        let hand = (questionType == .melodyPlay && !SettingsMT.shared.useAcousticKeyboard) ? " Right Hand" : ""
-                        Text("Start Recording \(hand)")
-                            .defaultButtonStyle(enabled: rhythmHeard || questionType != .intervalAural)
+                        StartRecordingView(questionType: questionType, rhythmHeard: rhythmHeard)
+//                        let hand = (questionType == .melodyPlay && !acousticPianoSettings.useAcousticKeyboard) ? " Right Hand" : ""
+//                        Text("Start Recording \(hand)")
+//                            .defaultButtonStyle(enabled: rhythmHeard || questionType != .intervalAural)
                     }
                 }
                 .disabled(!(rhythmHeard || questionType != .intervalAural))
@@ -474,7 +496,21 @@ struct ClapOrPlayPresentView: View {
                 
                 ///Option for editing the rhythm and restoring the rhythm to the original if the rhythm was edited
                 if answerState != .recording {
-                    if contentSection.getExamTakingStatus() != .inExam {
+                    if contentSection.getExamTakingStatus() == .inExam {
+                        HStack {
+                            if questionType == .melodyPlay {
+                                if answerState != .recording {
+                                    CountdownTimerView(size: 50.0, timerColor: .blue, allowRestart: false, timeLimit: $countDownTimeLimit,
+                                                       startNotification: {},
+                                                       endNotification: {})
+                                        .padding()
+                                        .roundedBorderRectangle()
+                                        .padding()
+                                }
+                            }
+                        }
+                    }
+                    else {
                         HStack {
                             if let instruction = self.getInstruction(mode: self.questionType, 
                                                                      grade: contentSection.getGrade(),
@@ -496,7 +532,7 @@ struct ClapOrPlayPresentView: View {
                             
                             if questionType == .melodyPlay {
                                 if answerState != .recording {
-                                    CountdownTimerView(size: 50.0, timerColor: .blue, timeLimit: $countDownTimeLimit, startNotification: {}, endNotification: {})
+                                    CountdownTimerView(size: 50.0, timerColor: .blue, allowRestart: true, timeLimit: $countDownTimeLimit, startNotification: {}, endNotification: {})
                                         .padding()
                                         .roundedBorderRectangle()
                                         .padding()
@@ -591,7 +627,7 @@ struct ClapOrPlayPresentView: View {
                             self.isTapping = false
                             ///Record end of playing to calculate the last note's duration
                             answer.rhythmValues = self.tapRecorder.stopRecording(score:score)
-                            answer.rhythmTolerancePercent = UIGlobalsMT.shared.rhythmTolerancePercent
+                            answer.rhythmToleranceSetting = UIGlobalsMT.shared.rhythmToleranceSetting
                             isTapping = false
                         })
                     }
@@ -663,7 +699,7 @@ struct ClapOrPlayPresentView: View {
                     })
                 }
 
-                metronome.setTempo("Question View Init", tempo: 90)
+                metronome.setTempo("Question View Init", tempo: ClapOrPlayView.defaultQuestionTempo)
                 metronome.setAllowTempoChange("ClapOrPlayPresentView", allow: true)
                 if questionType == .melodyPlay {
                     score.addTriadNotes()
@@ -701,8 +737,6 @@ struct ClapOrPlayAnswerView: View {
 
     private var questionType:QuestionType
     private var answer:Answer
-    let questionTempo = 90
-//    let melodyAnalyser = MelodyAnalyser()
     
     init(contentSection:ContentSection, score:Score, answerState:Binding<AnswerState>, tryNumber:Binding<Int>, answer:Answer, questionType:QuestionType) {
         self.contentSection = contentSection
@@ -766,7 +800,7 @@ struct ClapOrPlayAnswerView: View {
 
         let fitted = score.fitScoreToQuestionScore(userScore:tappedScore, 
                                                    onlyRhythm: questionType == .melodyPlay ? false : true,
-                                                   tolerancePercent: UIGlobalsMT.shared.rhythmTolerancePercent)
+                                                   toleranceSetting: UIGlobalsMT.shared.rhythmToleranceSetting)
         self.fittedScore = fitted.0
         
         let feedback = fitted.1
@@ -786,7 +820,7 @@ struct ClapOrPlayAnswerView: View {
             self.answerMetronome.setTempo("ClapOrPlayAnswerView", tempo: recordedTempo)
         }
         else {
-            self.answerMetronome.setTempo("ClapOrPlayAnswerView", tempo: self.questionTempo)
+            self.answerMetronome.setTempo("ClapOrPlayAnswerView", tempo: ClapOrPlayView.defaultQuestionTempo)
         }
         self.answerMetronome.setAllowTempoChange("analyseStudentSubmittal GOOD RHYTHM", allow: true)
         
@@ -797,7 +831,13 @@ struct ClapOrPlayAnswerView: View {
                 if let recordedTempo = tappedScore.tempo {
                     //self.answerMetronome.setAllowTempoChange("analyseStudentSubmittal GOOD RHYTHM", allow: true)
                     //self.answerMetronome.setTempo("ClapOrPlayAnswerView", tempo: recordedTempo)
-                    let questionTempo = Metronome.getMetronomeWithCurrentSettings(ctx: "for clap answer").getTempo()
+                    let questionTempo:Int
+                    if contentSection.getExamTakingStatus() == .inExamReview {
+                        questionTempo = 90
+                    }
+                    else {
+                        questionTempo = Metronome.getMetronomeWithCurrentSettings(ctx: "for clap answer").getTempo()
+                    }
                     let tolerance = Int(CGFloat(questionTempo) * 0.2)
                     if questionType == .rhythmVisualClap || questionType == .melodyPlay {
                         feedback.feedbackExplanation! +=
@@ -820,8 +860,8 @@ struct ClapOrPlayAnswerView: View {
             else {
                 feedback.correct = false
             }
-            if let rhythmTolerance = answer.rhythmTolerancePercent {
-                let tol = RhytmTolerance.getToleranceName(rhythmTolerance)
+            if let rhythmTolerance = answer.rhythmToleranceSetting {
+                let tol = RhythmTolerance.getToleranceName(rhythmTolerance)
                 if feedback.feedbackExplanation != nil {
                     if feedback.correct == false {
                         if UIGlobalsCommon.isLandscape() {
@@ -957,6 +997,15 @@ struct ClapOrPlayAnswerView: View {
             }
         }
     }
+    
+    ///For acoustic piano - outside exam mode the answer view is never shown
+    func studentUsedVirtualKeyBoard() -> Bool {
+        guard let tapValues = answer.rhythmValues else {
+            return false
+        }
+        return tapValues.count == 0 ? false : true
+    }
+
 
     var body: AnyView {
         AnyView(
@@ -966,8 +1015,10 @@ struct ClapOrPlayAnswerView: View {
                     .roundedBorderRectangle()
 
                 if let fittedScore = self.fittedScore {
-                    ScoreView(score: fittedScore, widthPadding: false).padding()
-                        .roundedBorderRectangle()
+                    if studentUsedVirtualKeyBoard() {
+                        ScoreView(score: fittedScore, widthPadding: false).padding()
+                            .roundedBorderRectangle()
+                    }
                 }
 
                 HStack {
@@ -1044,7 +1095,8 @@ struct ClapOrPlayView: View {
     let id = UUID()
     let questionType:QuestionType
     @State var tryNumber: Int = 0
-    
+    static public let defaultQuestionTempo = 90
+
     ///Score is created here and shared between the present view and the answer view. The present view might cause the contents of score to change with a rhythm simplifying edit.
     ///It appears to be pass to the child view by refernece since changes to score in the present view propagate tp the answer view as required
     //@State

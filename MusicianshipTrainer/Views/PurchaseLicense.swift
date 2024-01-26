@@ -82,6 +82,16 @@ public struct LicenseManagerView: View {
 #endif
                 }
             }
+            VStack {
+                Button(action: {
+                    iapManager.restoreTransactions()
+                }) {
+                    Text("Restore Licenses")
+                        .font(.title)
+                        .padding()
+                }
+            }
+
             HStack {
                 Button(action: {
                     presentationMode.wrappedValue.dismiss()

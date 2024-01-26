@@ -265,8 +265,12 @@ public class SettingsMT : ObservableObject {
         UserDefaults.standard.setBoolean(key: UserDefaultKeys.soundOnTaps, soundOnTaps)
         UserDefaults.standard.setBoolean(key: UserDefaultKeys.useUpstrokeTaps, useUpstrokeTaps)
         UserDefaults.standard.setBoolean(key: UserDefaultKeys.companionOn, companionOn)
-        UserDefaults.standard.setBoolean(key: UserDefaultKeys.useAcousticKeyboard, useAcousticKeyboard)
         UserDefaults.standard.setString(key: UserDefaultKeys.licenseEmail, licenseEmail)
+        ///Publish to Sight Reading if user switches this setting without exiting the Sight reading view
+        DispatchQueue.main.async {
+            UserDefaults.standard.setBoolean(key: UserDefaultKeys.useAcousticKeyboard, self.useAcousticKeyboard)
+        }
+
     }
     
 }

@@ -132,54 +132,64 @@ struct ListMelodiesView: View {
             }
             .padding()
             .fullScreenCover(isPresented: $presentMelodies) {
-                VStack {
-                    Spacer()
-                    Text("Examples of a \(intervalName)").font(.title).padding()
+                ZStack {
                     VStack {
-                        if presentScoreView {
-                            if let selectedMelody = selectedMelody {
-                                MelodyScoreView(basePitch: firstNote.midiNumber, interval:interval, melody: selectedMelody)
-                                    .padding(.horizontal, 0)
-                                //.border(Color.green)      
-                            }
-                        }
+                        Image("app_background_navigation")
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+                            .opacity(UIGlobalsMT.shared.backgroundImageOpacity)
                     }
                     VStack {
-                        ForEach(melodies) { melody in
-                            Button(action: {
-                                presentScoreView = false
-                                selectedMelodyId = melody.id
-                                selectedMelody = melody
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                    presentScoreView = true
+                        Spacer()
+                        Text("Examples of a \(intervalName)").font(.title).padding()
+                        VStack {
+                            if presentScoreView {
+                                if let selectedMelody = selectedMelody {
+                                    MelodyScoreView(basePitch: firstNote.midiNumber, interval:interval, melody: selectedMelody)
+                                        .padding(.horizontal, 0)
+                                    //.border(Color.green)
                                 }
-                            }) {
-                                //ZStack {
+                            }
+                        }
+                        VStack {
+                            ForEach(melodies) { melody in
+                                Button(action: {
+                                    presentScoreView = false
+                                    selectedMelodyId = melody.id
+                                    selectedMelody = melody
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                        presentScoreView = true
+                                    }
+                                }) {
+                                    //ZStack {
                                     Text(melody.name)
-                                        //.padding()
+                                    //.padding()
                                         .foregroundColor(selectedMelodyId == melody.id ? .black : .black)
                                         .background(selectedMelodyId == melody.id ? Color.blue : Color.white)
                                         .cornerRadius(8)
                                         .padding()
                                         .roundedBorderRectangle()
-//                                    HStack {
-//                                        Spacer()
-//                                        Image(systemName: "play")
-//                                            .foregroundColor(.blue)
-//                                            .font(.largeTitle)
-//                                            .padding()
-//                                    }
-                                //}
+                                    //                                    HStack {
+                                    //                                        Spacer()
+                                    //                                        Image(systemName: "play")
+                                    //                                            .foregroundColor(.blue)
+                                    //                                            .font(.largeTitle)
+                                    //                                            .padding()
+                                    //                                    }
+                                    //}
+                                }
                             }
-                        }
-                        Button("Dismiss") {
-                            presentMelodies = false
+                            Button("Dismiss") {
+                                presentMelodies = false
+                            }
+                            .padding()
                         }
                         .padding()
+                        Spacer()
                     }
-                    .padding()
-                    Spacer()
                 }
+                
                 //.padding()
                 .onAppear {
                     self.selectedMelody = nil
