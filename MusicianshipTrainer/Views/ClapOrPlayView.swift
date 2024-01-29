@@ -1026,7 +1026,9 @@ struct ClapOrPlayAnswerView: View {
                                       //score: getCurrentScore(),
                                       metronome: answerMetronome,
                                       fileName: contentSection.name,
-                                      onStart: {return score})
+                                      onStart: {
+                                            return score
+                                      })
 
                     if questionType == .melodyPlay && SettingsMT.shared.useAcousticKeyboard {
                         PlayRecordingView(buttonLabel: "Hear Your \(questionType == .melodyPlay ? "Melody" : "Rhythm")",
@@ -1039,7 +1041,9 @@ struct ClapOrPlayAnswerView: View {
                             PlayRecordingView(buttonLabel: "Hear Your \(questionType == .melodyPlay ? "Melody" : "Rhythm")",
                                               metronome: answerMetronome,
                                               fileName: contentSection.name,
-                                              onStart: {return fittedScore})
+                                              onStart: {
+                                return fittedScore
+                            })
                         }
                     }
                 }
@@ -1053,21 +1057,7 @@ struct ClapOrPlayAnswerView: View {
                 //Spacer() //Keep - required to align the page from the top
             }
             .onAppear() {
-//                if questionType == .rhythmVisualClap || questionType == .rhythmEchoClap
-////                    || (questionType == .melodyPlay && !SettingsMT.shared.useAcousticKeyboard)
-//                {
-                
                 analyseStudentSubmittal()
-                
-                    //answerMetronome.setTempo(tempo: questionTempo, context: "AnswerMode::OnAppear")
-//                }
-//                else {
-//                    ///50.3 - It appears it never gets here since acoustic sight reading never leaves the question page ....
-//                    //what about exam
-//                    analyseStudentMelody()
-//                }
-                ///Load score again since it may have changed due student simplifying the rhythm. The parent of this view that loaded the original score is not inited again on a retry of a simplified rhythm.
-                //score = contentSection.getScore(staffCount: questionType == .melodyPlay ? 2 : 1, onlyRhythm: questionType != .melodyPlay)
 
                 ///Disable bar editing in answer mode
                 score.barEditor = nil
@@ -1163,7 +1153,8 @@ struct ClapOrPlayView: View {
                 }
                 else {
                     if shouldShowAnswer() {
-                        //ScrollView {
+                        ///No alterative to scroll view to make sure UI all fits vertically in landscape on smaller iPad
+                        ScrollView {
                             ZStack {
                                 ClapOrPlayAnswerView(contentSection: contentSection,
                                                      score: score,
@@ -1179,7 +1170,7 @@ struct ClapOrPlayView: View {
                                     }
                                 }
                             }
-                        //}
+                        }
                     }
                     //Spacer() //Force it to align from the top
                 }

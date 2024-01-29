@@ -222,6 +222,9 @@ struct ContentSectionHeaderView: View {
                 self.tipsAndTricksExists = true
                 self.tipsAndTricksData = document
             }
+            else {
+                print ("===============xxxxxxx", pathSegments, filename)
+            }
         }
     }
     
@@ -839,7 +842,7 @@ struct ExamView: View {
     @State var sectionIndex = 0
     @State var answerState:AnswerState = .notEverAnswered
     @State var answer = Answer()
-    @State private var showingConfirmExit = false
+    @State var showConfirmExit = false
     @State private var examState:ExamState = .notStartedLoad
     
     enum ExamState {
@@ -870,7 +873,7 @@ struct ExamView: View {
     
     func getExamInstrucons() -> String {
         var text = "The exam has \(contentSection.getQuestionCount()) questions. Before starting the exam be sure to choose your preferences in the configuration screen for:"
-        text += "\n• Having the drum sound on or off for tapping rhythms"
+        text += "\n\n• Having the drum sound on or off for tapping rhythms"
         text += "\n• Using an acoustic piano or the built in virtual keyboard for sight reading"
         return text
     }
@@ -941,28 +944,34 @@ struct ExamView: View {
                             Spacer()
                             
                             Button(action: {
-                                showingConfirmExit = true
-                                //presentationMode.wrappedValue.dismiss()
-                                //print("===========SHOW", showingConfirmExit)
+                                showConfirmExit = true
                             }) {
                                 HStack {
                                     Spacer()
                                     Text("Exit Exam").defaultButtonStyle().padding()
                                 }
                             }
-                            .alert(isPresented: $showingConfirmExit) {
-                                Alert(title: Text("Are you sure?"),
-                                      message: Text("You cannot restart an exam you exit from"),
-                                      primaryButton: .destructive(Text("Yes, I'm sure")) {
-                                    for s in contentSections {
-                                        let answer = Answer()
-                                        s.setStoredAnswer(answer: answer, ctx: "")
-                                        s.saveAnswerToFile(answer: answer)
-                                    }
-                                    presentationMode.wrappedValue.dismiss()
-                                }, secondaryButton: .cancel())
+                            ///For some unknwon reason an Alert does not show, so use ActionSheet instead
+                            .actionSheet(isPresented: $showConfirmExit) {
+                                ActionSheet(
+                                    title: Text("Options"),
+                                    message: Text("Are you really sure? You cannot restart an exam you exit from"),
+                                    buttons: [
+                                        .default(Text("Exit Exam")) {
+                                            for s in contentSections {
+                                                let answer = Answer()
+                                                s.setStoredAnswer(answer: answer, ctx: "")
+                                                s.saveAnswerToFile(answer: answer)
+                                            }
+                                            presentationMode.wrappedValue.dismiss()
+                                        },
+                                        .default(Text("Continue Exam")) {
+                                        },
+                                        .cancel() {
+                                        }
+                                    ]
+                                )
                             }
-
                             .padding()
                         }
                     }
@@ -996,7 +1005,7 @@ struct ExamView: View {
         .onAppear() {
             self.sectionIndex = 0
             self.examState = .loading
-            showingConfirmExit = false
+            showConfirmExit = false
             contentSection.playExamInstructions(withDelay:true,
                 onLoaded: {status in
                     if status == .success {
