@@ -135,22 +135,22 @@ struct ContentSectionWebView: View {
     }
 }
    
-struct ContentSectionInstructionsView: UIViewRepresentable {
-    var htmlDocument:String
-
-    func makeUIView(context: Context) -> WKWebView {
-        let view = WKWebView()
-        view.backgroundColor = UIColor.white
-        return view
-    }
-    
-    func updateUIView(_ uiView: WKWebView, context: Context) {
-        let cssString = "body { background-color: white !important; }" // Force background color
-        let modifiedHTML = "<style>\(cssString)</style>\(htmlDocument)"
-        uiView.loadHTMLString(modifiedHTML.trimmingCharacters(in: .whitespaces), baseURL: nil)
-        //uiView.loadHTMLString(htmlDocument.trimmingCharacters(in: .whitespaces), baseURL: nil)
-    }
-}
+//struct ContentSectionInstructionsView: UIViewRepresentable {
+//    var htmlDocument:String
+//
+//    func makeUIView(context: Context) -> WKWebView {
+//        let view = WKWebView()
+//        //view.backgroundColor = UIColor.white
+//        return view
+//    }
+//    
+//    func updateUIView(_ uiView: WKWebView, context: Context) {
+//        //let cssString = "body { background-color: white !important; }" // Force background color
+//        //let modifiedHTML = "<style>\(cssString)</style>\(htmlDocument)"
+//        //uiView.loadHTMLString(modifiedHTML.trimmingCharacters(in: .whitespaces), baseURL: nil)
+//        uiView.loadHTMLString(htmlDocument.trimmingCharacters(in: .whitespaces), baseURL: nil)
+//    }
+//}
 
 struct InstructionsView: View {
     var contentSection:ContentSection
@@ -171,14 +171,10 @@ struct InstructionsView: View {
             if let instructions = self.instructions {
                 HStack {
                     ZStack {
-                        ContentSectionInstructionsView(htmlDocument: instructions)
+                        //ContentSectionInstructionsView(htmlDocument: instructions)
+                        ContentSectionWebView(htmlDocument: instructions, contentSection: contentSection)
                         NarrationView(contentSection: contentSection, htmlDocument: instructions, context: "Instructions")
                     }
-                    //.frame(height: CGFloat((getParagraphCount(html: instructions)))/12.0 * UIScreen.main.bounds.height)
-                    //.frame(height: 0.25 * UIScreen.main.bounds.height)
-                    //.padding()
-                    //.background(UIGlobals.colorNavigationBackground)
-                    //.background(Color(.secondarySystemBackground))
                 }
             }
         }
@@ -223,7 +219,7 @@ struct ContentSectionHeaderView: View {
                 self.tipsAndTricksData = document
             }
             else {
-                print ("===============xxxxxxx", pathSegments, filename)
+                //Logger.logger.reportError(contentSection, "getTipsTricksData \(contentSection.getPathTitle()) file:\(filename) Segments:\(pathSegments)")
             }
         }
     }
@@ -259,6 +255,25 @@ struct ContentSectionHeaderView: View {
         return p
     }
     
+    func getInstructionsName(contentSection: ContentSection) -> String {
+        let len = contentSection.getPathAsArray().count
+        if len == 1 {
+            return "Musicianship Overview"
+        }
+        if len == 2 {
+            if contentSection.getPathAsArray()[1].contains("Exam"){
+                return "Exam Instructions"
+            }
+            else {
+                return "Practice Mode Overview"
+            }
+        }
+        if len == 3{
+            return "Test Instruction"
+        }
+        return ""
+    }
+    
     var body: some View {
         VStack {
             //InstructionsView(contentSection: contentSection, audioInstructionsFileName: self.audioInstructionsFileName, instructions: self.instructions)
@@ -285,7 +300,7 @@ struct ContentSectionHeaderView: View {
                                                              audioInstructionsFileName: self.audioInstructionsFileName,
                                                              instructions: self.instructions)) {
                     VStack {
-                        Text("Exam Instructions")
+                        Text(getInstructionsName(contentSection: contentSection))
                             .font(UIDevice.current.userInterfaceIdiom == .phone ? .footnote : UIGlobalsCommon.navigationFont)
                         Image(systemName: "questionmark.circle")
                             .foregroundColor(colorScheme == .dark ? .white : .black)
@@ -871,10 +886,11 @@ struct ExamView: View {
         }
     }
     
-    func getExamInstrucons() -> String {
+    func getExamInstructions() -> String {
         var text = "The exam has \(contentSection.getQuestionCount()) questions. Before starting the exam be sure to choose your preferences in the configuration screen for:"
         text += "\n\n• Having the drum sound on or off for tapping rhythms"
         text += "\n• Using an acoustic piano or the built in virtual keyboard for sight reading"
+        text += "\n"
         return text
     }
     
@@ -895,14 +911,18 @@ struct ExamView: View {
                 if examState == .narrated {
                     VStack {
                         examImage()
-                        VStack {
-                            Text(getExamInstrucons())
-                                .defaultTextStyle()
-                                .padding()
-                                .frame(height: UIScreen.main.bounds.height / 5.0)
+                        ScrollView {
+                            VStack {
+                                Text(getExamInstructions())
+                                    .defaultTextStyle()
+                                    .padding()
+                            }
                         }
                         .roundedBorderRectangle().padding()
-                        RhythmToleranceView(contextText: "Please set the rhythm tolerance you'd like to use for the exam.")
+                        .frame(height: UIScreen.main.bounds.height / 5.0)
+                        
+                        let msg = UIDevice.current.userInterfaceIdiom == .phone ? "Rhythm Tolerance" : "Please set the rhythm tolerance you'd like to use for the exam."
+                        RhythmToleranceView(contextText: msg)
                             //.frame(width: UIScreen.main.bounds.width / 2.0)
                         Button(action: {
                             self.examState = .examStarted

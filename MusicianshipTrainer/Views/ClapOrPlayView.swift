@@ -528,6 +528,7 @@ struct ClapOrPlayPresentView: View {
                                     .roundedBorderRectangle()
                                     .padding()
                                 }
+                                .padding(UIDevice.current.userInterfaceIdiom == .phone ? 1 : 10)
                             }
                             
                             if questionType == .melodyPlay {
@@ -535,7 +536,7 @@ struct ClapOrPlayPresentView: View {
                                     CountdownTimerView(size: 50.0, timerColor: .blue, allowRestart: true, timeLimit: $countDownTimeLimit, startNotification: {}, endNotification: {})
                                         .padding()
                                         .roundedBorderRectangle()
-                                        .padding()
+                                        .padding(UIDevice.current.userInterfaceIdiom == .phone ? 1 : 10)
                                 }
                             }
 
@@ -574,6 +575,7 @@ struct ClapOrPlayPresentView: View {
                             }
                             //if questionType != .melodyPlay {
                             RhythmToleranceView(contextText: nil)
+                                .padding(UIDevice.current.userInterfaceIdiom == .phone ? 1 : 10)
                             //}
                         }
                     }
@@ -868,7 +870,7 @@ struct ClapOrPlayAnswerView: View {
                             feedback.feedbackExplanation! +=  "  "
                         }
                         else {
-                            feedback.feedbackExplanation! +=  "\n"
+                            feedback.feedbackExplanation! +=  "\n•"
                         }
                     }
                     feedback.feedbackExplanation! += " The rhythm tolerance was set at \(tol)"
