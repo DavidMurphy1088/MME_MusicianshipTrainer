@@ -89,9 +89,11 @@ struct ContentNavigationView: View {
                        }
                         .sheet(isPresented: $isShowingConfiguration) {
                             let newSettings = SettingsMT(copy: SettingsMT.shared)
-                            ConfigurationView(isPresented: $isShowingConfiguration,
-                                              settings: newSettings
-                            )
+                            ScrollView {
+                                ConfigurationView(isPresented: $isShowingConfiguration,
+                                                  settings: newSettings
+                                )
+                            }
                         }
                     }
                 }
@@ -103,7 +105,7 @@ struct ContentNavigationView: View {
                     Button(action: {
                         isShowingConfiguration = true
                     }) {
-                        let x = log1(contentSection)
+                        //let x = log1(contentSection)
                         Image(systemName: "music.note.list")
                             .foregroundColor(.blue)
                             .font(UIDevice.current.userInterfaceIdiom == .phone ? .body : .largeTitle)
@@ -116,7 +118,7 @@ struct ContentNavigationView: View {
         .navigationViewStyle(StackNavigationViewStyle()) // Use StackNavigationViewStyle - turns off the split navigation on iPad
     }
     
-    func log1(_ cs:ContentSection) {
-        print("======== CONFIG", contentSection.getPathAsArray())
-    }
+//    func log1(_ cs:ContentSection) {
+//        print("======== CONFIG", contentSection.getPathAsArray())
+//    }
 }

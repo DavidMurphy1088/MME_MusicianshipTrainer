@@ -51,14 +51,14 @@ struct ConfigurationView: View {
 
             VStack {
                 HStack {
-                    HStack {
+                    VStack {
                         Text("Age Group")
                         ConfigSelectAgeMode(selectedIndex: $settings.ageGroup)
                     }
                     .padding()
                     .roundedBorderRectangle()
                     
-                    HStack {
+                    VStack {
                         Text("Backgrounds")
                         ConfigBackgroundsSet(selectedIndex: $settings.backgroundsSet)
                     }
@@ -68,19 +68,6 @@ struct ConfigurationView: View {
                 .padding()
                 
                 VStack {
-                    Button(action: {
-                        DispatchQueue.main.async {
-                            settings.useAnimations.toggle()
-                        }
-                    }) {
-                        HStack {
-                            Image(systemName: settings.useAnimations ? "checkmark.square" : "square")
-                            let text = UIDevice.current.userInterfaceIdiom == .phone ? "Show animations" : "Show animations for correct and incorrect answers"
-                            Text(text)
-                        }
-                    }
-                    .padding()
-                    
                     Button(action: {
                         DispatchQueue.main.async {
                             settings.soundOnTaps.toggle()
@@ -102,6 +89,19 @@ struct ConfigurationView: View {
                         HStack {
                             let text = UIDevice.current.userInterfaceIdiom == .phone ? "Acoustic piano" : "Use an acoustic piano for sight reading"
                             Image(systemName: settings.useAcousticKeyboard ? "checkmark.square" : "square")
+                            Text(text)
+                        }
+                    }
+                    .padding()
+                    
+                    Button(action: {
+                        DispatchQueue.main.async {
+                            settings.useAnimations.toggle()
+                        }
+                    }) {
+                        HStack {
+                            Image(systemName: settings.useAnimations ? "checkmark.square" : "square")
+                            let text = UIDevice.current.userInterfaceIdiom == .phone ? "Show animations" : "Show animations for correct and incorrect answers"
                             Text(text)
                         }
                     }
@@ -201,7 +201,7 @@ struct ConfigurationView: View {
                     SettingsMT.shared.saveConfig()
                     isPresented = false
                 }) {
-                    Text("Ok").font(.title)
+                    Text("Save").font(.title)
                 }
                 .padding()
                 Button(action: {

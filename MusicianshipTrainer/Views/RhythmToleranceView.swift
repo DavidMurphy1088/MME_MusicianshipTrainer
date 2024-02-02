@@ -17,7 +17,7 @@ struct RhythmToleranceView: View {
                 Text(context).padding()
             }
             VStack {
-                var label = UIDevice.current.userInterfaceIdiom == .pad ? "Rhythm Tolerance:" : "Tolerance"
+                let label = UIDevice.current.userInterfaceIdiom == .pad ? "Rhythm Tolerance:" : "Tolerance"
                 //Text("\(label) \(RhytmTolerance.getToleranceName(UIGlobalsMT.shared.rhythmTolerancePercent))").defaultTextStyle()
                 Text("\(label)").defaultTextStyle()
                 Picker("Options", selection: $rhythmToleranceSetting) {

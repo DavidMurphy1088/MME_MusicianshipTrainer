@@ -134,7 +134,6 @@ struct ClapOrPlayPresentView: View {
                 result += "\(linefeed)\(bullet)Advice: For a clear result, you should tap with the pad of your finger and then immediately release"
                 result += " your finger from the screen, rather than holding it down."
                 result += "\(linefeed)\(bullet)If you tap the rhythm incorrectly, you will be able to hear your rhythm attempt and the correct given rhythm at crotchet = 90 on the Answer Page."
-                result += "\(linefeed)\(bullet)Note that the using the configuration screen you can ask that a drum sound is heard for each tap."
                 result += "\(linefeed)\(bullet)Note that in the configuration screen you can choose to have the drum sound either on or off."
             }
 
@@ -170,7 +169,7 @@ struct ClapOrPlayPresentView: View {
     
     func helpMetronome() -> String {
         let lname = questionType == .melodyPlay ? "melody" : "rhythm"
-        var practiceText = "You can adjust the metronome to hear the given \(lname) at varying tempi."
+        let practiceText = "You can adjust the metronome to hear the given \(lname) at varying tempi."
         return practiceText
     }
     
@@ -501,20 +500,24 @@ struct ClapOrPlayPresentView: View {
                             if questionType == .melodyPlay {
                                 if answerState != .recording {
                                     CountdownTimerView(size: 50.0, timerColor: .blue, allowRestart: false, timeLimit: $countDownTimeLimit,
-                                                       startNotification: {},
-                                                       endNotification: {})
-                                        .padding()
-                                        .roundedBorderRectangle()
-                                        .padding()
+                                    startNotification: {
+                                        answerState = .tryingKeyboard
+                                    },
+                                    endNotification: {
+                                        answerState = .notEverAnswered
+                                    })
+                                    .padding()
+                                    .roundedBorderRectangle()
+                                    .padding()
                                 }
                             }
                         }
                     }
                     else {
                         HStack {
-                            if let instruction = self.getInstruction(mode: self.questionType, 
+                            if self.getInstruction(mode: self.questionType,
                                                                      grade: contentSection.getGrade(),
-                                                                     examMode: contentSection.getExamTakingStatus() == .inExam) {
+                                                                     examMode: contentSection.getExamTakingStatus() == .inExam) != nil {
                                 Button(action: {
                                     presentInstructions.toggle()
                                 }) {
@@ -532,11 +535,20 @@ struct ClapOrPlayPresentView: View {
                             }
                             
                             if questionType == .melodyPlay {
-                                if answerState != .recording {
-                                    CountdownTimerView(size: 50.0, timerColor: .blue, allowRestart: true, timeLimit: $countDownTimeLimit, startNotification: {}, endNotification: {})
+                                if answerState != .recording || answerState == .tryingKeyboard {
+                                    if UIDevice.current.userInterfaceIdiom == .pad {
+                                        CountdownTimerView(size: 50.0, timerColor: .blue, allowRestart: true, timeLimit: $countDownTimeLimit, 
+                                                           startNotification: {
+                                            answerState = .tryingKeyboard
+                                        },
+                                                           endNotification: {
+                                            answerState = .notEverAnswered
+                                            
+                                        })
                                         .padding()
                                         .roundedBorderRectangle()
                                         .padding(UIDevice.current.userInterfaceIdiom == .phone ? 1 : 10)
+                                    }
                                 }
                             }
 
@@ -587,7 +599,9 @@ struct ClapOrPlayPresentView: View {
                         Text(" ")
                         if contentSection.getExamTakingStatus() == .inExam {
                             if examInstructionsNarrated {
-                                recordingStartView()
+                                if answerState != .tryingKeyboard {
+                                    recordingStartView()
+                                }
                             }
                             else {
                                 Text("Please wait for narrated instructions ...").hintAnswerButtonStyle(selected: false)
@@ -595,7 +609,9 @@ struct ClapOrPlayPresentView: View {
                         }
                         else {
                             if rhythmHeard || questionType == .melodyPlay || questionType == .rhythmVisualClap {
-                                recordingStartView()
+                                if answerState != .tryingKeyboard {
+                                    recordingStartView()
+                                }
                             }
                         }
                     }
@@ -637,7 +653,7 @@ struct ClapOrPlayPresentView: View {
                 
                 if questionType == .melodyPlay {
                     if !SettingsMT.shared.useAcousticKeyboard {
-                        if answerState == .recording {
+                        if answerState == .recording || answerState == .tryingKeyboard {
                             SightReadingPianoView(answer:answer, score: score)
                         }
                     }
@@ -706,7 +722,6 @@ struct ClapOrPlayPresentView: View {
                 if questionType == .melodyPlay {
                     score.addTriadNotes()
                 }
-                //self.rhythmTolerancePercent = UIGlobalsMT.shared.rhythmTolerancePercent
                 self.originalScore = contentSection.parseData(staffCount: 1, onlyRhythm: true)
             }
             .onDisappear() {
@@ -882,7 +897,7 @@ struct ClapOrPlayAnswerView: View {
     }
     
     func helpMetronome() -> String {
-        let lname = questionType == .melodyPlay ? "melody" : "rhythm"
+        //let lname = questionType == .melodyPlay ? "melody" : "rhythm"
         let practiceText = "You can tap the picture of the metronome to practise along with the tick."
         return practiceText
     }
@@ -1157,6 +1172,7 @@ struct ClapOrPlayView: View {
                     if shouldShowAnswer() {
                         ///No alterative to scroll view to make sure UI all fits vertically in landscape on smaller iPad
                         ScrollView {
+                            Text("") ///Leave if this view is within ScollView to ensure top of view is not slightly off the top of screen
                             ZStack {
                                 ClapOrPlayAnswerView(contentSection: contentSection,
                                                      score: score,

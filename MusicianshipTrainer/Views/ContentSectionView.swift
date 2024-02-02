@@ -388,7 +388,7 @@ struct ContentSectionHeaderView: View {
                         }
                     }
                 }
-                if let parents = self.parentsData {
+                if self.parentsData != nil {
                     Spacer()
                     NavigationLink(destination: ContentSectionWebView(htmlDocument: parentsData!, contentSection: contentSection)) {
                         VStack {
@@ -579,8 +579,10 @@ struct ContentSectionView: View {
         }
         .sheet(isPresented: $isShowingConfiguration) {
             let newSettings = SettingsMT(copy: SettingsMT.shared)
-            ConfigurationView(isPresented: $isShowingConfiguration,
-                              settings: newSettings)
+            ScrollView {
+                ConfigurationView(isPresented: $isShowingConfiguration,
+                                  settings: newSettings)
+            }
             
         }
         .onChange(of: isShowingConfiguration) { showingConfig in

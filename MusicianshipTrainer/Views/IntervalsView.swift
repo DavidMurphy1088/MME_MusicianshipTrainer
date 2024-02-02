@@ -233,7 +233,7 @@ struct IntervalPresentView: View { //}, QuestionPartProtocol {
                     }
                     
                     if !contentSection.isTakingExam() {
-                        if let instruction = self.getInstruction(mode: self.questionType) {
+                        if self.getInstruction(mode: self.questionType) != nil {
                             Button(action: {
                                 presentInstructions.toggle()
                             }) {

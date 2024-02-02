@@ -58,8 +58,8 @@ struct MelodyScoreView: View {
                     if let previousNote = previousNote {
                         let diff = note.midiNumber - previousNote.midiNumber
                         if diff == interval {
-                            ts.statusTag = .hilightAsCorrect
-                            previousNote.timeSlice.statusTag = .hilightAsCorrect
+                            ts.setStatusTag("MelodyScoreView1", StatusTag.hilightAsCorrect)
+                            previousNote.timeSlice.setStatusTag("MelodyScoreView2", StatusTag.hilightAsCorrect)
                             if !firstIntervalNoteFound {
                                 firstIntervalNoteFound = true
                                 pitchAdjust = basePitch - previousNote.midiNumber
@@ -91,7 +91,7 @@ struct MelodyScoreView: View {
                             let newRest = Rest(timeSlice: newTS, value: rest.getValue(), staffNum: 0)
                             newTS.addRest(rest: newRest)
                         }
-                        newTS.setStatusTag(ts.statusTag)
+                        newTS.setStatusTag("MelodyScoreView3", ts.statusTag)
                     }
                     if entry is BarLine {
                         score.addBarLine()
@@ -166,18 +166,11 @@ struct ListMelodiesView: View {
                                     Text(melody.name)
                                     //.padding()
                                         .foregroundColor(selectedMelodyId == melody.id ? .black : .black)
+                                        .padding()
                                         .background(selectedMelodyId == melody.id ? Color.blue : Color.white)
                                         .cornerRadius(8)
                                         .padding()
                                         .roundedBorderRectangle()
-                                    //                                    HStack {
-                                    //                                        Spacer()
-                                    //                                        Image(systemName: "play")
-                                    //                                            .foregroundColor(.blue)
-                                    //                                            .font(.largeTitle)
-                                    //                                            .padding()
-                                    //                                    }
-                                    //}
                                 }
                             }
                             Button("Dismiss") {

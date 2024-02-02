@@ -279,7 +279,7 @@ struct TypeRow: View {
             HStack {
                 Text("                                 ")
                 Text("Examples ")
-                var n1 = String(format: "%2d", exType.examples)
+                let n1 = String(format: "%2d", exType.examples)
                 Text(n1)
                     .font(.system(size: fontSize, weight: .regular, design: .monospaced))
                     .bold()
