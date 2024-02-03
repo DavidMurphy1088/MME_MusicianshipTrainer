@@ -9,7 +9,8 @@ public struct LicenseManagerView: View {
     let contentSection:ContentSection
     let email:String
     @ObservedObject var iapManager = IAPManager.shared
-
+    @State var isPopupPresented = false
+    
     public init(contentSection:ContentSection, email:String) {
         self.contentSection = contentSection
         self.email = email
@@ -23,6 +24,18 @@ public struct LicenseManagerView: View {
         }()
         }
         return filteredProducts
+    }
+    
+    struct InfoView:View {
+        let contentSection:ContentSection
+        public var body: some View {
+            VStack {
+                Text("Access to some content is restricted without this license.").padding()
+                Text("Purchasing this license provides you with unlimited access to all the practise examples and practise exams for \(contentSection.getPathTitle()) NZMEB Musicianship.").padding()
+                //                            Text("Product licenses are also available for registered music teachers. Please contact productsupport@musicmastereducation.co.nz for more details.").padding()
+
+            }
+        }
     }
     
     public var body: some View {
@@ -52,15 +65,25 @@ public struct LicenseManagerView: View {
                     }
                     .padding()
                     .navigationTitle("Available Products")
-                    HStack {
-                        Text("                  ").padding()
-                        VStack {
-                            Text("Access to some content is restricted without this license.").padding()
-                            Text("Purchasing this license provides you with unlimited access to all the practise examples and practise exams for \(contentSection.getPathTitle()) NZMEB Musicianship.").padding()
-                            Text("Product licenses are also available for registered music teachers. Please contact productsupport@musicmastereducation.co.nz for more details.").padding()
+                    if UIDevice.current.userInterfaceIdiom == .phone {
+                        Button(action: {
+                            isPopupPresented.toggle()
+                        }) {
+                            VStack {
+                                Image(systemName: "questionmark.circle")
+                            }
                         }
-
-                        Text("                  ").padding()
+                        .padding()
+                        .popover(isPresented: $isPopupPresented) {
+                            InfoView(contentSection: contentSection)
+                        }
+                    }
+                    else {
+                        HStack {
+                            Text("                  ").padding()
+                            InfoView(contentSection: contentSection)
+                            Text("                  ").padding()
+                        }
                     }
                     if iapManager.isInPurchasingState {
                         Text("Purchase in process. Please standby...").foregroundColor(.green).padding()

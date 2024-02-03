@@ -133,7 +133,7 @@ struct ClapOrPlayPresentView: View {
             if !examMode {
                 result += "\(linefeed)\(bullet)Advice: For a clear result, you should tap with the pad of your finger and then immediately release"
                 result += " your finger from the screen, rather than holding it down."
-                result += "\(linefeed)\(bullet)If you tap the rhythm incorrectly, you will be able to hear your rhythm attempt and the correct given rhythm at crotchet = 90 on the Answer Page."
+//                result += "\(linefeed)\(bullet)If you tap the rhythm incorrectly, you will be able to hear your rhythm attempt and the correct given rhythm at crotchet = 90 on the Answer Page."
                 result += "\(linefeed)\(bullet)Note that in the configuration screen you can choose to have the drum sound either on or off."
             }
 

@@ -4,6 +4,19 @@ import AVFoundation
 import AVKit
 import UIKit
 import CommonLibrary
+import SafariServices
+
+struct SafariView: UIViewControllerRepresentable {
+    let url: URL
+
+    func makeUIViewController(context: UIViewControllerRepresentableContext<SafariView>) -> SFSafariViewController {
+        return SFSafariViewController(url: url)
+    }
+
+    func updateUIViewController(_ uiViewController: SFSafariViewController, context: UIViewControllerRepresentableContext<SafariView>) {
+        // Here you could update the controller if needed.
+    }
+}
 
 ///The view that runs a specifc example type
 struct ContentTypeView: View {
@@ -327,8 +340,16 @@ struct ContentSectionHeaderView: View {
                         if let encodedString = urlStr.addingPercentEncoding(withAllowedCharacters: allowedCharacterSet) {
                             if let url = URL(string: encodedString) {
                                 //Run Safari externally
-                                UIApplication.shared.open(url)
+                                //UIApplication.shared.open(url)
                                 //isVideoPresented = true
+                                //let safariViewController = SFSafariViewController(url: url)
+                                //SafariView(url: url)
+                                if let window = UIApplication.shared.windows.first {
+                                    let vc = UIHostingController(rootView: SafariView(url: url))
+                                    vc.modalPresentationStyle = .fullScreen
+                                    window.rootViewController?.present(vc, animated: true, completion: nil)
+                                }
+
                             }
                         }
                     }) {
