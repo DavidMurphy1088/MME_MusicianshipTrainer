@@ -32,7 +32,8 @@ public struct LicenseManagerView: View {
             VStack {
                 Text("Access to some content is restricted without this license.").padding()
                 Text("Purchasing this license provides you with unlimited access to all the practise examples and practise exams for \(contentSection.getPathTitle()) NZMEB Musicianship.").padding()
-                //                            Text("Product licenses are also available for registered music teachers. Please contact productsupport@musicmastereducation.co.nz for more details.").padding()
+                //Text("Free licensing is available for NZMEB teachers.").padding()
+                Text("Free licensing is available for NZMEB teachers. Please contact sales@musicmastereducation.co.nz for more details.").padding()
 
             }
         }

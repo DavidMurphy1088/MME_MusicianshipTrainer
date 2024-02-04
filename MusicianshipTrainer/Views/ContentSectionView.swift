@@ -633,7 +633,8 @@ struct SectionsNavigationView:View {
     @ObservedObject var contentSection:ContentSection
     @State var homeworkIndex:Int?
     @State var showHomework = false
-    
+    @State var licenseInfoPresented = false
+
 //    func log(cs:ContentSection) -> String {
 //        print("🤢 ===================== SectionsNavigationView [", cs.getPath(),
 ////              //"]  ISCS", cs.isExamTypeContentSection(), "Stored", cs.hasStoredAnswers(),
@@ -646,7 +647,7 @@ struct SectionsNavigationView:View {
     struct HomeworkView: View {
         @ObservedObject var contentSection:ContentSection
         @Environment(\.presentationMode) var presentationMode
-        
+
         func msg(contentSection:ContentSection) -> String {
             var s = ""
             guard let answer = contentSection.storedAnswer else {
@@ -752,7 +753,7 @@ struct SectionsNavigationView:View {
         guard let exNum = Int(parts[1]) else {
             return true
         }
-        if exNum <= 2 {
+        if exNum <= 1 {
             return true
         }
         guard let grade = contentSection.parentSearch(testCondition: {section in
@@ -775,14 +776,42 @@ struct SectionsNavigationView:View {
                 List(Array(contentSections.indices), id: \.self) { index in
                     ///selection: A bound variable that causes the link to present `destination` when `selection` becomes equal to `tag`
                     ///tag: The value of `selection` that causes the link to present `destination`..
-                    
-                    NavigationLink(destination:
-                                    ContentSectionView(contentSection: contentSections[index]),
-                                   tag: index,
-                                   selection: $contentSection.selectedIndex
-                    ) {
-                        ZStack {
-                            HStack {
+                    HStack {
+                        if !isExampleLicensed(contentSection: contentSections[index]) {
+                            ZStack {
+                                HStack {
+                                    Spacer()
+                                    Text(contentSections[index].getTitle())
+                                        .font(UIGlobalsCommon.navigationFont).foregroundColor(.gray)
+                                        .padding(.vertical, 8)
+                                    Spacer()
+                                }
+                                HStack {
+                                    Spacer()
+                                    Text("This content requires a license")
+                                    Button(action: {
+                                        licenseInfoPresented.toggle()
+                                    }) {
+                                        VStack {
+                                            Image(systemName: "questionmark.circle")
+                                        }
+                                    }
+                                    
+                                }
+                                ///Required to force SwiftUI's horz line beween Nav links to run full width when text is centered
+                                HStack {
+                                    Text("")
+                                    Spacer()
+                                }
+                            }
+                            .padding()
+                        }
+                        else {
+                            NavigationLink(destination:
+                                            ContentSectionView(contentSection: contentSections[index]),
+                                           tag: index,
+                                           selection: $contentSection.selectedIndex
+                            ) {
                                 ZStack {
                                     HStack {
                                         Spacer()
@@ -791,49 +820,17 @@ struct SectionsNavigationView:View {
                                             .padding(.vertical, 8)
                                         Spacer()
                                     }
-                                    if !contentSections[index].homeworkIsAssigned {
-                                        //Show correct answer icon for an exam question
-                                        if let rowImage = contentSections[index].getGradeImage() {
-                                            HStack {
-                                                Spacer()
-                                                rowImage
-                                                    .resizable()
-                                                    .scaledToFit()
-                                                    .frame(width: 40.0)
-                                                Text("    ")
-                                            }
-                                        }
-                                    }
-                                    else {
-                                        if SettingsMT.shared.companionOn {
-                                            //Show correct answer icon for a homework question
-                                            HStack {
-                                                Spacer()
-                                                Button(action: {
-                                                    homeworkIndex = index
-                                                    showHomework.toggle()
-                                                }) {
-                                                    HomeworkStatusIconView(contentSection: contentSections[index])
-                                                }
-                                                .buttonStyle(BorderlessButtonStyle())
-                                                .sheet(isPresented: $showHomework) {
-                                                    HomeworkView(contentSection: contentSections[index])
-                                                }
-                                                Text("        ").font(.system(size: 18, weight: .regular, design: .monospaced))
-                                            }
-                                        }
+                                    
+                                    ///Required to force SwiftUI's horz line beween Nav links to run full width when text is centered
+                                    HStack {
+                                        Text("")
+                                        Spacer()
                                     }
                                 }
                             }
-                            ///Required to force SwiftUI's horz line beween Nav links to run full width when text is centered
-                            HStack {
-                                Text("")
-                                Spacer()
-                            }
+                            .disabled(!isExampleLicensed(contentSection: contentSections[index]))
                         }
                     }
-                    .disabled(!isExampleLicensed(contentSection: contentSections[index]))
-                    //.backgroundColor(isExampleLicensed(contentSection: contentSections[index]) ? Color.black : Color.lightGray)
                     ///End of Nav link view
                     //.background(Color.clear)
                     //.padding()
@@ -864,6 +861,12 @@ struct SectionsNavigationView:View {
                         }
                     }
                 }
+                .popover(isPresented: $licenseInfoPresented) {
+                    VStack {
+                        Text("Access to content for this grade requires a license. Please see the License information at the grade entry page.")
+                    }
+                }
+
                 .onDisappear() {
                     AudioRecorder.shared.stopPlaying()
                 }
