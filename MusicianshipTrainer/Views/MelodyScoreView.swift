@@ -118,11 +118,6 @@ struct ListMelodiesView: View {
     @State var presentScoreView = false
     @State var selectedMelody:Melody?
     
-//    func log(_ m:String)->Bool {
-//        print("==============\(m)", selectedMelodyId ?? 0)
-//        return true
-//    }
-    
     var body: some View {
         VStack {
             Button(action: {

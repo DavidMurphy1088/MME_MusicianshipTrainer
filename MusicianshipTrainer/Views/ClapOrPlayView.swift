@@ -536,19 +536,13 @@ struct ClapOrPlayPresentView: View {
                             
                             if questionType == .melodyPlay {
                                 if answerState != .recording || answerState == .tryingKeyboard {
-                                    if UIDevice.current.userInterfaceIdiom == .pad {
-                                        CountdownTimerView(size: 50.0, timerColor: .blue, allowRestart: true, timeLimit: $countDownTimeLimit, 
-                                                           startNotification: {
+                                    CountdownTimerView(size: 50, timerColor: .blue, allowRestart: true, timeLimit: $countDownTimeLimit,
+                                        startNotification: {
                                             answerState = .tryingKeyboard
                                         },
-                                                           endNotification: {
+                                        endNotification: {
                                             answerState = .notEverAnswered
-                                            
                                         })
-                                        .padding()
-                                        .roundedBorderRectangle()
-                                        .padding(UIDevice.current.userInterfaceIdiom == .phone ? 1 : 10)
-                                    }
                                 }
                             }
 

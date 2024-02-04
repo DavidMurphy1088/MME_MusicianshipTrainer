@@ -635,15 +635,6 @@ struct SectionsNavigationView:View {
     @State var showHomework = false
     @State var licenseInfoPresented = false
 
-//    func log(cs:ContentSection) -> String {
-//        print("🤢 ===================== SectionsNavigationView [", cs.getPath(),
-////              //"]  ISCS", cs.isExamTypeContentSection(), "Stored", cs.hasStoredAnswers(),
-//////              "child", cs.hasExamModeChildren(),
-////              "HOMEWORK", contentSection.homeworkIsAssigned
-////        )
-//        return ""
-//    }
-    
     struct HomeworkView: View {
         @ObservedObject var contentSection:ContentSection
         @Environment(\.presentationMode) var presentationMode
@@ -788,7 +779,10 @@ struct SectionsNavigationView:View {
                                 }
                                 HStack {
                                     Spacer()
-                                    Text("This content requires a license")
+                                    if UIDevice.current.userInterfaceIdiom != .phone {
+                                        let msg = "This content requires a license"
+                                        Text(msg)
+                                    }
                                     Button(action: {
                                         licenseInfoPresented.toggle()
                                     }) {
@@ -796,7 +790,6 @@ struct SectionsNavigationView:View {
                                             Image(systemName: "questionmark.circle")
                                         }
                                     }
-                                    
                                 }
                                 ///Required to force SwiftUI's horz line beween Nav links to run full width when text is centered
                                 HStack {
