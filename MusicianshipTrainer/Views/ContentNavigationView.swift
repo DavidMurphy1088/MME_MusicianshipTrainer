@@ -117,8 +117,5 @@ struct ContentNavigationView: View {
         //When running the app in full-screen mode on an iPad, the NavigationView will collapse to a single view, and the navigation links will be hidden. This behavior is by design to provide a consistent user experience across different device sizes and orientations.
         .navigationViewStyle(StackNavigationViewStyle()) // Use StackNavigationViewStyle - turns off the split navigation on iPad
     }
-    
-//    func log1(_ cs:ContentSection) {
-//        print("======== CONFIG", contentSection.getPathAsArray())
-//    }
+
 }

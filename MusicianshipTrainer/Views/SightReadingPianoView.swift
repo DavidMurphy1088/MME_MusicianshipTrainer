@@ -53,6 +53,8 @@ struct SightReadingPianoView: View {
                 getPianoView(piano: piano)
             }
         }
+        //.frame(width: UIScreen.main.bounds.width / 2.0)
+        .frame(width: 100)
         .onAppear() {
             ///Determine what range the piano keys need to span
             var minMidi = 100

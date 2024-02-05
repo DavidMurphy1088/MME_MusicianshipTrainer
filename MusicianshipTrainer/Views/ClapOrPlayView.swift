@@ -53,7 +53,7 @@ struct PlayRecordingView: View {
 
 struct ClapOrPlayPresentView: View {
     let contentSection:ContentSection
-    @ObservedObject var score:Score     
+    @ObservedObject var score:Score
     @ObservedObject var audioRecorder = AudioRecorder.shared
     @ObservedObject public var tapRecorder = TapRecorder.shared
     @ObservedObject private var logger = Logger.logger
@@ -98,7 +98,7 @@ struct ClapOrPlayPresentView: View {
         }
 
     }
-//    
+//
 //    func examInstructionsDone(status:RequestStatus) {
 //    }
     
@@ -348,7 +348,7 @@ struct ClapOrPlayPresentView: View {
                                     return melodyScore
                                 }
                             }
-                            else {                            
+                            else {
                                 if let recordedScore = getStudentTappingAsAScore() {
                                     if let recordedtempo = recordedScore.tempo {
                                         metronome.setTempo("start hear student", tempo: recordedtempo)
@@ -693,7 +693,7 @@ struct ClapOrPlayPresentView: View {
             }
             .font(.system(size: UIDevice.current.userInterfaceIdiom == .phone ? UIFont.systemFontSize : UIFont.systemFontSize * 1.6))
             .sheet(isPresented: $presentInstructions) {
-                if let instruction = self.getInstruction(mode: self.questionType, 
+                if let instruction = self.getInstruction(mode: self.questionType,
                                                          grade: contentSection.getGrade(),
                                                          examMode: contentSection.getExamTakingStatus() == .inExam) {
                     instructionView(instruction: instruction)
@@ -809,7 +809,7 @@ struct ClapOrPlayAnswerView: View {
         ///Otherwise, try to make the studnets tapped score look the same as the question score up until the point of error
         ///(e.g. a long tap might correctly represent either a long note or a short note followed by a rest. So mark the tapped score accordingingly
 
-        let fitted = score.fitScoreToQuestionScore(userScore:tappedScore, 
+        let fitted = score.fitScoreToQuestionScore(userScore:tappedScore,
                                                    onlyRhythm: questionType == .melodyPlay ? false : true,
                                                    toleranceSetting: UIGlobalsMT.shared.rhythmToleranceSetting)
         self.fittedScore = fitted.0
@@ -965,6 +965,7 @@ struct ClapOrPlayAnswerView: View {
                 if self.scoreCurrentBarCount != originalScore.getBarCount() {
                     Button(action: {
                         score.copyEntries(from: originalScore)
+                        score.barLayoutPositions = BarLayoutPositions()
                         self.scoreCurrentBarCount = self.score.getBarCount()
                         if let fittedScore = fittedScore {
                             if let studentFeedback = fittedScore.studentFeedback {

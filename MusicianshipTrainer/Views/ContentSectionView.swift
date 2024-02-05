@@ -635,81 +635,81 @@ struct SectionsNavigationView:View {
     @State var showHomework = false
     @State var licenseInfoPresented = false
 
-    struct HomeworkView: View {
-        @ObservedObject var contentSection:ContentSection
-        @Environment(\.presentationMode) var presentationMode
-
-        func msg(contentSection:ContentSection) -> String {
-            var s = ""
-            guard let answer = contentSection.storedAnswer else {
-                return "This is homework to do"
-            }
-            if answer.correct {
-                s = "Homework done - Good Job!"
-            }
-            else {
-                s = "Homework was done but it wasn't correct. You need to retry it."
-            }
-
-            return s
-        }
-        
-        func getColor(contentSection:ContentSection) -> Color {
-            guard let answer = contentSection.storedAnswer else {
-                return Color.orange
-            }
-
-            if answer.correct {
-                return Color.green
-            }
-            else {
-                return Color.red
-            }
-        }
-        
-        var body: some View {
-            VStack(spacing: 20) {
-                Text("Homework for week of Monday 27th")
-                    .font(.title)
-                Image("homework_girl_transparent")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 180)
-                    .padding()
-                    .padding()
-
-                Text(msg(contentSection:contentSection)).foregroundColor(getColor(contentSection: contentSection)).font(.title)
-                Text("")
-                Button("Dismiss") {
-                    presentationMode.wrappedValue.dismiss()
-                }
-            }
-            .padding()
-        }
-    }
+//    struct HomeworkView: View {
+//        @ObservedObject var contentSection:ContentSection
+//        @Environment(\.presentationMode) var presentationMode
+//
+//        func msg(contentSection:ContentSection) -> String {
+//            var s = ""
+//            guard let answer = contentSection.storedAnswer else {
+//                return "This is homework to do"
+//            }
+//            if answer.correct {
+//                s = "Homework done - Good Job!"
+//            }
+//            else {
+//                s = "Homework was done but it wasn't correct. You need to retry it."
+//            }
+//
+//            return s
+//        }
+//        
+//        func getColor(contentSection:ContentSection) -> Color {
+//            guard let answer = contentSection.storedAnswer else {
+//                return Color.orange
+//            }
+//
+//            if answer.correct {
+//                return Color.green
+//            }
+//            else {
+//                return Color.red
+//            }
+//        }
+//        
+//        var body: some View {
+//            VStack(spacing: 20) {
+//                Text("Homework for week of Monday 27th")
+//                    .font(.title)
+//                Image("homework_girl_transparent")
+//                    .resizable()
+//                    .scaledToFit()
+//                    .frame(width: 180)
+//                    .padding()
+//                    .padding()
+//
+//                Text(msg(contentSection:contentSection)).foregroundColor(getColor(contentSection: contentSection)).font(.title)
+//                Text("")
+//                Button("Dismiss") {
+//                    presentationMode.wrappedValue.dismiss()
+//                }
+//            }
+//            .padding()
+//        }
+//    }
     
-    func homeworkImage(contentSection:ContentSection) -> some View {
-        var color = Color.black
-        if let answer = contentSection.storedAnswer {
-            if answer.correct {
-                color = Color.green
-            }
-            else {
-                color = Color.red
-            }
-        }
-        else {
-            color = Color.orange
-        }
-
-        let im = Image("hw")
-            .resizable()
-            .scaledToFit()
-            .frame(width: 30)
-            .foregroundColor(color)
-            .overlay(Circle().stroke(color, lineWidth: 2)) // Stroke around a circular image
-        return im
-    }
+//    func homeworkImage(contentSection:ContentSection) -> some View {
+//        var color = Color.black
+//        if let answer = contentSection.storedAnswer {
+//            if answer.correct {
+//                color = Color.green
+//            }
+//            else {
+//                color = Color.red
+//            }
+//        }
+//        else {
+//            color = Color.orange
+//        }
+//
+//        let im = Image("hw")
+//            .resizable()
+//            .scaledToFit()
+//            .frame(width: 30)
+//            .foregroundColor(color)
+//            .overlay(Circle().stroke(color, lineWidth: 2)) // Stroke around a circular image
+//        return im
+//    }
     
 //    func log() -> String {
 //        print("==== Sections NAVIGATION View", contentSection.getPathAsArray(), contentSection.subSections.count)
@@ -717,19 +717,71 @@ struct SectionsNavigationView:View {
 //    }
     
     ///Need to be separate View to force the image to change immediately after answer is made
-    struct HomeworkStatusIconView:View {
-        @ObservedObject var contentSection:ContentSection
-        var body: some View {
-            HStack {
-                Text("Homework:").padding(.vertical)
-                if let rowImage = contentSection.getGradeImage() {
-                    rowImage
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 40.0)
+//    struct HomeworkStatusIconView:View {
+//        @ObservedObject var contentSection:ContentSection
+//        var body: some View {
+//            HStack {
+//                Text("Homework:").padding(.vertical)
+//                if let rowImage = contentSection.getGradeImage() {
+//                    rowImage
+//                        .resizable()
+//                        .scaledToFit()
+//                        .frame(width: 40.0)
+//                }
+//            }
+//        }
+//    }
+    
+    func getScore(contentSection: ContentSection) -> Int {
+        var score = 0
+        for s in contentSection.getNavigableChildSections() {
+            if let answer = s.storedAnswer {
+                if answer.correct {
+                    score += 1
                 }
             }
         }
+        return score
+    }
+    
+    func getGradeImage(contentSection: ContentSection) -> Image? {
+        var name = ""
+        if contentSection.isExamTypeContentSection() {
+            //test section group header
+            if !contentSection.hasStoredAnswers() {
+                return nil
+            }
+            else {
+                if getScore(contentSection: contentSection) == contentSection.getNavigableChildSections().count {
+                    name = "checkmark_ok" //grade_a"
+                }
+                else {
+                    name = "checkmark_ok" //grade_b"
+                }
+            }
+        }
+        else {
+            //individual tests
+            if !contentSection.homeworkIsAssigned {
+                return nil
+            }
+            else {
+                if let answer = contentSection.storedAnswer {
+                    if answer.correct {
+                        name = "grade_a"
+                    }
+                    else {
+                        name = "grade_b"
+                    }
+                }
+                else {
+                    name = "todo_transparent"
+                }
+            }
+        }
+        var image:Image
+        image = Image(name)
+        return image
     }
     
     func isExampleLicensed(contentSection:ContentSection) -> Bool {
@@ -818,6 +870,16 @@ struct SectionsNavigationView:View {
                                     HStack {
                                         Text("")
                                         Spacer()
+                                    }
+                                    if let rowImage = getGradeImage(contentSection: contentSections[index]) {
+                                        HStack {
+                                            Spacer()
+                                            rowImage
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(width: 40.0)
+                                            Text("    ")
+                                        }
                                     }
                                 }
                             }
