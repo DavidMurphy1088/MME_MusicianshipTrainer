@@ -10,10 +10,15 @@ public struct LicenseManagerView: View {
     let email:String
     @ObservedObject var iapManager = IAPManager.shared
     @State var isPopupPresented = false
+    var yearString = ""
     
     public init(contentSection:ContentSection, email:String) {
         self.contentSection = contentSection
         self.email = email
+        let currentYear = Calendar.current.component(.year, from: Date())
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .none // This ensures no comma formatting
+        yearString = formatter.string(from: NSNumber(value: currentYear)) ?? ""
     }
     
     func getProducts() -> [SKProduct] {
@@ -28,10 +33,11 @@ public struct LicenseManagerView: View {
     
     struct InfoView:View {
         let contentSection:ContentSection
+        let yearString:String
         public var body: some View {
             VStack {
                 Text("Access to some content is restricted without this license.").padding()
-                Text("Purchasing this license provides you with unlimited access to all the practise examples and practise exams for \(contentSection.getPathTitle()) NZMEB Musicianship.").padding()
+                Text("Purchasing this license provides you with unlimited access to all the practise examples and practise exams for \(contentSection.getPathTitle()) NZMEB Musicianship for calendar year \(yearString).").padding()
                 //Text("Free licensing is available for NZMEB teachers.").padding()
                 Text("Free licensing is available for NZMEB teachers. Please contact sales@musicmastereducation.co.nz for more details.").padding()
 
@@ -76,13 +82,13 @@ public struct LicenseManagerView: View {
                         }
                         .padding()
                         .popover(isPresented: $isPopupPresented) {
-                            InfoView(contentSection: contentSection)
+                            InfoView(contentSection: contentSection, yearString: yearString)
                         }
                     }
                     else {
                         HStack {
                             Text("                  ").padding()
-                            InfoView(contentSection: contentSection)
+                            InfoView(contentSection: contentSection, yearString: yearString)
                             Text("                  ").padding()
                         }
                     }
