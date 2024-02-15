@@ -98,10 +98,7 @@ struct ClapOrPlayPresentView: View {
         }
 
     }
-//
-//    func examInstructionsDone(status:RequestStatus) {
-//    }
-    
+
     func getInstruction(mode:QuestionType, grade:Int, examMode:Bool) -> String? {
         var result = ""
         let bullet = "\u{2022}" + " "
@@ -116,13 +113,13 @@ struct ClapOrPlayPresentView: View {
             
             if !examMode {
                 result += "\(linefeed)\(bullet)Tap your rhythm on the drum with the pad of your finger and then press Stop Recording once you have finished."
-                
                 result += "\(linefeed)\(bullet)Advice: For a clear result, you should tap and then immediately release"
                 result += " your finger from the screen, rather than holding it down."
                 if grade >= 2 {
                     result += "\(linefeed)\(bullet)For rests, accurately count them but do not touch the screen."
                 }
                 result += "\(linefeed)\(bullet)Note that in the configuration screen you can choose to have the drum sound either on or off."
+                result += "\(linefeed)\(bullet)Also note that when the drum sound is turned on your device's processing power may limit the tempo at which you can tap a rhythm. If the drum sound is off you will still hear a click when you tap and you will be able to tap at a faster tempo. However, the click won't be as loud as the drum sound."
             }
             
         case .rhythmEchoClap:
@@ -135,19 +132,25 @@ struct ClapOrPlayPresentView: View {
                 result += " your finger from the screen, rather than holding it down."
 //                result += "\(linefeed)\(bullet)If you tap the rhythm incorrectly, you will be able to hear your rhythm attempt and the correct given rhythm at crotchet = 90 on the Answer Page."
                 result += "\(linefeed)\(bullet)Note that in the configuration screen you can choose to have the drum sound either on or off."
+                result += "\(linefeed)\(bullet)Also note that when the drum sound is turned on your device's processing power may limit the tempo at which you can tap a rhythm. If the drum sound is off you will still hear a click when you tap and you will be able to tap at a faster tempo. However, the click won't be as loud as the drum sound."
+
             }
 
         case .melodyPlay:
-            result += "\(bullet)Press Start Recording then "
-            if !SettingsMT.shared.useAcousticKeyboard {
-                result += "play the melody."
-            }
-            else {
-                result += "play the melody and the final chords."
-            }
+            result += "\(bullet)Press Start Timer to allow yourself 30 seconds to practise the given melody."
+            result += "\(linefeed)\(bullet)Press start Recording then play the melody and the final chords. (Final chords are only possible in acoustic recordings)."
+//            if !SettingsMT.shared.useAcousticKeyboard {
+//                result += "play the melody."
+//            }
+//            else {
+//                result += "play the melody and the final chords."
+//            }
             result += "\(linefeed)\(bullet)When you have finished, stop the recording."
             result += "\(linefeed)\(bullet)Note that in the configuration screen you can choose to use either a built in virtual keyboard for recording the right hand, or your own acoustic instrument. If you choose to use the built in keyboard you will be able to see your feedback. If you choose to use your instrument, you will be able to hear back your attempt. You should practise both ways."
-            if !SettingsMT.shared.useAcousticKeyboard {
+            if SettingsMT.shared.useAcousticKeyboard {
+                result += "\(linefeed)\(bullet)In an acoustic recording you should concentrate on good fingering and a legato right hand, as well as having the correct final chord(s)."
+            }
+            else {
                 result += "\(linefeed)\(bullet)Advice for using the virtual keyboard: For a clear result, you should tap and then immediately release your finger from the keyboard after playing each note. Don't try to be legato."
             }
 
@@ -812,6 +815,7 @@ struct ClapOrPlayAnswerView: View {
         let fitted = score.fitScoreToQuestionScore(userScore:tappedScore,
                                                    onlyRhythm: questionType == .melodyPlay ? false : true,
                                                    toleranceSetting: UIGlobalsMT.shared.rhythmToleranceSetting)
+        //fitted.0.debugScore33("FITTED 1111", withBeam: false)
         self.fittedScore = fitted.0
         
         let feedback = fitted.1
