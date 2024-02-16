@@ -8,8 +8,8 @@ public class UIGlobalsMT {
     public let borderColor = Color.gray
     public let borderLineWidth = 4.0
     public let backgroundImageOpacity = 0.5
-    //public var rhythmToleranceSetting: Int = 0 //Hardest
-    public var rhythmToleranceSetting: Int = 1 //Hard
+    public var rhythmToleranceSetting: Int = 0 //Hardest
+    //public var rhythmToleranceSetting: Int = 1 //Hard
 
     private var lastRandom = -1
     public func getRandomBackgroundImageName(backgroundSet:BackgroundsSet) -> String {

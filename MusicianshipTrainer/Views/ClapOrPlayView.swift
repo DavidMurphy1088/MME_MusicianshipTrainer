@@ -875,20 +875,22 @@ struct ClapOrPlayAnswerView: View {
             else {
                 feedback.correct = false
             }
-            if let rhythmTolerance = answer.rhythmToleranceSetting {
-                let tol = RhythmTolerance.getToleranceName(rhythmTolerance)
-                if feedback.feedbackExplanation != nil {
-                    if feedback.correct == false {
-                        if UIGlobalsCommon.isLandscape() {
-                            feedback.feedbackExplanation! +=  "  "
-                        }
-                        else {
-                            feedback.feedbackExplanation! +=  "\n•"
-                        }
-                    }
-                    feedback.feedbackExplanation! += " The rhythm tolerance was set at \(tol)"
-                }
-            }
+//            if UIDevice.current.userInterfaceIdiom != .phone {
+//                if let rhythmTolerance = answer.rhythmToleranceSetting {
+//                    let tol = RhythmTolerance.getToleranceName(rhythmTolerance)
+//                    if feedback.feedbackExplanation != nil {
+//                        if feedback.correct == false {
+//                            if UIGlobalsCommon.isLandscape() {
+//                                feedback.feedbackExplanation! +=  "  "
+//                            }
+//                            else {
+//                                feedback.feedbackExplanation! +=  "\n•"
+//                            }
+//                        }
+//                        feedback.feedbackExplanation! += " The rhythm tolerance was set at \(tol)"
+//                    }
+//                }
+//            }
 
             self.fittedScore!.setStudentFeedback(studentFeedack: feedback)
         }
