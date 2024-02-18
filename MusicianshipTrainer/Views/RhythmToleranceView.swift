@@ -35,10 +35,13 @@ struct RhythmToleranceView: View {
             }
             .sheet(isPresented: $isToleranceHelpPresented) {
                 VStack {
-                    Spacer()
-                    Text("Rhythm Matching Tolerance").font(.title).foregroundColor(.blue).padding()
-                    Text("The rhythm tolerance setting affects how precisely your tapped rhythm is measured for correctness.").padding()
-                    Text("Higher grades of tolerance require more precise tapping to achieve a correct rhythm. Lower grades require less precise tapping.").padding()
+                    Text("").padding()
+                    VStack {
+                        Text("Rhythm Matching Tolerance").font(.title).foregroundColor(.blue).padding()
+                        Text("The rhythm tolerance setting affects how precisely your tapped rhythm is measured for correctness.").padding()
+                        Text("Higher grades of tolerance require more precise tapping to achieve a correct rhythm. Lower grades require less precise tapping.").padding()
+                    }
+                    .padding().padding().padding()
                     Spacer()
                 }
                 .background(SettingsMT.shared.colorBackground)

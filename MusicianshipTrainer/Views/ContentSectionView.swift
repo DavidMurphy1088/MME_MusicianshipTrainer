@@ -500,7 +500,6 @@ struct ContentSectionView: View {
     
     var body: some View {
         VStack {
-           
             if contentSection.getNavigableChildSections().count > 0 {
                 if contentSection.isExamTypeContentSection() {
                     ///Navigating to a specific exam
@@ -736,6 +735,9 @@ struct SectionsNavigationView:View {
         var score = 0
         for s in contentSection.getNavigableChildSections() {
             if let answer = s.storedAnswer {
+                if answer.wasCancelled {
+                    return -1
+                }
                 if answer.correct {
                     score += 1
                 }
@@ -752,11 +754,17 @@ struct SectionsNavigationView:View {
                 return nil
             }
             else {
-                if getScore(contentSection: contentSection) == contentSection.getNavigableChildSections().count {
+                let score = getScore(contentSection: contentSection)
+                if score == contentSection.getNavigableChildSections().count {
                     name = "checkmark_ok" //grade_a"
                 }
                 else {
-                    name = "checkmark_ok" //grade_b"
+                    if score < 0 {
+                        name = "delete_icon" //cancelled
+                    }
+                    else {
+                        name = "checkmark_ok" //grade_b"
+                    }
                 }
             }
         }
@@ -805,8 +813,17 @@ struct SectionsNavigationView:View {
             return true
         }
         return SettingsMT.shared.isContentSectionLicensed(contentSection:contentSection)
-        //print("  +++ grade", grade.name, lic)
-        //return license != nil
+    }
+    
+    func isExamCancelled(contentSection:ContentSection) -> Bool {
+        if !contentSection.isExamTypeContentSection() {
+            return false
+        }
+        if !contentSection.hasStoredAnswers() {
+            return false
+        }
+        let score = getScore(contentSection: contentSection)
+        return score < 0
     }
     
     ///The list of examples. The navigation link takes the user  to the specific question next
@@ -849,7 +866,7 @@ struct SectionsNavigationView:View {
                                     Spacer()
                                 }
                             }
-                            .padding()
+                            //.padding()
                         }
                         else {
                             NavigationLink(destination:
@@ -874,6 +891,9 @@ struct SectionsNavigationView:View {
                                     if let rowImage = getGradeImage(contentSection: contentSections[index]) {
                                         HStack {
                                             Spacer()
+                                            if isExamCancelled(contentSection: contentSections[index]) {
+                                                Text("Cancelled")
+                                            }
                                             rowImage
                                                 .resizable()
                                                 .scaledToFit()
@@ -884,6 +904,7 @@ struct SectionsNavigationView:View {
                                 }
                             }
                             .disabled(!isExampleLicensed(contentSection: contentSections[index]))
+                            .disabled(isExamCancelled(contentSection: contentSections[index]))
                         }
                     }
                     ///End of Nav link view
@@ -918,8 +939,9 @@ struct SectionsNavigationView:View {
                 }
                 .popover(isPresented: $licenseInfoPresented) {
                     VStack {
-                        Text("Access to content for this grade requires a license. Please see the License information at the grade entry page.")
+                        Text("👉 Access to content for this grade requires a license. Please see the License information at the grade entry page.")
                     }
+                    .padding()
                 }
 
                 .onDisappear() {
@@ -1010,8 +1032,6 @@ struct ExamView: View {
                             AudioRecorder.shared.stopPlaying()
                         }) {
                         VStack {
-                            //Text(examInstructionsStatus).padding().font(.title)
-
                             Text("Start the Exam").defaultButtonStyle().padding()
                         }
                         .padding()
@@ -1061,6 +1081,7 @@ struct ExamView: View {
                                         .default(Text("Exit Exam")) {
                                             for s in contentSections {
                                                 let answer = Answer()
+                                                answer.wasCancelled = true
                                                 s.setStoredAnswer(answer: answer, ctx: "")
                                                 s.saveAnswerToFile(answer: answer)
                                             }
@@ -1121,7 +1142,7 @@ struct ExamView: View {
                         self.examState = .narrated
                     }
                 })
-            DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
                 ///5Nov2023 Added after much research into why the audio player can be given data to play but never plays it
                 ///and never throws an error. And therefore never notifies that the audio is narrated
                 if self.examState == .loadedAndNarrating {

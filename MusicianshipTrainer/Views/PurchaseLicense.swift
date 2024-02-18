@@ -37,7 +37,7 @@ public struct LicenseManagerView: View {
         public var body: some View {
             VStack {
                 Text("Access to some content is restricted without this license.").padding()
-                Text("Purchasing this license provides you with unlimited access to all the practise examples and practise exams for \(contentSection.getPathTitle()) NZMEB Musicianship for calendar year \(yearString).").padding()
+                Text("Purchasing this license provides you with unlimited access to all the practice examples and practice exams for \(contentSection.getPathTitle()) NZMEB Musicianship for calendar year \(yearString).").padding()
                 //Text("Free licensing is available for NZMEB teachers.").padding()
                 Text("Free licensing is available for NZMEB teachers. Please contact sales@musicmastereducation.co.nz for more details.").padding()
 
@@ -54,7 +54,7 @@ public struct LicenseManagerView: View {
                     Text("\(license)").font(.title).bold().foregroundColor(.green)
                 }
                 .padding()
-                Text("This license provides you with unlimited access to all the practise examples and practise exams for \(contentSection.getPathTitle()) NZMEB Musicianship.").padding().padding().padding()
+                Text("This license provides you with unlimited access to all the practice examples and practice exams for \(contentSection.getPathTitle()) NZMEB Musicianship.").padding().padding().padding()
             }
             else {
                 if iapManager.isLicenseAvailable(grade: contentSection.name) {

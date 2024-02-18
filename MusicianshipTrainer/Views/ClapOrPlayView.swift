@@ -817,7 +817,7 @@ struct ClapOrPlayAnswerView: View {
                                                    toleranceSetting: UIGlobalsMT.shared.rhythmToleranceSetting)
         //fitted.0.debugScore33("FITTED 1111", withBeam: false)
         self.fittedScore = fitted.0
-        
+
         let feedback = fitted.1
         
         if self.fittedScore == nil {
@@ -827,7 +827,9 @@ struct ClapOrPlayAnswerView: View {
             ///Some iPads too short in landscape mode
             self.fittedScore!.heightPaddingEnabled = UIGlobalsCommon.isLandscape() ? false : true
         }
-
+        self.fittedScore!.resetTapToValueRatios()
+        fittedScore?.showTempos = false //Enable the UI switch
+        
         self.answerMetronome.setAllowTempoChange("analyseStudentSubmittal", allow: false)
         ///23Jan2024 - changed to playback at whatever tempo student tapped
         //self.answerMetronome.setTempo("ClapOrPlayAnswerView", tempo: self.questionTempo)
@@ -1005,6 +1007,7 @@ struct ClapOrPlayAnswerView: View {
                             Button(action: {
                                 answerState = .notEverAnswered
                                 self.tryNumber += 1
+                                answerMetronome.stopPlayingScore()
                             }) {
                                 Text("Try Again").submitAnswerButtonStyle() //defaultButtonStyle()
                             }
