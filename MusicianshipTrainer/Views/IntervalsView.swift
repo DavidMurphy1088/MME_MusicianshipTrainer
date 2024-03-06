@@ -398,7 +398,7 @@ struct IntervalAnswerView: View {
                         Text("\u{2190} Previous").defaultButtonStyle()
                     }
                 }
-                if SettingsMT.shared.isContentSectionLicensed(contentSection: contentSection) {
+                if SettingsMT.shared.isLicensed() {
                     Spacer()
                     Button(action: {
                         let parent = self.contentSection.parent

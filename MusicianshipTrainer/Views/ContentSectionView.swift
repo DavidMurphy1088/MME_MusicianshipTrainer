@@ -299,7 +299,8 @@ struct ContentSectionHeaderView: View {
                     }) {
                         VStack {
                             VStack {
-                                Text("Licenses")
+                                //Text("Licences")
+                                Text("Subscriptions")
                                     .font(UIDevice.current.userInterfaceIdiom == .phone ? .footnote : UIGlobalsCommon.navigationFont)
                                 Image(systemName: "applelogo")
                                     .foregroundColor(colorScheme == .dark ? .white : .black)
@@ -388,7 +389,7 @@ struct ContentSectionHeaderView: View {
                 }
                 
                 if contentSection.getPathAsArray().count > 2 {
-                    if SettingsMT.shared.isContentSectionLicensed(contentSection: contentSection) {
+                    if SettingsMT.shared.isLicensed() {
                         Spacer()
                         Button(action: {
                             DispatchQueue.main.async {
@@ -463,7 +464,7 @@ struct ContentSectionHeaderView: View {
         .roundedBorderRectangle()
         
         .sheet(isPresented: $promptForLicense) {
-            LicenseManagerView(contentSection: contentSection, email: SettingsMT.shared.licenseEmail)
+            LicenseManagerView(contentSection: contentSection, email: SettingsMT.shared.configuredLicenceEmail)
         }
         .onAppear() {
             getAudio()
@@ -606,13 +607,13 @@ struct ContentSectionView: View {
             
         }
         .onChange(of: isShowingConfiguration) { showingConfig in
-            if !SettingsMT.shared.licenseEmail.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            if !SettingsMT.shared.configuredLicenceEmail.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 if showingConfig {
-                    self.emailLicenseIsValidPriorConfig = IAPManager.shared.emailIsLicensed(email:SettingsMT.shared.licenseEmail)
+                    self.emailLicenseIsValidPriorConfig = LicenceManager.shared.emailIsLicensed(email:SettingsMT.shared.configuredLicenceEmail)
                 }
                 else {
                     if !self.emailLicenseIsValidPriorConfig {
-                        if IAPManager.shared.emailIsLicensed(email:SettingsMT.shared.licenseEmail) {
+                        if LicenceManager.shared.emailIsLicensed(email:SettingsMT.shared.configuredLicenceEmail) {
                             DispatchQueue.main.async {
                                 showLicenseChange = true
                             }
@@ -622,7 +623,7 @@ struct ContentSectionView: View {
             }
         }
         .alert(isPresented: $showLicenseChange) {
-            Alert(title: Text("Licensing"), message: Text("Your email \(SettingsMT.shared.licenseEmail) is now licensed"), dismissButton: .default(Text("OK")))
+            Alert(title: Text("Licensing"), message: Text("Your email \(SettingsMT.shared.configuredLicenceEmail) \nis now licensed"), dismissButton: .default(Text("OK")))
         }
     }
 }
@@ -630,6 +631,7 @@ struct ContentSectionView: View {
 struct SectionsNavigationView:View {
     @Environment(\.presentationMode) private var presentationMode
     @ObservedObject var contentSection:ContentSection
+    @ObservedObject var licenceManager = LicenceManager.shared
     @State var homeworkIndex:Int?
     @State var showHomework = false
     @State var licenseInfoPresented = false
@@ -812,7 +814,7 @@ struct SectionsNavigationView:View {
         }) else {
             return true
         }
-        return SettingsMT.shared.isContentSectionLicensed(contentSection:contentSection)
+        return SettingsMT.shared.isLicensed()
     }
     
     func isExamCancelled(contentSection:ContentSection) -> Bool {
@@ -849,7 +851,7 @@ struct SectionsNavigationView:View {
                                 HStack {
                                     Spacer()
                                     if UIDevice.current.userInterfaceIdiom != .phone {
-                                        let msg = "This content requires a license"
+                                        let msg = "This content requires a\nsubscription"
                                         Text(msg)
                                     }
                                     Button(action: {
@@ -939,7 +941,8 @@ struct SectionsNavigationView:View {
                 }
                 .popover(isPresented: $licenseInfoPresented) {
                     VStack {
-                        Text("👉 Access to content for this grade requires a license. Please see the License information at the grade entry page.")
+                        Text("Access to content for this grade requires a subscription.")
+                        Text("Please see the Subscription information on the grade entry page.")
                     }
                     .padding()
                 }

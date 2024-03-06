@@ -168,7 +168,7 @@ public class SettingsMT : ObservableObject {
     @Published public var useUpstrokeTaps = false //Turned off for the moment. Possibly will never use and always use downstrokes
     @Published public var companionOn = true
     @Published public var useAcousticKeyboard = false
-    @Published public var licenseEmail:String = ""
+    @Published public var configuredLicenceEmail:String = ""
     
     public static var shared = SettingsMT()
     
@@ -196,10 +196,10 @@ public class SettingsMT : ObservableObject {
         companionOn = UserDefaults.standard.getBoolean(key: UserDefaultKeys.companionOn)
         useAcousticKeyboard = UserDefaults.standard.getBoolean(key: UserDefaultKeys.useAcousticKeyboard)
         if let email = UserDefaults.standard.getString(key: UserDefaultKeys.licenseEmail) {
-            licenseEmail = email
+            configuredLicenceEmail = email
         }
         else {
-            licenseEmail = ""
+            configuredLicenceEmail = ""
         }
     }
     
@@ -216,39 +216,43 @@ public class SettingsMT : ObservableObject {
         self.useUpstrokeTaps = settings.useUpstrokeTaps
         self.companionOn = settings.companionOn
         self.useAcousticKeyboard = settings.useAcousticKeyboard
-        self.licenseEmail = settings.licenseEmail
+        self.configuredLicenceEmail = settings.configuredLicenceEmail
     }
     
-    public func getNameOfLicense(grade:String, email:String) -> String? {        
-        let iap = IAPManager.shared
-        let now = Date()
-        let calendar = Calendar.current
-        let currentYear = calendar.component(.year, from: now)
-        let gradeToCheck = grade.replacingOccurrences(of: " ", with: "_")
-        for productId in iap.purchasedProductIds {
-            if productId.contains(gradeToCheck) {
-                if productId.contains(String(currentYear)) {
-                    if let product = iap.availableProducts[productId] {
-                        return product.localizedTitle
-                    }
-                }
+    public func isLicensed() -> Bool {
+        if LicenceManager.shared.emailIsLicensed(email: configuredLicenceEmail) {
+            return true
+        }
+        else {
+            if let subscription = SubscriptionTransactionReceipt.load() {
+                //print("=============", "    Expire:", subscription.expiryDate, " now:", Date())
+                return subscription.expiryDate >= Date()
             }
         }
-        if iap.emailIsLicensed(email: email) {
-            return email
-        }
-        return nil
+        return false
     }
     
-    public func isContentSectionLicensed(contentSection:ContentSection) -> Bool {
-        guard let gradeSection = contentSection.parentSearch(testCondition: {section in
-                return section.name.contains("Grade")
-            }) else {
-                return true
-            }
-        return getNameOfLicense(grade: gradeSection.name, email: self.licenseEmail) != nil
-    }
-
+//    public func getNameOfGradeLicense(grade:String, email:String) -> String? {
+//        let iap = IAPManager.shared
+//        if iap.emailIsLicensed(email: email) {
+//            return email
+//        }
+//        let now = Date()
+//        let calendar = Calendar.current
+//        let currentYear = calendar.component(.year, from: now)
+//        let gradeToCheck = grade.replacingOccurrences(of: " ", with: "_")
+//        for productId in iap.purchasedProductIds {
+//            if productId.contains(gradeToCheck) {
+//                if productId.contains(String(currentYear)) {
+//                    if let product = iap.availableProducts[productId] {
+//                        return product.localizedTitle
+//                    }
+//                }
+//            }
+//        }
+//        return nil
+//    }
+        
     public func getAgeGroup() -> String {
         return ageGroup == .Group_11Plus ? AGE_GROUP_11_PLUS : "5-10"
     }
@@ -265,7 +269,7 @@ public class SettingsMT : ObservableObject {
         UserDefaults.standard.setBoolean(key: UserDefaultKeys.soundOnTaps, soundOnTaps)
         UserDefaults.standard.setBoolean(key: UserDefaultKeys.useUpstrokeTaps, useUpstrokeTaps)
         UserDefaults.standard.setBoolean(key: UserDefaultKeys.companionOn, companionOn)
-        UserDefaults.standard.setString(key: UserDefaultKeys.licenseEmail, licenseEmail)
+        UserDefaults.standard.setString(key: UserDefaultKeys.licenseEmail, configuredLicenceEmail)
         ///Publish to Sight Reading if user switches this setting without exiting the Sight reading view
         DispatchQueue.main.async {
             UserDefaults.standard.setBoolean(key: UserDefaultKeys.useAcousticKeyboard, self.useAcousticKeyboard)

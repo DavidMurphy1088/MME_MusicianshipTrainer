@@ -8,7 +8,7 @@ public struct LicenseManagerView: View {
     @Environment(\.presentationMode) var presentationMode
     let contentSection:ContentSection
     let email:String
-    @ObservedObject var iapManager = IAPManager.shared
+    @ObservedObject var iapManager = LicenceManager.shared
     @State var isPopupPresented = false
     var yearString = ""
     
@@ -22,42 +22,60 @@ public struct LicenseManagerView: View {
     }
     
     func getProducts() -> [SKProduct] {
-        let products: [SKProduct] = Array(IAPManager.shared.availableProducts.values)
-        let filteredProducts = products.filter { product in {
-            let grade = contentSection.getPathTitle().replacingOccurrences(of: " ", with: "_")
-            return product.productIdentifier.hasPrefix("NZMEB") && product.productIdentifier.contains(grade)
-        }()
+        let products = LicenceManager.shared.purchaseableProducts.values.sorted { (product1, product2) -> Bool in
+            return product1.price.compare(product2.price) == .orderedAscending
         }
-        return filteredProducts
+//        let filteredProducts = products.filter { product in {
+//            let grade = contentSection.getPathTitle().replacingOccurrences(of: " ", with: "_")
+//            if product.productIdentifier.hasPrefix("MT") { 
+//                return true
+//            }
+//            return product.productIdentifier.hasPrefix("NZMEB") && product.productIdentifier.contains(grade)
+//        }()
+//        }
+        //return filteredProducts
+        return products
     }
     
     struct InfoView:View {
         let contentSection:ContentSection
         let yearString:String
         public var body: some View {
-            VStack {
-                Text("Access to some content is restricted without this license.").padding()
-                Text("Purchasing this license provides you with unlimited access to all the practice examples and practice exams for \(contentSection.getPathTitle()) NZMEB Musicianship for calendar year \(yearString).").padding()
-                //Text("Free licensing is available for NZMEB teachers.").padding()
-                Text("Free licensing is available for NZMEB teachers. Please contact sales@musicmastereducation.co.nz for more details.").padding()
-
+            VStack() {
+                let info = "Access to some content is restricted without a subscription.\n\nPurchasing a subscription provides you with access to all the NZMEB Musicianship practice examples and practice exams.\n\nFree licensing is available for NZMEB teachers. Please contact sales@musicmastereducation.co.nz for more details."
+                Text(info).padding()
             }
+        }
+    }
+    
+    func getSubscriptionName() -> String {
+        if let licence = SubscriptionTransactionReceipt.load() {
+            return licence.getDescription()
+        }
+        else {
+            return "No stored subscription"
         }
     }
     
     public var body: some View {
         VStack {
-            Text("\(contentSection.getPathTitle()) License").font(.title).padding()
-            if let license = SettingsMT.shared.getNameOfLicense(grade: contentSection.name, email: email) {
+            Text("Available Subscriptions").font(.title).padding()
+            //if let license = LicenceManager.shared.getNameOfStoredSubscription(email: email) {
+            if SettingsMT.shared.isLicensed() {
                 VStack {
-                    Text("Your current license is ").padding()
-                    Text("\(license)").font(.title).bold().foregroundColor(.green)
+                    Text("Your current subscription is ").padding()
+                    if LicenceManager.shared.emailIsLicensed(email:SettingsMT.shared.configuredLicenceEmail) {
+                        Text("Teacher email \(SettingsMT.shared.configuredLicenceEmail)").foregroundColor(.green).bold().padding()
+                    }
+                    else {
+                        Text(getSubscriptionName()).foregroundColor(.green).bold().padding()
+                    }
                 }
                 .padding()
-                Text("This license provides you with unlimited access to all the practice examples and practice exams for \(contentSection.getPathTitle()) NZMEB Musicianship.").padding().padding().padding()
+                Text("This subscription provides you with access to all the NZMEB Musicianship practice examples and practice exams.").padding().padding().padding()
             }
             else {
-                if iapManager.isLicenseAvailable(grade: contentSection.name) {
+                if iapManager.isLicenseAvailableToPurchase(grade: contentSection.name) {
                     List {
                         ForEach(getProducts(), id: \.self) { product in
                             HStack {
@@ -67,6 +85,14 @@ public struct LicenseManagerView: View {
                                 Text(currency ?? "")
                                 let price:String = product.price.description
                                 Text(price)
+                                Button(action: {
+                                    //iapManager.buyProduct(grade: contentSection.name)
+                                    iapManager.buyProductSubscription(product: product)
+                                }) {
+                                    Text("Purchase")
+                                        .font(.title)
+                                        .padding()
+                                }
                             }
                         }
                     }
@@ -93,20 +119,12 @@ public struct LicenseManagerView: View {
                         }
                     }
                     if iapManager.isInPurchasingState {
-                        Text("Purchase in process. Please standby...").foregroundColor(.green).padding()
+                        Text("Purchase in progress. Please standby...").font(.title).foregroundColor(.green).bold().padding()
                     }
-                    else {
-                        Button(action: {
-                            iapManager.buyProduct(grade: contentSection.name)
-                        }) {
-                            Text("Purchase")
-                                .font(.title)
-                                .padding()
-                        }
-                    }
+
                 }
                 else {
-                    Text("Sorry, no license is available yet")
+                    Text("Sorry, no subscription is available yet")
 #if targetEnvironment(simulator)
                     Text("SIMULATOR CANNOT DO LICENSING")
 #endif
@@ -116,7 +134,7 @@ public struct LicenseManagerView: View {
                 Button(action: {
                     iapManager.restoreTransactions()
                 }) {
-                    Text("Restore Licenses")
+                    Text("Restore Subscriptions")
                         .font(.title)
                         .padding()
                 }

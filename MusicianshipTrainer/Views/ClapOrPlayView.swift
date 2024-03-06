@@ -920,7 +920,7 @@ struct ClapOrPlayAnswerView: View {
                     }
                 }
                 
-                if SettingsMT.shared.isContentSectionLicensed(contentSection:contentSection) {
+                if SettingsMT.shared.isLicensed() {
                     Spacer()
                     Button(action: {
                         let parent = self.contentSection.parent

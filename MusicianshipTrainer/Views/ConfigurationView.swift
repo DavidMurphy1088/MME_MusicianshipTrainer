@@ -113,7 +113,7 @@ struct ConfigurationView: View {
                 HStack {
                     HStack {
                         Text("Email")
-                        TextField("Enter your email", text: $settings.licenseEmail)
+                        TextField("Enter your email", text: $settings.configuredLicenceEmail)
                             .keyboardType(.emailAddress)
                             .autocapitalization(.none)
                     }
@@ -137,7 +137,7 @@ struct ConfigurationView: View {
                 .padding()
                 
                 if UIDevice.current.userInterfaceIdiom == .pad {
-                    if let user = IAPManager.shared.getLicenseUser(email: settings.licenseEmail) {
+                    if let user = LicenceManager.shared.getFreeLicenceUser(email: settings.configuredLicenceEmail) {
                         if user.allowTest {
                             Text("------------------ Testing Only ------------------").padding()
                             

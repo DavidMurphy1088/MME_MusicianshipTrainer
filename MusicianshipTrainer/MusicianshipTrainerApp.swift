@@ -125,12 +125,12 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         ///Code to run on the Simulator
         print("Running on the Simulator, will not load IAP licenses")
 #else
-        SKPaymentQueue.default().add(IAPManager.shared) ///Do this as early as possible
-        IAPManager.shared.requestProducts() ///Get products
-        IAPManager.shared.restoreTransactions() ///Get licenses
+        SKPaymentQueue.default().add(LicenceManager.shared) ///Do this as early as possible
+        LicenceManager.shared.verifyStoredSubscriptionReceipt(ctx: "App starting")
+        LicenceManager.shared.requestProducts() ///Get products
+        LicenceManager.shared.restoreTransactions() ///Get licenses
 #endif
         UIDevice.current.beginGeneratingDeviceOrientationNotifications()
-
         Logger.logger.log(self, "Version.Build \(appVersion).\(buildNumber)")
         
         //Make navigation titles at top larger font
@@ -160,6 +160,8 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
 @main
 struct MusicianshipTrainerApp: App {
+    @Environment(\.scenePhase) private var scenePhase
+
     ///Must be @State to notify view when loaded
     @ObservedObject var exampleData:ExampleData
     @StateObject var launchScreenState = LaunchScreenStateManager()
