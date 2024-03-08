@@ -125,10 +125,10 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         ///Code to run on the Simulator
         print("Running on the Simulator, will not load IAP licenses")
 #else
-        SKPaymentQueue.default().add(LicenceManager.shared) ///Do this as early as possible
-        LicenceManager.shared.verifyStoredSubscriptionReceipt(ctx: "App starting")
+        SKPaymentQueue.default().add(LicenceManager.shared) ///Do this as early as possible so manager is a queue observer
+        LicenceManager.shared.verifyStoredSubscriptionReceipt(ctx: "App starting") ///Get the current validity of any locally stored subscription receipt
         LicenceManager.shared.requestProducts() ///Get products
-        LicenceManager.shared.restoreTransactions() ///Get licenses
+        ///LicenceManager.shared.restoreTransactions() ///No need - the last subscription receipt received is stored locally. If not (e.g. nmew device) user does 'Restore Subscriptions'
 #endif
         UIDevice.current.beginGeneratingDeviceOrientationNotifications()
         Logger.logger.log(self, "Version.Build \(appVersion).\(buildNumber)")
