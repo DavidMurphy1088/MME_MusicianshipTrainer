@@ -131,7 +131,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         ///LicenceManager.shared.restoreTransactions() ///No need - the last subscription receipt received is stored locally. If not (e.g. nmew device) user does 'Restore Subscriptions'
 #endif
         UIDevice.current.beginGeneratingDeviceOrientationNotifications()
-        Logger.logger.log(self, "Version.Build \(appVersion).\(buildNumber)")
+        AppLogger.logger.log(self, "Version.Build \(appVersion).\(buildNumber)")
         
         //Make navigation titles at top larger font
         let appearance = UINavigationBarAppearance()
@@ -153,7 +153,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         @unknown default:
             statusMsg = "unknown \(status)"
         }
-        Logger.logger.log(self, "Microphone access:\(statusMsg))")
+        AppLogger.logger.log(self, "Microphone access:\(statusMsg))")
         return true
     }
 }
@@ -166,7 +166,7 @@ struct MusicianshipTrainerApp: App {
     @ObservedObject var exampleData:ExampleData
     @StateObject var launchScreenState = LaunchScreenStateManager()
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-    var logger = Logger.logger
+    var logger = AppLogger.logger
     static let productionMode = true
     let settings:SettingsMT = SettingsMT.shared
     

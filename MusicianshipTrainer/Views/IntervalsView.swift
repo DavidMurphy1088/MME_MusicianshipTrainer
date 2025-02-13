@@ -72,7 +72,7 @@ struct IntervalPresentView: View { //}, QuestionPartProtocol {
     var grade:Int
     
     @ObservedObject var score:Score
-    @ObservedObject private var logger = Logger.logger
+    @ObservedObject private var logger = AppLogger.logger
     @ObservedObject var audioRecorder = AudioRecorder.shared
     
     @State var examInstructionsWereNarrated = false
@@ -508,7 +508,7 @@ struct IntervalView: View {
     
     var score:Score
     
-    @ObservedObject var logger = Logger.logger
+    @ObservedObject var logger = AppLogger.logger
     @Binding var answerState:AnswerState
     @Binding var answer:Answer
 

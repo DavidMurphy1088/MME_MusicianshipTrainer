@@ -4,7 +4,7 @@ import SwiftUI
 import CommonLibrary
 
 struct LogView: View {
-    let items: [LogMessage] = Logger.logger.loggedMsgs    
+    let items: [LogMessage] = AppLogger.logger.loggedMsgs    
     var body: some View {
         Text("Log messages")
         ScrollView {

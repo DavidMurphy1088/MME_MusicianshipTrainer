@@ -56,7 +56,7 @@ struct ClapOrPlayPresentView: View {
     @ObservedObject var score:Score
     @ObservedObject var audioRecorder = AudioRecorder.shared
     @ObservedObject public var tapRecorder = TapRecorder.shared
-    @ObservedObject private var logger = Logger.logger
+    @ObservedObject private var logger = AppLogger.logger
     @ObservedObject private var metronome:Metronome = Metronome.getMetronomeWithCurrentSettings(ctx: "ClapOrPlayPresentView init @ObservedObject")
 
     @Binding var answerState:AnswerState
@@ -733,7 +733,7 @@ struct ClapOrPlayPresentView: View {
 struct ClapOrPlayAnswerView: View {
     let contentSection:ContentSection
     @ObservedObject var tapRecorder = TapRecorder.shared
-    @ObservedObject private var logger = Logger.logger
+    @ObservedObject private var logger = AppLogger.logger
     @ObservedObject var audioRecorder = AudioRecorder.shared
     var answerMetronome:Metronome
     @Binding var answerState:AnswerState
@@ -1100,7 +1100,7 @@ struct ClapOrPlayAnswerView: View {
 
 struct ClapOrPlayView: View {
     let contentSection: ContentSection
-    @ObservedObject var logger = Logger.logger
+    @ObservedObject var logger = AppLogger.logger
     @Binding var answerState:AnswerState
     @Binding var answer:Answer
     let id = UUID()
