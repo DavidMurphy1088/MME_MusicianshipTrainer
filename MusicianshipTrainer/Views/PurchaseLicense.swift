@@ -42,7 +42,8 @@ public struct LicenseManagerView: View {
         let yearString:String
         public var body: some View {
             VStack() {
-                let info = "Access to some content is restricted without a subscription.\n\nPurchasing a subscription provides you with access to all the NZMEB Musicianship practice examples and practice exams.\n\nFree licensing is available for NZMEB teachers. Please contact sales@musicmastereducation.co.nz for more details."
+                let info = "Access to some content is restricted without a subscription.\n\nPurchasing a subscription provides you with access to all the NZMEB Musicianship practice examples and practice exams."
+                //\n\nFree licensing is available for NZMEB teachers. Please contact sales@musicmastereducation.co.nz for more details."
                 Text(info).padding()
             }
         }
