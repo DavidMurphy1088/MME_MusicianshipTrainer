@@ -12,11 +12,54 @@ class Invert : ObservableObject {
     func switchBorder() {
         DispatchQueue.main.async {
             self.invert.toggle()
-            DispatchQueue.main.async {
-                Thread.sleep(forTimeInterval: 0.05)
+            ///RATIONALE: Thread.sleep here blocked the MAIN thread for 50ms on every tap. While it
+            ///sleeps, iOS can't deliver the next touch to the app, so a tap made during that time is
+            ///processed late. asyncAfter gives the same 50ms flash without blocking anything.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
                 self.invert.toggle()
             }
         }
+    }
+}
+
+///A transparent UIKit view laid over the drum that reports each finger-down with its hardware time.
+///RATIONALE for using UIKit instead of SwiftUI DragGesture:
+///  - DragGesture is designed for dragging. It reports continuously while a finger is down or moving,
+///    so one tap arrives as several events (4-6 on iPhone). The old code had to discard events within
+///    0.20s of the previous tap, which also discarded genuine fast taps (a semiquaver at 120 bpm is
+///    0.125s), and a long or wobbly press could still be counted twice.
+///  - touchesBegan is called exactly ONCE each time a finger goes down, so no time filter is needed:
+///    fast rhythms are recorded completely and long presses never double count.
+///  - UITouch.timestamp is the time iOS detected the touch, not the time our code got to run.
+final class TapPadView: UIView {
+    var onTap: ((TimeInterval) -> Void)?
+
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        ///One call per finger that went down. Usually one touch; if two fingers land in the same
+        ///instant each is a separate tap, as it would be on a real drum.
+        for touch in touches {
+            onTap?(touch.timestamp)
+        }
+    }
+}
+
+struct TapPad: UIViewRepresentable {
+    let onTap: (TimeInterval) -> Void
+
+    func makeUIView(context: Context) -> TapPadView {
+        let view = TapPadView()
+        view.backgroundColor = .clear      ///Invisible, the drum image shows through; clear views still receive touches
+        ///RATIONALE: students often alternate fingers, putting the next finger down before lifting the
+        ///previous one. With multiple touch disabled, that second finger-down would not be delivered
+        ///and the tap would be lost.
+        view.isMultipleTouchEnabled = true
+        view.onTap = onTap
+        return view
+    }
+
+    func updateUIView(_ view: TapPadView, context: Context) {
+        ///Refresh the closure so it always sees the current isRecording value
+        view.onTap = onTap
     }
 }
 
@@ -31,7 +74,7 @@ struct TappingView: View {
     @ObservedObject var invert:Invert = Invert()
     @State var tapSoundOn = false
     @State var tapCtr = 0
-    @State var lastGestureTime:Date? = nil
+    ///lastGestureTime removed: it only existed for the 0.20s duplicate filter, which is no longer needed
 
     func drumView() -> some View {
         ZStack {
@@ -56,7 +99,7 @@ struct TappingView: View {
     }
     
     func getDrumWidth() -> Double {
-        var size = UIScreen.main.bounds.width / (UIDevice.current.userInterfaceIdiom == .pad ? 3 : 2)
+        var size = UIGlobalsCommon.screenBounds.width / (UIDevice.current.userInterfaceIdiom == .pad ? 3 : 2)
         if UIGlobalsCommon.isLandscape() {
             size *= 0.75
         }
@@ -71,7 +114,7 @@ struct TappingView: View {
 //            if Settings.shared.useUpstrokeTaps { //}|| UIDevice.current.userInterfaceIdiom == .phone {
 //                ZStack {
 //                    drumView()
-//                        .frame(width: UIScreen.main.bounds.width / (UIDevice.current.userInterfaceIdiom == .pad ? 4 : 2))
+//                        .frame(width: UIGlobalsCommon.screenBounds.width / (UIDevice.current.userInterfaceIdiom == .pad ? 4 : 2))
 //                }
 //                .padding()
 //                .onTapGesture {
@@ -86,32 +129,18 @@ struct TappingView: View {
 //            else {
                 drumView()
                 .frame(width: getDrumWidth())
-                .gesture(
-                    ///Fires on downstroke
-                    ///Min distance has to be 0 to notify on tap
-                    DragGesture(minimumDistance: 0)
-                    .onChanged({ gesture in
+                ///Still fires on the downstroke, as before, but once per finger-down and with the touch's own time.
+                .overlay(
+                    TapPad { touchTime in
                         if isRecording {
-                            ///iPhone seems to generate 4-6 notifictions on each tap. Maybe since this is a gesture?
-                            ///So drop the notifictions that are too close together. < 0.10 seconds
-                            var doTap = false
-                            if let lastTime = lastGestureTime {
-                                let diff = gesture.time.timeIntervalSince(lastTime)
-                                if diff > 0.20 {
-                                    doTap = true
-                                }
-                            }
-                            else {
-                                doTap = true
-                            }
-                            if doTap {
-                                self.lastGestureTime = gesture.time
-                                invert.switchBorder()
-                                tapRecorder.makeTap(useSoundPlayer:SettingsMT.shared.soundOnTaps)
-                            }
+                            ///Record FIRST using the touch's own timestamp, then do the visual/sound feedback.
+                            ///Always the system tap sound. The drum sound option was removed from Configuration; any old saved
+                            ///soundOnTaps value is ignored, so all users get the same (lighter, lower-latency) click.
+                            tapRecorder.makeTap(useSoundPlayer: false, timestamp: touchTime)
+                            invert.switchBorder()
                             tapCtr += 1
                         }
-                    })
+                    }
                 )
                 .padding()
 //            }

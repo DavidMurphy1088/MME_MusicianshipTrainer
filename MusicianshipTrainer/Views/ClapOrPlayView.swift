@@ -118,21 +118,18 @@ struct ClapOrPlayPresentView: View {
                 if grade >= 2 {
                     result += "\(linefeed)\(bullet)For rests, accurately count them but do not touch the screen."
                 }
-                result += "\(linefeed)\(bullet)Note that in the configuration screen you can choose to have the drum sound either on or off."
-                result += "\(linefeed)\(bullet)Also note that when the drum sound is turned on your device's processing power may limit the tempo at which you can tap a rhythm. If the drum sound is off you will still hear a click when you tap and you will be able to tap at a faster tempo. However, the click won't be as loud as the drum sound."
             }
             
         case .rhythmEchoClap:
             result += "\(bullet)Listen to the given rhythm."
             //result += "\(linefeed)\(bullet)When it has finished you will be able to press Start Recording."
             result += "\(linefeed)\(bullet)Tap your rhythm on the drum that appears and then press Stop Recording once you have finished."
+            result += "\(linefeed)\(bullet)The last note lasts until the end of the bar. You don't need to wait for it to finish before pressing Stop Recording."
             
             if !examMode {
                 result += "\(linefeed)\(bullet)Advice: For a clear result, you should tap with the pad of your finger and then immediately release"
                 result += " your finger from the screen, rather than holding it down."
 //                result += "\(linefeed)\(bullet)If you tap the rhythm incorrectly, you will be able to hear your rhythm attempt and the correct given rhythm at crotchet = 90 on the Answer Page."
-                result += "\(linefeed)\(bullet)Note that in the configuration screen you can choose to have the drum sound either on or off."
-                result += "\(linefeed)\(bullet)Also note that when the drum sound is turned on your device's processing power may limit the tempo at which you can tap a rhythm. If the drum sound is off you will still hear a click when you tap and you will be able to tap at a faster tempo. However, the click won't be as loud as the drum sound."
 
             }
 
@@ -162,7 +159,8 @@ struct ClapOrPlayPresentView: View {
     
     func getStudentTappingAsAScore() -> Score? {
         if let values = self.answer.rhythmValues {
-            let rhythmAnalysisScore = tapRecorder.getTappedAsAScore(timeSignatue: score.timeSignature, questionScore: score, tapValues: values)
+            let rhythmAnalysisScore = tapRecorder.getTappedAsAScore(timeSignatue: score.timeSignature, questionScore: score, tapValues: values,
+                                                                          forgiveLastNoteDuration: questionType == .rhythmEchoClap || questionType == .melodyPlay)
             return rhythmAnalysisScore
         }
         else {
@@ -183,7 +181,8 @@ struct ClapOrPlayPresentView: View {
         guard let tapValues = answer.rhythmValues else {
             return nil
         }
-        tappedScore = tapRecorder.getTappedAsAScore(timeSignatue: score.timeSignature, questionScore: score, tapValues: tapValues)
+        tappedScore = tapRecorder.getTappedAsAScore(timeSignatue: score.timeSignature, questionScore: score, tapValues: tapValues,
+                                                     forgiveLastNoteDuration: questionType == .rhythmEchoClap || questionType == .melodyPlay)
         guard let tappedScore = tappedScore else {
             return nil
         }
@@ -204,7 +203,8 @@ struct ClapOrPlayPresentView: View {
         guard let tapValues = answer.rhythmValues else {
             return false
         }
-        let tappedScore = tapRecorder.getTappedAsAScore(timeSignatue: score.timeSignature, questionScore: score, tapValues: tapValues)
+        let tappedScore = tapRecorder.getTappedAsAScore(timeSignatue: score.timeSignature, questionScore: score, tapValues: tapValues,
+                                                     forgiveLastNoteDuration: questionType == .rhythmEchoClap || questionType == .melodyPlay)
         let fittedScore = score.fitScoreToQuestionScore(userScore:tappedScore,
                                                         onlyRhythm: questionType == .melodyPlay ? false : true,
                                                         toleranceSetting: UIGlobalsMT.shared.rhythmToleranceSetting
@@ -787,7 +787,8 @@ struct ClapOrPlayAnswerView: View {
         guard let tapValues = answer.rhythmValues else {
             return
         }
-        tappedScore = tapRecorder.getTappedAsAScore(timeSignatue: score.timeSignature, questionScore: score, tapValues: tapValues)
+        tappedScore = tapRecorder.getTappedAsAScore(timeSignatue: score.timeSignature, questionScore: score, tapValues: tapValues,
+                                                     forgiveLastNoteDuration: questionType == .rhythmEchoClap || questionType == .melodyPlay)
         guard let tappedScore = tappedScore else {
             return
         }
@@ -934,9 +935,11 @@ struct ClapOrPlayAnswerView: View {
                     }
                     Spacer()
                     Button(action: {
-                        if let parent = self.contentSection.parent {
-                            let c = parent.subSections.count
-                            let r = Int.random(in: 0...c)
+                        ///pickIndex fixes the old 0...c range (could pick one past the end) and avoids repeating the current question.
+                        ///The dice roll is decorative only; selection is unchanged.
+                        if let parent = self.contentSection.parent,
+                           let r = DiceShuffle.pickIndex(count: parent.subSections.count, avoiding: parent.selectedIndex) {
+                            DiceShuffle.shared.roll()
                             parent.setSelected(r)
                         }
                     }) {
@@ -1152,7 +1155,7 @@ struct ClapOrPlayView: View {
                 Image(imageName)
                     .resizable()
                     .scaledToFill() // Scales the image to fill the view
-                    .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+                    .frame(width: UIGlobalsCommon.screenBounds.width, height: UIGlobalsCommon.screenBounds.height)
                     .opacity(UIGlobalsMT.shared.backgroundImageOpacity)
             }
 
@@ -1169,7 +1172,7 @@ struct ClapOrPlayView: View {
                             answer: $answer,
                             tryNumber: $tryNumber,
                             questionType: questionType)
-                        .frame(width: UIScreen.main.bounds.width)
+                        .frame(width: UIGlobalsCommon.screenBounds.width)
                     //}
                 }
                 else {

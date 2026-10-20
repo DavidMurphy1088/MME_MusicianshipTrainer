@@ -393,9 +393,11 @@ struct ContentSectionHeaderView: View {
                         Spacer()
                         Button(action: {
                             DispatchQueue.main.async {
-                                let c = contentSection.subSections.count
-                                let r = Int.random(in: 0...c)
-                                contentSection.setSelected(r)
+                                ///pickIndex fixes the old 0...c range (could pick one past the end). Dice roll is decorative only.
+                                if let r = DiceShuffle.pickIndex(count: contentSection.subSections.count, avoiding: contentSection.selectedIndex) {
+                                    DiceShuffle.shared.roll()
+                                    contentSection.setSelected(r)
+                                }
                             }
                         }) {
                             VStack {
@@ -510,7 +512,7 @@ struct ContentSectionView: View {
                             Image("app_background_navigation")
                                 .resizable()
                                 .scaledToFill() // Scales the image to fill the view
-                                .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+                                .frame(width: UIGlobalsCommon.screenBounds.width, height: UIGlobalsCommon.screenBounds.height)
                                 .opacity(UIGlobalsMT.shared.backgroundImageOpacity)
                         }
 
@@ -542,14 +544,14 @@ struct ContentSectionView: View {
                             Image("app_background_navigation")
                                 .resizable()
                                 .scaledToFill() // Scales the image to fill the view
-                                .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+                                .frame(width: UIGlobalsCommon.screenBounds.width, height: UIGlobalsCommon.screenBounds.height)
                                 .opacity(UIGlobalsMT.shared.backgroundImageOpacity)
                         }
                         //ScrollViewReader { proxy in
                         VStack {
                             ContentSectionHeaderView(contentSection: contentSection)
                                 .padding()
-                                //.frame(height: 0.1 * UIScreen.main.bounds.height)
+                                //.frame(height: 0.1 * UIGlobalsCommon.screenBounds.height)
                             SectionsNavigationView(contentSection: contentSection)
                                 .padding()
                         }
@@ -919,7 +921,7 @@ struct SectionsNavigationView:View {
                 .roundedBorderRectangle()
                 .padding()
                 ///Force list view height to stop it taking whole height of screen
-                .frame(height: UIScreen.main.bounds.height * (UIGlobalsCommon.isLandscape() ? 0.45 : 0.45))
+                .frame(height: UIGlobalsCommon.screenBounds.height * (UIGlobalsCommon.isLandscape() ? 0.45 : 0.45))
 
                 ///This color matches the NavigationView background which cannot be changed.
                 ///i.e. any other colour here causes the navigation link rows to have a different background than the background of the navigationView's own background
@@ -988,14 +990,13 @@ struct ExamView: View {
             Image("judge")
                 .resizable()
                 .aspectRatio(contentMode: .fit)
-                .frame(width: UIScreen.main.bounds.height / 4.0)
+                .frame(width: UIGlobalsCommon.screenBounds.height / 4.0)
         }
     }
     
     func getExamInstructions() -> String {
         var text = "The exam has \(contentSection.getQuestionCount()) questions. Before starting the exam be sure to choose your preferences in the configuration screen for:"
-        text += "\n\n• Having the drum sound on or off for tapping rhythms"
-        text += "\n• Using an acoustic piano or the built in virtual keyboard for sight reading"
+        text += "\n\n• Using an acoustic piano or the built in virtual keyboard for sight reading"
         text += "\n"
         return text
     }
@@ -1025,11 +1026,11 @@ struct ExamView: View {
                             }
                         }
                         .roundedBorderRectangle().padding()
-                        .frame(height: UIScreen.main.bounds.height / 5.0)
+                        .frame(height: UIGlobalsCommon.screenBounds.height / 5.0)
                         
                         let msg = UIDevice.current.userInterfaceIdiom == .phone ? "Rhythm Tolerance" : "Please set the rhythm tolerance you'd like to use for the exam."
                         RhythmToleranceView(contextText: msg)
-                            //.frame(width: UIScreen.main.bounds.width / 2.0)
+                            //.frame(width: UIGlobalsCommon.screenBounds.width / 2.0)
                         Button(action: {
                             self.examState = .examStarted
                             AudioRecorder.shared.stopPlaying()

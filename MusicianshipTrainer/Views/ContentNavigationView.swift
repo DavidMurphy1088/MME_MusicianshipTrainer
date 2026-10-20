@@ -19,7 +19,7 @@ struct ProductIntroView: View {
                     Image("NZMEB_logo_bird_transparent")
                         .resizable()
                         .scaledToFit()
-                        .frame(width: UIScreen.main.bounds.height * 0.20)
+                        .frame(width: UIGlobalsCommon.screenBounds.height * 0.20)
                         .padding()
                 }
             }
@@ -40,7 +40,7 @@ struct ContentNavigationView: View {
                         Image("app_background_navigation")
                             .resizable()
                             .scaledToFill()
-                            .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+                            .frame(width: UIGlobalsCommon.screenBounds.width, height: UIGlobalsCommon.screenBounds.height)
                             .opacity(UIGlobalsMT.shared.backgroundImageOpacity)
                     }
                     VStack {
@@ -79,7 +79,7 @@ struct ContentNavigationView: View {
                                 .listStyle(PlainListStyle()) // Removes default List styling
                                 .roundedBorderRectangle()
                             }
-                            .frame(height: UIScreen.main.bounds.height * (UIGlobalsCommon.isLandscape() ? 0.33 : 0.40))
+                            .frame(height: UIGlobalsCommon.screenBounds.height * (UIGlobalsCommon.isLandscape() ? 0.33 : 0.40))
                             if UIDevice.current.userInterfaceIdiom == .phone {
                                 Text("      ")
                             }

@@ -93,7 +93,7 @@ struct LaunchScreenView: View {
                         //VStack {
                             Text("NZMEB Musicianship Trainer").font(.title)
                             Text("")
-                            Text("© 2024 Musicmaster Education LLC.")//.font(.title3)
+                            Text("© 2026 Musicmaster Education Limited")//.font(.title3)
                         //}
                         //.position(x: geo.size.width * 0.5, y: geo.size.height * 0.85)
                         .opacity(self.opacity.imageOpacity)
@@ -123,7 +123,6 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 #if targetEnvironment(simulator)
         ///Simulator asks for password every time even though its signed in with Apple ID. By design for IAP purchasing... :(
         ///Code to run on the Simulator
-        print("Running on the Simulator, will not load IAP licenses")
 #else
         SKPaymentQueue.default().add(LicenceManager.shared) ///Do this as early as possible so manager is a queue observer
         LicenceManager.shared.verifyStoredSubscriptionReceipt(ctx: "App starting") ///Get the current validity of any locally stored subscription receipt
@@ -203,6 +202,8 @@ struct MusicianshipTrainerApp: App {
                 if launchScreenState.state == .finished {
                     if getDataLoadedStatus() == RequestStatus.success {
                         ContentNavigationView(contentSection: getStartContentSection())
+                            ///Decorative dice roll for Shuffle / Random Pick. Ignores touches; see DiceShuffleOverlay.
+                            .overlay(DiceShuffleOverlay())
                         ///No colour here appears to make a difference. i.e. be visible
                             //.background(Color(red: 0.0, green: 0.7, blue: 0.7))
                     }

@@ -43,8 +43,7 @@ struct ConfigurationView: View {
     var body: some View {
         VStack(alignment: .center) {
             Spacer()
-            Text("Configuration").font(.largeTitle).padding()
-                .padding()
+            Text("Configuration").font(.largeTitle).padding(.vertical, 8)
 //            Image(systemName: "music.note.list")
 //                .foregroundColor(.blue)
 //                .font(UIDevice.current.userInterfaceIdiom == .phone ? .body : .largeTitle)
@@ -65,22 +64,10 @@ struct ConfigurationView: View {
                     .padding()
                     .roundedBorderRectangle()
                 }
-                .padding()
+                .padding(.vertical, 6)   ///Tighter spacing so Save/Cancel fit without scrolling
                 
                 VStack {
-                    Button(action: {
-                        DispatchQueue.main.async {
-                            settings.soundOnTaps.toggle()
-                        }
-                    }) {
-                        HStack {
-                            let text = UIDevice.current.userInterfaceIdiom == .phone ? "Drum sound tap" : "Use a drum sound for rhythm tapping"
-                            Image(systemName: settings.soundOnTaps ? "checkmark.square" : "square")
-                            Text(text)
-                        }
-                    }
-                    .padding()
-                    
+                    ///"Use a drum sound for rhythm tapping" option removed - taps always use the system tap sound (see TappingView)
                     Button(action: {
                         DispatchQueue.main.async {
                             settings.useAcousticKeyboard.toggle()
@@ -92,7 +79,7 @@ struct ConfigurationView: View {
                             Text(text)
                         }
                     }
-                    .padding()
+                    .padding(.horizontal).padding(.vertical, 6)
                     
                     Button(action: {
                         DispatchQueue.main.async {
@@ -105,41 +92,46 @@ struct ConfigurationView: View {
                             Text(text)
                         }
                     }
-                    .padding()
+                    .padding(.horizontal).padding(.vertical, 6)
                 }
                 .roundedBorderRectangle()
-                .padding()
+                .padding(.vertical, 6)
                 
                 HStack {
                     HStack {
                         Text("Email")
                         TextField("Enter your email", text: $settings.configuredLicenceEmail)
                             .keyboardType(.emailAddress)
-                            .autocapitalization(.none)
+                            .textInputAutocapitalization(.never)
+                            ///Stop iOS autocorrect/predictive text replacing what was typed (e.g. "@david" being replaced by a contact email suggestion)
+                            .autocorrectionDisabled(true)
                     }
-                    .padding()
+                    .padding(.horizontal).padding(.vertical, 8)
                     .roundedBorderRectangle()
-                    .padding()
+                    .padding(.horizontal).padding(.vertical, 6)
                 }
                     
-                HStack {
-                    Button(action: {
-                        //Logger.logger.reportError(IAPManager.shared, "test test test test test test test test test test test test test test ")
-                        showLog.toggle()
-                    }) {
-                        Text("Show System Log")
+                ///Only show the system log button for the developer free-licence prefix (e.g. "@david"), not for customers.
+                ///Appears as soon as the prefix is typed, since the field is bound to settings.
+                if settings.configuredLicenceEmail.trimmingCharacters(in: .whitespacesAndNewlines).hasPrefix(LicenceManager.freeLicencePrefix) {
+                    HStack {
+                        Button(action: {
+                            //Logger.logger.reportError(IAPManager.shared, "test test test test test test test test test test test test test test ")
+                            showLog.toggle()
+                        }) {
+                            Text("Show System Log")
+                        }
+                        //}
+                        .padding(.horizontal).padding(.vertical, 8)
+                        .roundedBorderRectangle()
                     }
-                    //}
-                    .padding()
-                    .roundedBorderRectangle()
+                    .padding(.vertical, 6)
                 }
-                
-                .padding()
                 
                 if UIDevice.current.userInterfaceIdiom == .pad {
                     if let user = LicenceManager.shared.getFreeLicenceUser(email: settings.configuredLicenceEmail) {
                         if user.allowTest {
-                            Text("------------------ Testing Only ------------------").padding()
+                            Text("------------------ Testing Only ------------------").padding(.vertical, 4)
                             
                             HStack {
                                 Button(action: {
@@ -203,13 +195,13 @@ struct ConfigurationView: View {
                 }) {
                     Text("Save").font(.title)
                 }
-                .padding()
+                .padding(.horizontal).padding(.vertical, 8)
                 Button(action: {
                     isPresented = false
                 }) {
                     Text("Cancel").font(.title)
                 }
-                .padding()
+                .padding(.horizontal).padding(.vertical, 8)
 
             }
             
@@ -218,7 +210,7 @@ struct ConfigurationView: View {
 
             VStack {
                 Text("Musicianship Trainer - Version.Build \(appVersion).\(buildNumber)").font(.headline)
-                Text("© 2024 Musicmaster Education LLC.").font(.headline)
+                Text("© 2026 Musicmaster Education Limited").font(.headline)
             }
             Spacer()
         }

@@ -126,12 +126,7 @@ extension UserDefaults {
     }
 
     func log() {
-        let userDefaults = UserDefaults.standard
-        let allValues = userDefaults.dictionaryRepresentation()
-
-        for (key, value) in allValues {
-            print("Key: \(key), Value: \(value)")
-        }
+        ///C4: debug print output removed
     }
 }
 

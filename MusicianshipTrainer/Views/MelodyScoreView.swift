@@ -132,7 +132,7 @@ struct ListMelodiesView: View {
                         Image("app_background_navigation")
                             .resizable()
                             .scaledToFill()
-                            .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+                            .frame(width: UIGlobalsCommon.screenBounds.width, height: UIGlobalsCommon.screenBounds.height)
                             .opacity(UIGlobalsMT.shared.backgroundImageOpacity)
                     }
                     VStack {

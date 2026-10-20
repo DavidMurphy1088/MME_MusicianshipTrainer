@@ -15,9 +15,14 @@ struct SightReadingView: PianoUserProtocol, View {
     }
     
     func receiveNotificationOfKeyPress(key: PianoKey) {
+        receiveNotificationOfKeyPress(key: key, at: Date())
+    }
+
+    ///time: when the finger touched the key (from the touch itself), not when this code ran - see PianoKeyTouchPad
+    func receiveNotificationOfKeyPress(key: PianoKey, at time: Date) {
         if let answer = answer {
             answer.sightReadingNotePitches.append(key.midi)
-            answer.sightReadingNoteTimes.append(Date())
+            answer.sightReadingNoteTimes.append(time)
             answer.rhythmToleranceSetting = UIGlobalsMT.shared.rhythmToleranceSetting
         }
     }
@@ -53,7 +58,7 @@ struct SightReadingPianoView: View {
                 getPianoView(piano: piano)
             }
         }
-        //.frame(width: UIScreen.main.bounds.width / 2.0)
+        //.frame(width: UIGlobalsCommon.screenBounds.width / 2.0)
         .frame(width: 100)
         .onAppear() {
             ///Determine what range the piano keys need to span

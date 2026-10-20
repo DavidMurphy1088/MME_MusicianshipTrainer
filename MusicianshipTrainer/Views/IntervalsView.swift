@@ -209,7 +209,7 @@ struct IntervalPresentView: View { //}, QuestionPartProtocol {
                     ScoreView(score: score, widthPadding: true).padding()
                         .roundedBorderRectangle()
                         .opacity(questionType == .intervalAural ? 0.0 : 1.0)
-                        .frame(width: UIScreen.main.bounds.width * 0.75)
+                        .frame(width: UIGlobalsCommon.screenBounds.width * 0.75)
                 }
                 
                 HStack {
@@ -413,9 +413,11 @@ struct IntervalAnswerView: View {
                     
                     Spacer()
                     Button(action: {
-                        if let parent = self.contentSection.parent {
-                            let c = parent.subSections.count
-                            let r = Int.random(in: 0...c)
+                        ///pickIndex fixes the old 0...c range (could pick one past the end) and avoids repeating the current question.
+                        ///The dice roll is decorative only; selection is unchanged.
+                        if let parent = self.contentSection.parent,
+                           let r = DiceShuffle.pickIndex(count: parent.subSections.count, avoiding: parent.selectedIndex) {
+                            DiceShuffle.shared.roll()
                             parent.setSelected(r)
                         }
                     }) {
@@ -435,7 +437,7 @@ struct IntervalAnswerView: View {
                 ScoreSpacerView()
                 ScoreView(score: score, widthPadding: true).padding()
                     .roundedBorderRectangle()
-                    .frame(width: UIScreen.main.bounds.width * 0.75)
+                    .frame(width: UIGlobalsCommon.screenBounds.width * 0.75)
                 //ScoreSpacerView()
                 //ScoreSpacerView()
                 
@@ -553,7 +555,7 @@ struct IntervalView: View {
                 Image(imageName)
                     .resizable()
                     .scaledToFill() // Scales the image to fill the view
-                    .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+                    .frame(width: UIGlobalsCommon.screenBounds.width, height: UIGlobalsCommon.screenBounds.height)
                     .opacity(UIGlobalsMT.shared.backgroundImageOpacity)
             }
 
