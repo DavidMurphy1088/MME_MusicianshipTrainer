@@ -77,7 +77,9 @@ public struct LicenseManagerView: View {
             }
             else {
                 if iapManager.isLicenseAvailableToPurchase(grade: contentSection.name) {
-                    List {
+                    ///A plain VStack (not a List) so both subscription plans are shown in full without scrolling.
+                    ///A List only gets the height left over by the rest of the screen, which forced scrolling.
+                    VStack(spacing: 0) {
                         ForEach(getProducts(), id: \.self) { product in
                             HStack {
                                 Text(product.localizedTitle)
@@ -91,12 +93,17 @@ public struct LicenseManagerView: View {
                                     iapManager.buyProductSubscription(product: product)
                                 }) {
                                     Text("Purchase")
-                                        .font(.title)
-                                        .padding()
+                                        .font(.title2)
+                                        .padding(.horizontal)
+                                        .padding(.vertical, 6)
                                 }
                             }
+                            .padding(.horizontal)
+                            .padding(.vertical, 8)
+                            Divider()
                         }
                     }
+                    .roundedBorderRectangle()
                     .padding()
                     .navigationTitle("Available Products")
                     if UIDevice.current.userInterfaceIdiom == .phone {
@@ -140,6 +147,21 @@ public struct LicenseManagerView: View {
                         .padding()
                 }
             }
+
+            ///App Store Guideline 3.1.2: the subscription screen must show auto-renewal terms and working links
+            ///to the Terms of Use (EULA) and the Privacy Policy.
+            VStack(spacing: 6) {
+                Text("Subscriptions renew automatically unless cancelled at least 24 hours before the end of the current period. You can manage or cancel your subscription in your Apple Account settings.")
+                    .font(.footnote)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                HStack(spacing: 20) {
+                    Link("Terms of Use (EULA)", destination: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!)
+                    Link("Privacy Policy", destination: URL(string: "https://www.musicmastereducation.co.nz/NZMEB_MusicianshipTrainer/privacypolicy.html")!)
+                }
+                .font(.footnote)
+            }
+            .padding(.horizontal)
 
             HStack {
                 Button(action: {

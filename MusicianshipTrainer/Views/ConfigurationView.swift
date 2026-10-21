@@ -39,6 +39,22 @@ struct ConfigurationView: View {
     @ObservedObject var settings:SettingsMT
     let colorCircleSize = 60.0
     @State var showLog = false
+    let suggestionEmailAddress = "hello@musicmastereducation.co.nz"
+
+    ///A mailto: link with the subject and the app version / device filled in, to help us follow up
+    func suggestionEmailURL() -> URL? {
+        let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? ""
+        let buildNumber = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? ""
+        let device = UIDevice.current.model + ", iOS " + UIDevice.current.systemVersion
+        let subject = "Musicianship Trainer Question/Suggestion"
+        let body = "\n\n\n---\nApp version \(appVersion).\(buildNumber), \(device)"
+        var components = URLComponents()
+        components.scheme = "mailto"
+        components.path = suggestionEmailAddress
+        components.queryItems = [URLQueryItem(name: "subject", value: subject),
+                                 URLQueryItem(name: "body", value: body)]
+        return components.url
+    }
     
     var body: some View {
         VStack(alignment: .center) {
@@ -99,7 +115,7 @@ struct ConfigurationView: View {
                 
                 HStack {
                     HStack {
-                        Text("Email")
+                        Text("Optional Email")
                         TextField("Enter your email", text: $settings.configuredLicenceEmail)
                             .keyboardType(.emailAddress)
                             .textInputAutocapitalization(.never)
@@ -187,6 +203,29 @@ struct ConfigurationView: View {
             }
             
             //LogView().border(.black).padding()
+
+            ///Opens the device's mail app with a new suggestion email addressed to us.
+            ///The address is also shown as text in case no mail app is set up on the device.
+            if let url = suggestionEmailURL() {
+                VStack(spacing: 2) {
+                    Link(destination: url) {
+                        HStack {
+                            Image(systemName: "envelope.fill")
+                            Text("Send us any questions or suggestions")
+                        }
+                        .font(.headline)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .foregroundColor(.white)
+                        .background(Capsule().fill(Color.blue))
+                    }
+                    Text(suggestionEmailAddress)
+                        .font(.footnote)
+                        .foregroundColor(.secondary)
+                }
+                .padding(.vertical, 6)
+            }
+
             HStack {
                 Button(action: {
                     SettingsMT.shared = SettingsMT(copy: settings)
