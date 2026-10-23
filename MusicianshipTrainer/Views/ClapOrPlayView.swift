@@ -199,6 +199,34 @@ struct ClapOrPlayPresentView: View {
         return tappedScore
     }
     
+    ///Sight reading on the on-screen keyboard: true if the notes played match the question in pitch and rhythm.
+    ///Builds the student's melody the same way the answer view does in practice mode (analyseStudentSubmittal),
+    ///so the exam result matches what the student sees when reviewing the question.
+    func melodyIsCorrect() -> Bool {
+        answer.makeNoteValues()
+        guard let tapValues = answer.rhythmValues, tapValues.count > 0 else {
+            return false
+        }
+        let tappedScore = tapRecorder.getTappedAsAScore(timeSignatue: score.timeSignature, questionScore: score, tapValues: tapValues,
+                                                        forgiveLastNoteDuration: true)
+        ///Add the note pitches played on the keyboard to the student's score
+        var pitchIndex = 0
+        for timeslice in tappedScore.getAllTimeSlices() {
+            let notes = timeslice.getTimeSliceNotes(staffNum: 0)
+            if notes.count > 0 {
+                guard pitchIndex < answer.sightReadingNotePitches.count else {
+                    return false
+                }
+                notes[0].midiNumber = answer.sightReadingNotePitches[pitchIndex]
+                pitchIndex += 1
+            }
+        }
+        let fittedScore = score.fitScoreToQuestionScore(userScore: tappedScore,
+                                                        onlyRhythm: false,
+                                                        toleranceSetting: UIGlobalsMT.shared.rhythmToleranceSetting).0
+        return fittedScore.errorCount() == 0 && fittedScore.getAllTimeSlices().count > 0
+    }
+
     func rhythmIsCorrect() -> Bool {
         guard let tapValues = answer.rhythmValues else {
             return false
@@ -680,7 +708,20 @@ struct ClapOrPlayPresentView: View {
                             Button(action: {
                                 answerState = .submittedAnswer
                                 if questionType == .melodyPlay {
-                                    answer.correct = true
+                                    if contentSection.getExamTakingStatus() != .inExam {
+                                        ///Practice mode: unchanged (the answer view shows the student's mistakes itself)
+                                        answer.correct = true
+                                    }
+                                    else if SettingsMT.shared.useAcousticKeyboard {
+                                        ///Acoustic piano: only a sound recording exists, so the answer cannot be marked
+                                        answer.correct = true
+                                        answer.sightReadingGraded = false
+                                    }
+                                    else {
+                                        ///On-screen keyboard: mark pitches and rhythm with the same check practice mode uses
+                                        answer.correct = melodyIsCorrect()
+                                        answer.sightReadingGraded = true
+                                    }
                                 }
                                 else {
                                     answer.correct = rhythmIsCorrect()

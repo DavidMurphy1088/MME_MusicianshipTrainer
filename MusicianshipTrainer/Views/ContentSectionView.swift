@@ -637,6 +637,8 @@ struct SectionsNavigationView:View {
     @State var homeworkIndex:Int?
     @State var showHomework = false
     @State var licenseInfoPresented = false
+    ///Height of one navigation row's content, measured on screen. Used to size the exam review list.
+    @State private var measuredRowHeight:CGFloat = 0
 
 //    struct HomeworkView: View {
 //        @ObservedObject var contentSection:ContentSection
@@ -819,6 +821,126 @@ struct SectionsNavigationView:View {
         return SettingsMT.shared.isLicensed()
     }
     
+    ///True when this row is a question inside an exam that has already been answered (exam review mode)
+    func isAnsweredExamQuestion(contentSection:ContentSection) -> Bool {
+        guard let parent = contentSection.parent, parent.isExamTypeContentSection() else {
+            return false
+        }
+        guard let answer = contentSection.storedAnswer else {
+            return false
+        }
+        return !answer.wasCancelled
+    }
+
+    ///Whether this answered question was marked right or wrong.
+    ///Type_3 (sight reading) is only marked when played on the on-screen keyboard; acoustic piano recordings
+    ///(and sight reading answers saved before marking was added) show "Not Graded" instead of a tick or cross.
+    func isMarkedQuestionType(contentSection:ContentSection) -> Bool {
+        if contentSection.type == "Type_3" {
+            return contentSection.storedAnswer?.sightReadingGraded == true
+        }
+        return ["Type_1", "Type_2", "Type_4", "Type_5"].contains(contentSection.type)
+    }
+
+    ///Size of the tick/cross. One fixed size per device so all marks line up in the same column.
+    let examMarkSize:CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 34 : 26
+
+    ///Green tick or red cross (or "Not Graded") shown at the right of each answered exam question
+    @ViewBuilder
+    func examQuestionMark(contentSection:ContentSection) -> some View {
+        if let answer = contentSection.storedAnswer, isMarkedQuestionType(contentSection: contentSection) {
+            Image(systemName: answer.correct ? "checkmark.circle.fill" : "xmark.circle.fill")
+                .resizable()
+                .scaledToFit()
+                .foregroundColor(answer.correct ? .green : .red)
+                .frame(width: examMarkSize, height: examMarkSize)
+                .accessibilityLabel(answer.correct ? "Correct" : "Incorrect")
+        }
+        else {
+            ///Ungraded question types (sight reading): "Not Graded" centred on the same vertical line as the ticks and crosses.
+            ///The text sits in an overlay on a mark-sized frame so the column position is identical to the tick/cross rows.
+            Color.clear
+                .frame(width: examMarkSize, height: examMarkSize)
+                .overlay(
+                    Text("Not Graded")
+                        .font(UIDevice.current.userInterfaceIdiom == .pad ? .callout : .caption)
+                        .foregroundColor(.secondary)
+                        .fixedSize()
+                )
+        }
+    }
+
+    ///True when this list shows the questions of an exam that has been taken (exam review mode)
+    func isExamReview() -> Bool {
+        return contentSection.isExamTypeContentSection() && !contentSection.hasExamModeChildren() && contentSection.hasStoredAnswers()
+    }
+
+    ///Screen height left for the list in exam review mode: the screen minus the safe areas (status bar, home indicator)
+    ///and the navigation bar. In exam review mode there is no header above the list.
+    func examReviewAvailableHeight() -> CGFloat {
+        var safeTop:CGFloat = 0
+        var safeBottom:CGFloat = 0
+        let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+        if let window = scenes.flatMap({ $0.windows }).first(where: { $0.isKeyWindow }) ?? scenes.first?.windows.first {
+            safeTop = window.safeAreaInsets.top
+            safeBottom = window.safeAreaInsets.bottom
+        }
+        let navigationBarHeight:CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 50 : 44
+        return UIGlobalsCommon.screenBounds.height - safeTop - safeBottom - navigationBarHeight - 8
+    }
+
+    ///Keep the tallest measured row height (used to size the exam review and topic lists)
+    func recordRowHeight(_ height:CGFloat) {
+        if height > measuredRowHeight + 0.5 {
+            DispatchQueue.main.async {
+                measuredRowHeight = height
+            }
+        }
+    }
+
+    ///In exam review mode the list is sized to show every question without scrolling, using the measured row height
+    ///(see recordRowHeight) plus the list row insets and the list's own padding and border.
+    ///It never exceeds the space on screen; only if the questions cannot all fit even then does the list scroll.
+    ///Elsewhere the original height is kept.
+    func listHeight(rowCount:Int) -> CGFloat {
+        let screenHeight = UIGlobalsCommon.screenBounds.height
+        let defaultHeight = screenHeight * 0.45
+        let examReview = isExamReview()
+        let topicList = isTopicList()
+        if !examReview && !topicList {
+            return defaultHeight
+        }
+        ///Fallback estimate until the first row has been measured
+        let estimatedRow:CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 52 : 42
+        let contentRow = measuredRowHeight > 0 ? measuredRowHeight : estimatedRow
+        ///List row top/bottom insets and separator, with a little slack so rounding never forces a scroll
+        let rowHeight = max(contentRow + 20, 44)
+        ///.padding() around the list (16 top + 16 bottom) and the rounded border, plus one extra row of room.
+        ///Testing showed the list's own row spacing makes it about one row short otherwise, on both iPad and iPhone.
+        let needed = CGFloat(rowCount + 1) * rowHeight + 48
+        if examReview {
+            return min(needed, examReviewAvailableHeight())
+        }
+        ///Topic list: the header with its buttons (Instructions, Tips and Tricks, Video...) sits above the list,
+        ///so leave room for it. Never smaller than the original height, so nothing gets shorter than before.
+        let headerAllowance:CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 170 : 150
+        let available = examReviewAvailableHeight() - headerAllowance
+        return max(defaultHeight, min(needed, available))
+    }
+
+    ///True for a list of topics (e.g. Visual Intervals, Clapping...) as opposed to a list of examples:
+    ///every row opens a further list rather than a single question. Not exam lists.
+    func isTopicList() -> Bool {
+        if contentSection.isExamTypeContentSection() {
+            return false
+        }
+        let children = contentSection.getNavigableChildSections()
+        if children.isEmpty {
+            return false
+        }
+        return children.allSatisfy { $0.getNavigableChildSections().count > 0 }
+    }
+
     func isExamCancelled(contentSection:ContentSection) -> Bool {
         if !contentSection.isExamTypeContentSection() {
             return false
@@ -905,7 +1027,24 @@ struct SectionsNavigationView:View {
                                             Text("    ")
                                         }
                                     }
+                                    ///Exam review: green tick or red cross at the right of each answered question
+                                    if isAnsweredExamQuestion(contentSection: contentSections[index]) {
+                                        HStack {
+                                            Spacer()
+                                            examQuestionMark(contentSection: contentSections[index])
+                                            Text("    ")
+                                        }
+                                    }
                                 }
+                                ///Measure the row's height so the exam review list can be sized to show all questions
+                                .background(
+                                    ///(List rows don't pass SwiftUI preferences out of the List, so the height is stored directly)
+                                    GeometryReader { geo in
+                                        Color.clear
+                                            .onAppear { recordRowHeight(geo.size.height) }
+                                            .onChange(of: geo.size.height) { height in recordRowHeight(height) }
+                                    }
+                                )
                             }
                             .disabled(!isExampleLicensed(contentSection: contentSections[index]))
                             .disabled(isExamCancelled(contentSection: contentSections[index]))
@@ -921,7 +1060,8 @@ struct SectionsNavigationView:View {
                 .roundedBorderRectangle()
                 .padding()
                 ///Force list view height to stop it taking whole height of screen
-                .frame(height: UIGlobalsCommon.screenBounds.height * (UIGlobalsCommon.isLandscape() ? 0.45 : 0.45))
+                ///In exam review mode the list is made tall enough to show all questions (see listHeight)
+                .frame(height: listHeight(rowCount: contentSections.count))
 
                 ///This color matches the NavigationView background which cannot be changed.
                 ///i.e. any other colour here causes the navigation link rows to have a different background than the background of the navigationView's own background
